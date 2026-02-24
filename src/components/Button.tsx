@@ -3,6 +3,7 @@ import { cva } from '@generated/css';
 interface ButtonProps {
 	onClick: () => void;
 	variant?: 'primary' | 'danger' | 'icon';
+	'aria-label'?: string;
 	children: React.ReactNode;
 }
 
@@ -33,9 +34,9 @@ const buttonStyle = cva({
 	defaultVariants: { variant: 'primary' },
 });
 
-export default function Button({ onClick, variant = 'primary', children }: ButtonProps) {
+export default function Button({ onClick, variant = 'primary', 'aria-label': ariaLabel, children }: ButtonProps) {
 	return (
-		<button onClick={onClick} className={buttonStyle({ variant })}>
+		<button onClick={onClick} aria-label={ariaLabel} className={buttonStyle({ variant })}>
 			{children}
 		</button>
 	);

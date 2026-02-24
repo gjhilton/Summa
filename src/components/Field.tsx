@@ -53,7 +53,7 @@ export default function Field({ value, label, error = false, onChange }: FieldPr
 					type="text"
 					value={value}
 					onChange={e => onChange(e.target.value)}
-					aria-label={label}
+					aria-label={{ l: 'pounds', s: 'shillings', d: 'pence' }[label]}
 					className={cx(inputBase, error ? inputError : inputNormal)}
 				/>
 			) : (
