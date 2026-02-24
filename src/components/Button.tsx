@@ -1,10 +1,11 @@
-import { cva } from '../generated/css';
+import { cva, cx } from '../generated/css';
 import { focusRing } from '../styles/shared';
 
 interface ButtonProps {
 	onClick: () => void;
 	variant?: 'primary' | 'danger' | 'icon';
 	'aria-label'?: string;
+	className?: string;
 	children: React.ReactNode;
 }
 
@@ -37,9 +38,9 @@ const buttonStyle = cva({
 	defaultVariants: { variant: 'primary' },
 });
 
-export default function Button({ onClick, variant = 'primary', 'aria-label': ariaLabel, children }: ButtonProps) {
+export default function Button({ onClick, variant = 'primary', 'aria-label': ariaLabel, className, children }: ButtonProps) {
 	return (
-		<button type="button" onClick={onClick} aria-label={ariaLabel} className={buttonStyle({ variant })}>
+		<button type="button" onClick={onClick} aria-label={ariaLabel} className={cx(buttonStyle({ variant }), className)}>
 			{children}
 		</button>
 	);

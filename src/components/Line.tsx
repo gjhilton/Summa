@@ -10,11 +10,14 @@ interface LineProps {
 	literals: LsdStrings;
 	error: boolean;
 	canRemove: boolean;
+	showOp: boolean;
 	showWorking: boolean;
 	totalPence: number;
 	onChangeField: (f: 'l' | 's' | 'd', v: string) => void;
 	onRemove: () => void;
 }
+
+const hidden = css({ visibility: 'hidden' });
 
 const lineError = css({
 	borderWidth: 'thin',
@@ -44,6 +47,7 @@ export default function Line({
 	literals,
 	error,
 	canRemove,
+	showOp,
 	showWorking,
 	totalPence,
 	onChangeField,
@@ -62,15 +66,16 @@ export default function Line({
 
 	return (
 		<LedgerRow className={error ? lineError : undefined}>
-			{canRemove ? (
-				<Button variant="icon" aria-label="Remove line" onClick={onRemove}>
-					<Icon icon="cross" />
-				</Button>
-			) : (
-				<span />
-			)}
+			<Button
+				variant="icon"
+				aria-label="Remove line"
+				className={canRemove ? undefined : hidden}
+				onClick={onRemove}
+			>
+				<Icon icon="cross" />
+			</Button>
 			<div className={opCol}>
-				<span className={opSign}>+</span>
+				{showOp && <span className={opSign}>+</span>}
 				{showWorking && !error && totalPence > 0 && (
 					<span className={lineTotalText}>= {totalPence}<sup>d</sup></span>
 				)}

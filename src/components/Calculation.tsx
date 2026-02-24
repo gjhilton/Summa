@@ -28,12 +28,13 @@ export default function Calculation({
 }: CalculationProps) {
 	return (
 		<div className={layout}>
-			{lines.map(line => (
+			{lines.map((line, i) => (
 				<Line
 					key={line.id}
 					literals={line.literals}
 					error={line.error}
 					canRemove={lines.length > 2}
+					showOp={i > 0}
 					showWorking={showWorking}
 					totalPence={line.totalPence}
 					onChangeField={(f, v) => onUpdateField(line.id, f, v)}

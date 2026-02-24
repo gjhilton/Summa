@@ -31,7 +31,7 @@ const fieldBase = css({
 	minWidth: 0,
 	textAlign: 'right',
 	padding: 'xs',
-	fontSize: 'm',
+	fontSize: 'xl',
 	borderBottomWidth: 'thin',
 	borderBottomStyle: 'solid',
 });
@@ -52,17 +52,13 @@ const readonlyStyle = css({
 
 const labelBox = css({
 	display: 'inline-flex',
-	alignItems: 'center',
+	alignItems: 'flex-start',
 	justifyContent: 'center',
-	borderWidth: 'thin',
-	borderStyle: 'solid',
+	alignSelf: 'stretch',
 	padding: 'xs',
 	fontSize: 's',
 	flexShrink: 0,
 });
-
-const labelNormal = css({ borderColor: 'ink' });
-const labelError = css({ borderColor: 'error' });
 
 const workingText = css({
 	fontSize: 's',
@@ -88,7 +84,7 @@ export default function Field({ value, label, error = false, onChange, working }
 				) : (
 					<span className={cx(fieldBase, readonlyStyle)}>{value}</span>
 				)}
-				<span className={cx(labelBox, error ? labelError : labelNormal)}>{LABELS[label]}</span>
+				<span className={labelBox}>{LABELS[label]}</span>
 			</FieldRow>
 			{working && <span className={workingText}>{working}</span>}
 		</span>
