@@ -5,6 +5,7 @@ interface FieldProps {
 	label: 'l' | 's' | 'd';
 	error?: boolean;
 	onChange?: (v: string) => void;
+	working?: React.ReactNode;
 }
 
 const LABELS = { l: 'ℓ', s: 's', d: 'd' } as const;
@@ -39,6 +40,14 @@ const inputBase = css({
 const inputNormal = css({ borderColor: 'ink', bg: 'paper' });
 const inputError = css({ borderColor: 'error', bg: 'errorBg' });
 
+const workingText = css({
+	fontSize: 's',
+	color: 'ink',
+	opacity: 0.6,
+	fontStyle: 'italic',
+	textAlign: 'center',
+});
+
 const readonlyField = css({
 	width: 'field',
 	textAlign: 'center',
@@ -52,7 +61,7 @@ const readonlyField = css({
 	fontSize: 'm',
 });
 
-export default function Field({ value, label, error = false, onChange }: FieldProps) {
+export default function Field({ value, label, error = false, onChange, working }: FieldProps) {
 	const Wrapper = onChange ? 'label' : 'span';
 	return (
 		<Wrapper className={container}>
@@ -68,6 +77,7 @@ export default function Field({ value, label, error = false, onChange }: FieldPr
 			) : (
 				<span className={readonlyField}>{value}</span>
 			)}
+			{onChange && working && <span className={workingText}>{working}</span>}
 		</Wrapper>
 	);
 }

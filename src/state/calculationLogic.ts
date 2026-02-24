@@ -81,6 +81,25 @@ export function withNewLines(prev: CalculationState, lines: LineState[]): Calcul
 	return { ...prev, lines, totalPence, totalDisplay };
 }
 
+/**
+ * For "show working" mode: returns the text prefix and pence value separately
+ * so the caller can render the 'd' as a superscript.
+ * e.g. { prefix: "4 × 12 = ", pence: 48 }. Returns null for empty or invalid input.
+ */
+export function computeFieldWorking(
+	value: string,
+	field: 'l' | 's' | 'd',
+): { prefix: string; pence: number } | null {
+	if (!value) return null;
+	const norm = normalizeEarlyModernInput(value);
+	if (!isValidRoman(norm)) return null;
+	const integer = romanToInteger(norm);
+	const multiplier = PENCE_MULTIPLIERS[field];
+	const pence = integer * multiplier;
+	const prefix = multiplier === 1 ? '' : `${integer} × ${multiplier} = `;
+	return { prefix, pence };
+}
+
 export function initialState(): CalculationState {
 	const lines = [emptyLine(), emptyLine()];
 	const { totalPence, totalDisplay } = computeGrandTotal(lines);

@@ -7,6 +7,7 @@ import Button from './Button';
 interface CalculationProps {
 	lines: LineState[];
 	totalDisplay: LsdStrings;
+	showWorking: boolean;
 	onUpdateField: (lineId: string, f: 'l' | 's' | 'd', v: string) => void;
 	onAddLine: () => void;
 	onRemoveLine: (id: string) => void;
@@ -19,6 +20,7 @@ const toolbar = css({ display: 'flex', gap: 'sm', marginTop: 'lg' });
 export default function Calculation({
 	lines,
 	totalDisplay,
+	showWorking,
 	onUpdateField,
 	onAddLine,
 	onRemoveLine,
@@ -31,6 +33,9 @@ export default function Calculation({
 					key={line.id}
 					literals={line.literals}
 					error={line.error}
+					canRemove={lines.length > 2}
+					showWorking={showWorking}
+					totalPence={line.totalPence}
 					onChangeField={(f, v) => onUpdateField(line.id, f, v)}
 					onRemove={() => onRemoveLine(line.id)}
 				/>

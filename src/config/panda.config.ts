@@ -13,15 +13,18 @@ export default defineConfig({
 				colors: {
 					ink: { value: 'black' },
 					paper: { value: 'white' },
-					muted: { value: '#f9fafb' },      // read-only field background
+					muted: { value: '#f9fafb' },        // read-only field background
 					border: { value: '{colors.ink}' },
 					primary: { value: '#008cff' },
 					error: { value: 'red' },
-					errorBg: { value: '#fee2e2' },     // error input background
-					errorLineBg: { value: '#fff5f5' }, // error line background
+					errorBg: { value: '#fee2e2' },       // error input background
+					errorLineBg: { value: '#fff5f5' },   // error line background
+					toggleActive: { value: '#34c759' },  // toggle on
+					toggleInactive: { value: '#d1d1d6' }, // toggle off
 				},
 				fonts: {
 					joscelyn: { value: 'Joscelyn, serif' },
+					body: { value: "'Libre Caslon Text', serif" },
 				},
 				fontSizes: {
 					s: { value: '0.875rem' }, // 14px — labels, small UI

@@ -8,7 +8,11 @@ import {
 } from './calculationLogic';
 import Calculation from '../components/Calculation';
 
-export default function CalculationData() {
+interface CalculationDataProps {
+	showWorking: boolean;
+}
+
+export default function CalculationData({ showWorking }: CalculationDataProps) {
 	const [state, setState] = useState<CalculationState>(initialState);
 
 	function updateField(lineId: string, field: 'l' | 's' | 'd', value: string): void {
@@ -34,6 +38,7 @@ export default function CalculationData() {
 		<Calculation
 			lines={state.lines}
 			totalDisplay={state.totalDisplay}
+			showWorking={showWorking}
 			onUpdateField={updateField}
 			onAddLine={addLine}
 			onRemoveLine={removeLine}
