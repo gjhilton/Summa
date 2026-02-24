@@ -1,4 +1,4 @@
-![Summa](public/summer.gif)
+<img src="public/summer.gif" width="100%" alt="Summa" />
 
 # Summa
 
