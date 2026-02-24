@@ -15,7 +15,7 @@ export default function Footer() {
 	return (
 		<footer className={footer}>
 			<div className={smallText}>
-				Concept, design and <a href={GITHUB_URL} title="Summa on GitHub">code</a> copyright ©2025–2026
+				Concept, design and <a href={GITHUB_URL} title="Summa on GitHub">code</a> copyright ©2026
 				g.j.hilton / <a href={FUNERAL_GAMES_URL} title="Funeral Games">funeral games</a>.
 			</div>
 		</footer>
