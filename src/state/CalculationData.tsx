@@ -3,7 +3,7 @@ import { CalculationState } from '../types/calculation';
 import {
 	emptyLine,
 	processFieldUpdate,
-	computeGrandTotal,
+	withNewLines,
 	initialState,
 } from './calculationLogic';
 import Calculation from '../components/Calculation';
@@ -11,33 +11,18 @@ import Calculation from '../components/Calculation';
 export default function CalculationData() {
 	const [state, setState] = useState<CalculationState>(initialState);
 
-	function updateField(
-		lineId: string,
-		field: 'l' | 's' | 'd',
-		value: string,
-	): void {
-		setState(prev => {
-			const lines = processFieldUpdate(prev.lines, lineId, field, value);
-			const { totalPence, totalDisplay } = computeGrandTotal(lines);
-			return { ...prev, lines, totalPence, totalDisplay };
-		});
+	function updateField(lineId: string, field: 'l' | 's' | 'd', value: string): void {
+		setState(prev => withNewLines(prev, processFieldUpdate(prev.lines, lineId, field, value)));
 	}
 
 	function addLine(): void {
-		setState(prev => {
-			const lines = [...prev.lines, emptyLine()];
-			const { totalPence, totalDisplay } = computeGrandTotal(lines);
-			return { ...prev, lines, totalPence, totalDisplay };
-		});
+		setState(prev => withNewLines(prev, [...prev.lines, emptyLine()]));
 	}
 
 	function removeLine(lineId: string): void {
 		setState(prev => {
-			// Always keep at least 2 lines
 			if (prev.lines.length <= 2) return prev;
-			const lines = prev.lines.filter(l => l.id !== lineId);
-			const { totalPence, totalDisplay } = computeGrandTotal(lines);
-			return { ...prev, lines, totalPence, totalDisplay };
+			return withNewLines(prev, prev.lines.filter(l => l.id !== lineId));
 		});
 	}
 

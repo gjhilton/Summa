@@ -1,6 +1,5 @@
 const CHAR_VALUES: Record<string, number> = {
 	i: 1,
-	j: 1, // early modern variant of i
 	v: 5,
 	x: 10,
 	l: 50,
@@ -35,7 +34,7 @@ const ROMAN_TABLE: [number, string][] = [
 export function isValidRoman(input: string): boolean {
 	if (!input) return false;
 	const s = input.toLowerCase();
-	if (!/^[ivxlcdmj]+$/.test(s)) return false;
+	if (!/^[ivxlcdm]+$/.test(s)) return false;
 	if (/vv/.test(s) || /ll/.test(s) || /dd/.test(s)) return false;
 
 	for (let i = 0; i < s.length - 1; i++) {

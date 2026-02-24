@@ -11,16 +11,22 @@ export default defineConfig({
 			},
 			tokens: {
 				colors: {
-					error: { value: 'red' },
-					ink: { value: 'black' },
+					ink: { value: '#111827' },
 					paper: { value: 'white' },
-					primary: { value: '#008cff' },
-					border: { value: '{colors.ink}' },
+					muted: { value: '#f9fafb' },
+					border: { value: '#d1d5db' },
+					primary: { value: '#1e40af' },
+					primaryBg: { value: '#dbeafe' },
+					error: { value: '#ef4444' },
+					errorBg: { value: '#fee2e2' },
+					errorText: { value: '#991b1b' },
+					errorLineBg: { value: '#fff5f5' },
+					divider: { value: '#000000' },
 				},
 				fontSizes: {
-					s: { value: '0.875rem' },
-					m: { value: '1.25rem' },
-					l: { value: '1.375rem' },
+					s: { value: '0.75em' },
+					m: { value: '1rem' },
+					l: { value: '1.25rem' },
 					xl: { value: '2rem' },
 				},
 				spacing: {
@@ -39,6 +45,9 @@ export default defineConfig({
 				radii: {
 					sm: { value: '4px' },
 					md: { value: '8px' },
+				},
+				sizes: {
+					field: { value: '5rem' },
 				},
 			},
 		},

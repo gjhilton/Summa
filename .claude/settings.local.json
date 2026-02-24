@@ -5,7 +5,9 @@
       "Bash(tsc:*)",
       "Bash(vite build:*)",
       "Bash(npx vite:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(npx panda:*)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -151,7 +151,7 @@ describe('empty field handling', () => {
 		let updated = processFieldUpdate(lines, line.id, 'd', 'v');
 		updated = processFieldUpdate(updated, line.id, 'd', '');
 		expect(updated[0].error).toBe(false);
-		expect(updated[0].pence.d).toBe(0);
+		expect(updated[0].totalPence).toBe(0);
 	});
 
 	it('all empty fields sum to 0 pence', () => {
@@ -162,21 +162,20 @@ describe('empty field handling', () => {
 });
 
 describe('boundary values', () => {
-	it('correctly handles additive form iiii = 4', () => {
+	it('correctly handles additive form iiii = 4d', () => {
 		const state = initialState();
 		const lines = applyUpdates(state.lines, [
 			{ lineIndex: 0, field: 'd', value: 'iiii' },
 		]);
-		expect(lines[0].integers.d).toBe(4);
-		expect(lines[0].pence.d).toBe(4);
+		expect(lines[0].totalPence).toBe(4);
 	});
 
-	it('correctly handles early modern form iiij = 4', () => {
+	it('correctly handles early modern form iiij = 4d via normalization', () => {
 		const state = initialState();
 		const lines = applyUpdates(state.lines, [
 			{ lineIndex: 0, field: 'd', value: 'iiij' },
 		]);
-		expect(lines[0].integers.d).toBe(4);
+		expect(lines[0].totalPence).toBe(4);
 	});
 
 	it('correctly handles u → v normalization', () => {
@@ -184,7 +183,7 @@ describe('boundary values', () => {
 		const lines = applyUpdates(state.lines, [
 			{ lineIndex: 0, field: 'd', value: 'uiii' }, // = viii = 8
 		]);
-		expect(lines[0].integers.d).toBe(8);
+		expect(lines[0].totalPence).toBe(8);
 		expect(lines[0].error).toBe(false);
 	});
 });

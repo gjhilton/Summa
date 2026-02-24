@@ -1,46 +1,34 @@
-import { FieldLiterals } from '../types/calculation';
-import InputField from './InputField';
+import { css, cx } from '@generated/css';
+import { LsdStrings } from '../types/calculation';
+import Field from './Field';
 import Button from './Button';
 
 interface LineProps {
-	id: string;
-	literals: FieldLiterals;
+	literals: LsdStrings;
 	error: boolean;
 	onChangeField: (f: 'l' | 's' | 'd', v: string) => void;
 	onRemove: () => void;
 }
 
+const lineBase = css({
+	display: 'flex',
+	alignItems: 'center',
+	gap: 'sm',
+	padding: 'sm',
+	borderWidth: 'thin',
+	borderStyle: 'solid',
+	borderRadius: 'sm',
+});
+
+const lineNormal = css({ borderColor: 'transparent', bg: 'transparent' });
+const lineError = css({ borderColor: 'error', bg: 'errorLineBg' });
+
 export default function Line({ literals, error, onChangeField, onRemove }: LineProps) {
 	return (
-		<div
-			style={{
-				display: 'flex',
-				alignItems: 'center',
-				gap: '0.5rem',
-				padding: '0.5rem',
-				border: `1px solid ${error ? '#ef4444' : 'transparent'}`,
-				borderRadius: '4px',
-				background: error ? '#fff5f5' : 'transparent',
-			}}
-		>
-			<InputField
-				value={literals.l}
-				label="l"
-				error={error}
-				onChange={v => onChangeField('l', v)}
-			/>
-			<InputField
-				value={literals.s}
-				label="s"
-				error={error}
-				onChange={v => onChangeField('s', v)}
-			/>
-			<InputField
-				value={literals.d}
-				label="d"
-				error={error}
-				onChange={v => onChangeField('d', v)}
-			/>
+		<div className={cx(lineBase, error ? lineError : lineNormal)}>
+			<Field value={literals.l} label="l" error={error} onChange={v => onChangeField('l', v)} />
+			<Field value={literals.s} label="s" error={error} onChange={v => onChangeField('s', v)} />
+			<Field value={literals.d} label="d" error={error} onChange={v => onChangeField('d', v)} />
 			<Button label="×" onClick={onRemove} variant="danger" />
 		</div>
 	);

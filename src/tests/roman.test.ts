@@ -19,7 +19,6 @@ describe('romanToInteger', () => {
 
 	it('converts additive iiii to 4', () => expect(romanToInteger('iiii')).toBe(4));
 	it('converts additive viii to 8', () => expect(romanToInteger('viii')).toBe(8));
-	it('converts iiij (early modern) to 4', () => expect(romanToInteger('iiij')).toBe(4));
 
 	it('converts mcmxcix to 1999', () => expect(romanToInteger('mcmxcix')).toBe(1999));
 	it('converts mmxxvi to 2026', () => expect(romanToInteger('mmxxvi')).toBe(2026));
@@ -68,7 +67,6 @@ describe('isValidRoman', () => {
 	it('accepts subtractive xc', () => expect(isValidRoman('xc')).toBe(true));
 	it('accepts subtractive cd', () => expect(isValidRoman('cd')).toBe(true));
 	it('accepts subtractive cm', () => expect(isValidRoman('cm')).toBe(true));
-	it('accepts iiij (early modern 4)', () => expect(isValidRoman('iiij')).toBe(true));
 	it('accepts mcmxcix', () => expect(isValidRoman('mcmxcix')).toBe(true));
 
 	it('rejects empty string', () => expect(isValidRoman('')).toBe(false));
@@ -81,6 +79,7 @@ describe('isValidRoman', () => {
 	it('rejects lm', () => expect(isValidRoman('lm')).toBe(false));
 	it('rejects non-roman chars', () => expect(isValidRoman('abc')).toBe(false));
 	it('rejects spaces', () => expect(isValidRoman('i i')).toBe(false));
+	it('rejects j (unnormalized early modern)', () => expect(isValidRoman('iiij')).toBe(false));
 
 	it('is case-insensitive', () => expect(isValidRoman('XIV')).toBe(true));
 	it('accepts uppercase mcmxcix', () => expect(isValidRoman('MCMXCIX')).toBe(true));

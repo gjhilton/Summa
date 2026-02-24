@@ -10,10 +10,6 @@ export default defineConfig({
 	plugins: [react()],
 	resolve: {
 		alias: {
-			'@': resolve(__dirname, '..'),
-			'@components': resolve(__dirname, '../components'),
-			'@state': resolve(__dirname, '../state'),
-			'@utils': resolve(__dirname, '../utils'),
 			'@generated': resolve(__dirname, '../../dist/styled-system'),
 		},
 	},

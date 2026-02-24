@@ -1,16 +1,20 @@
-import { LineState, TotalDisplay } from '../types/calculation';
+import { css } from '@generated/css';
+import { LineState, LsdStrings } from '../types/calculation';
 import Line from './Line';
 import Total from './Total';
 import Button from './Button';
 
 interface CalculationProps {
 	lines: LineState[];
-	totalDisplay: TotalDisplay;
+	totalDisplay: LsdStrings;
 	onUpdateField: (lineId: string, f: 'l' | 's' | 'd', v: string) => void;
 	onAddLine: () => void;
 	onRemoveLine: (id: string) => void;
 	onReset: () => void;
 }
+
+const layout = css({ display: 'flex', flexDirection: 'column', gap: 'sm' });
+const toolbar = css({ display: 'flex', gap: 'sm', marginTop: 'sm' });
 
 export default function Calculation({
 	lines,
@@ -21,11 +25,10 @@ export default function Calculation({
 	onReset,
 }: CalculationProps) {
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+		<div className={layout}>
 			{lines.map(line => (
 				<Line
 					key={line.id}
-					id={line.id}
 					literals={line.literals}
 					error={line.error}
 					onChangeField={(f, v) => onUpdateField(line.id, f, v)}
@@ -33,7 +36,7 @@ export default function Calculation({
 				/>
 			))}
 			<Total display={totalDisplay} />
-			<div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+			<div className={toolbar}>
 				<Button label="Add line" onClick={onAddLine} variant="primary" />
 				<Button label="Reset" onClick={onReset} variant="danger" />
 			</div>

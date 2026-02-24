@@ -1,22 +1,16 @@
-import {
-	LineState,
-	TotalDisplay,
-	CalculationState,
-} from '../types/calculation';
+import { LsdStrings, LineState, CalculationState } from '../types/calculation';
 import { normalizeEarlyModernInput, formatEarlyModernOutput } from '../utils/earlyModern';
 import { isValidRoman, romanToInteger, integerToRoman } from '../utils/roman';
-import { lsdToPence, penceToLsd } from '../utils/currency';
+import { penceToLsd } from '../utils/currency';
+
+const PENCE_MULTIPLIERS = { l: 240, s: 12, d: 1 } as const;
 
 export function emptyLine(): LineState {
 	return {
 		id: crypto.randomUUID(),
 		error: false,
 		literals: { l: '', s: '', d: '' },
-		normalized: { l: '', s: '', d: '' },
-		integers: { l: 0, s: 0, d: 0 },
-		pence: { l: 0, s: 0, d: 0 },
 		totalPence: 0,
-		operation: '+',
 	};
 }
 
@@ -34,7 +28,7 @@ function formatComponent(value: number): string {
  */
 export function computeGrandTotal(lines: LineState[]): {
 	totalPence: number;
-	totalDisplay: TotalDisplay;
+	totalDisplay: LsdStrings;
 } {
 	const totalPence = lines
 		.filter(line => !line.error)
@@ -50,53 +44,22 @@ export function computeGrandTotal(lines: LineState[]): {
 	};
 }
 
-/**
- * Process a field update on a single line and return the updated line.
- */
-function updateLine(
-	line: LineState,
-	field: 'l' | 's' | 'd',
-	value: string,
-): LineState {
-	const updated: LineState = {
-		...line,
-		literals: { ...line.literals, [field]: value },
-		normalized: { ...line.normalized },
-		integers: { ...line.integers },
-		pence: { ...line.pence },
-		error: false,
-	};
-
-	if (value === '') {
-		// Empty → treat as 0, no error
-		updated.normalized[field] = '';
-		updated.integers[field] = 0;
-		updated.pence[field] = 0;
-	} else {
-		const norm = normalizeEarlyModernInput(value);
-		updated.normalized[field] = norm;
-
-		if (!isValidRoman(norm)) {
-			updated.error = true;
-			// Preserve previous numeric values for the other fields
-			return updated;
-		}
-
-		const intVal = romanToInteger(norm);
-		updated.integers[field] = intVal;
-
-		// Pence equivalents: l*240, s*12, d*1
-		const multiplier = field === 'l' ? 240 : field === 's' ? 12 : 1;
-		updated.pence[field] = intVal * multiplier;
+function computeLinePence(literals: LsdStrings): { totalPence: number; error: boolean } {
+	let totalPence = 0;
+	for (const f of ['l', 's', 'd'] as const) {
+		const v = literals[f];
+		if (!v) continue;
+		const norm = normalizeEarlyModernInput(v);
+		if (!isValidRoman(norm)) return { totalPence: 0, error: true };
+		totalPence += romanToInteger(norm) * PENCE_MULTIPLIERS[f];
 	}
+	return { totalPence, error: false };
+}
 
-	// Recompute line total from all three pence fields
-	updated.totalPence = lsdToPence(0, 0, 0)
-		+ updated.pence.l
-		+ updated.pence.s
-		+ updated.pence.d;
-
-	return updated;
+function updateLine(line: LineState, field: 'l' | 's' | 'd', value: string): LineState {
+	const literals = { ...line.literals, [field]: value };
+	const { totalPence, error } = computeLinePence(literals);
+	return { ...line, literals, totalPence, error };
 }
 
 /**
@@ -113,13 +76,13 @@ export function processFieldUpdate(
 	);
 }
 
+export function withNewLines(prev: CalculationState, lines: LineState[]): CalculationState {
+	const { totalPence, totalDisplay } = computeGrandTotal(lines);
+	return { ...prev, lines, totalPence, totalDisplay };
+}
+
 export function initialState(): CalculationState {
 	const lines = [emptyLine(), emptyLine()];
 	const { totalPence, totalDisplay } = computeGrandTotal(lines);
-	return {
-		lines,
-		totalPence,
-		totalDisplay,
-		showRoman: true,
-	};
+	return { lines, totalPence, totalDisplay };
 }
