@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { css } from '../dist/styled-system/css';
+import { css } from './generated/css';
 import CalculationData from './state/CalculationData';
 import Logo from './components/Logo';
 import Footer from './components/Footer';

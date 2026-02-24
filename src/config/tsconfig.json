@@ -17,7 +17,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"baseUrl": "../..",
 		"paths": {
-			"@generated/*": ["dist/styled-system/*"]
+			"@generated/*": ["src/generated/*"]
 		}
 	},
 	"include": ["../../src"]

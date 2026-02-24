@@ -26,7 +26,7 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			'@generated': resolve(__dirname, '../../dist/styled-system'),
+			'@generated': resolve(__dirname, '../generated'),
 		},
 	},
 });

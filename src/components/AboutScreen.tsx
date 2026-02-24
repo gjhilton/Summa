@@ -1,4 +1,4 @@
-import { css } from '../../dist/styled-system/css';
+import { css } from '../generated/css';
 import Button from './Button';
 import Footer from './Footer';
 import PageLayout from './PageLayout';

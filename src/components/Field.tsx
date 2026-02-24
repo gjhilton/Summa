@@ -1,4 +1,4 @@
-import { css, cx } from '../../dist/styled-system/css';
+import { css, cx } from '../generated/css';
 import { focusRing } from '../styles/shared';
 
 interface FieldProps {

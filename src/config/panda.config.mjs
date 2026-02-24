@@ -65,5 +65,5 @@ export default defineConfig({
 			},
 		},
 	},
-	outdir: 'dist/styled-system',
+	outdir: 'src/generated',
 });

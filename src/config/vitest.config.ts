@@ -10,7 +10,7 @@ export default defineConfig({
 	plugins: [react()],
 	resolve: {
 		alias: {
-			'@generated': resolve(__dirname, '../../dist/styled-system'),
+			'@generated': resolve(__dirname, '../generated'),
 		},
 	},
 	test: {
@@ -30,7 +30,7 @@ export default defineConfig({
 				'node_modules/**',
 				'dist/**',
 				'src/config/**',
-				'dist/styled-system/**',
+				'src/generated/**',
 				'**/main.tsx',
 			],
 		},
