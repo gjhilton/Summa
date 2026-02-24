@@ -26,17 +26,26 @@ const inputBase = css({
 	fontFamily: 'inherit',
 	fontSize: 'm',
 	transition: 'all 200ms ease-in-out',
-	_focusVisible: { outline: 'medium solid {colors.ink}', outlineOffset: 'tiny' },
+	borderWidth: 'thin',
+	borderStyle: 'solid',
+	_focusVisible: {
+		outlineWidth: 'medium',
+		outlineStyle: 'solid',
+		outlineColor: 'ink',
+		outlineOffset: 'tiny',
+	},
 });
 
-const inputNormal = css({ border: '1px solid {colors.ink}', bg: 'paper' });
-const inputError = css({ border: '1px solid {colors.error}', bg: 'errorBg' });
+const inputNormal = css({ borderColor: 'ink', bg: 'paper' });
+const inputError = css({ borderColor: 'error', bg: 'errorBg' });
 
 const readonlyField = css({
 	width: 'field',
 	textAlign: 'center',
 	padding: 'xs',
-	border: '1px solid {colors.ink}',
+	borderWidth: 'thin',
+	borderStyle: 'solid',
+	borderColor: 'ink',
 	bg: 'muted',
 	display: 'inline-block',
 	fontFamily: 'joscelyn',

@@ -19,7 +19,9 @@ const lineBase = css({
 });
 
 const lineError = css({
-	border: '1px solid {colors.error}',
+	borderWidth: 'thin',
+	borderStyle: 'solid',
+	borderColor: 'error',
 	bg: 'errorLineBg',
 });
 

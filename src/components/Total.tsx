@@ -11,7 +11,9 @@ const totalRow = css({
 	alignItems: 'center',
 	gap: 'sm',
 	padding: 'sm',
-	borderTop: '2px solid {colors.ink}',
+	borderTopWidth: 'medium',
+	borderTopStyle: 'solid',
+	borderTopColor: 'ink',
 	fontWeight: 'bold',
 });
 

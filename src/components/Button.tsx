@@ -10,12 +10,19 @@ interface ButtonProps {
 const buttonStyle = cva({
 	base: {
 		cursor: 'pointer',
-		border: '1px solid {colors.ink}',
+		borderWidth: 'thin',
+		borderStyle: 'solid',
+		borderColor: 'ink',
 		fontFamily: 'inherit',
 		transition: 'all 200ms ease-in-out',
 		_hover: { transform: 'scale(1.02)' },
 		_active: { transform: 'scale(0.95)' },
-		_focusVisible: { outline: 'medium solid {colors.ink}', outlineOffset: 'tiny' },
+		_focusVisible: {
+			outlineWidth: 'medium',
+			outlineStyle: 'solid',
+			outlineColor: 'ink',
+			outlineOffset: 'tiny',
+		},
 	},
 	variants: {
 		variant: {
