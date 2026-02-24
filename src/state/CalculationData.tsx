@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CalculationState } from '../types/calculation';
 import {
 	emptyLine,
@@ -12,8 +12,24 @@ interface CalculationDataProps {
 	showWorking: boolean;
 }
 
+const STORAGE_KEY = 'summa_calculation';
+
+function loadState(): CalculationState {
+	try {
+		const saved = localStorage.getItem(STORAGE_KEY);
+		if (saved) return JSON.parse(saved) as CalculationState;
+	} catch {
+		// ignore parse errors
+	}
+	return initialState();
+}
+
 export default function CalculationData({ showWorking }: CalculationDataProps) {
-	const [state, setState] = useState<CalculationState>(initialState);
+	const [state, setState] = useState<CalculationState>(loadState);
+
+	useEffect(() => {
+		localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+	}, [state]);
 
 	function updateField(lineId: string, field: 'l' | 's' | 'd', value: string): void {
 		setState(prev => withNewLines(prev, processFieldUpdate(prev.lines, lineId, field, value)));
@@ -31,6 +47,7 @@ export default function CalculationData({ showWorking }: CalculationDataProps) {
 	}
 
 	function resetCalculation(): void {
+		localStorage.removeItem(STORAGE_KEY);
 		setState(initialState());
 	}
 
