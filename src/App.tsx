@@ -1,14 +1,27 @@
 import { css } from '@generated/css';
 import CalculationData from './state/CalculationData';
 
-const main = css({ padding: 'lg', maxWidth: '480px', margin: '0 auto' });
-const heading = css({ fontSize: 'xl', fontWeight: 'bold', marginBottom: 'lg' });
+const page = css({
+	maxWidth: '90%',
+	marginLeft: 'auto',
+	marginRight: 'auto',
+	paddingTop: '3xl',
+	paddingBottom: '3xl',
+	desktop: { maxWidth: '800px' },
+});
+
+const heading = css({
+	fontFamily: 'joscelyn',
+	fontSize: 'xl',
+	fontWeight: 'bold',
+	marginBottom: '3xl',
+});
 
 export default function App() {
 	return (
-		<main className={main}>
+		<div className={page}>
 			<h1 className={heading}>Summa</h1>
 			<CalculationData />
-		</main>
+		</div>
 	);
 }

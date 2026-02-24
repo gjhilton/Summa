@@ -2,6 +2,7 @@ import { css, cx } from '@generated/css';
 import { LsdStrings } from '../types/calculation';
 import Field from './Field';
 import Button from './Button';
+import Icon from './Icon';
 
 interface LineProps {
 	literals: LsdStrings;
@@ -15,21 +16,22 @@ const lineBase = css({
 	alignItems: 'center',
 	gap: 'sm',
 	padding: 'sm',
-	borderWidth: 'thin',
-	borderStyle: 'solid',
-	borderRadius: 'sm',
 });
 
-const lineNormal = css({ borderColor: 'transparent', bg: 'transparent' });
-const lineError = css({ borderColor: 'error', bg: 'errorLineBg' });
+const lineError = css({
+	border: '1px solid {colors.error}',
+	bg: 'errorLineBg',
+});
 
 export default function Line({ literals, error, onChangeField, onRemove }: LineProps) {
 	return (
-		<div className={cx(lineBase, error ? lineError : lineNormal)}>
+		<div className={cx(lineBase, error ? lineError : undefined)}>
 			<Field value={literals.l} label="l" error={error} onChange={v => onChangeField('l', v)} />
 			<Field value={literals.s} label="s" error={error} onChange={v => onChangeField('s', v)} />
 			<Field value={literals.d} label="d" error={error} onChange={v => onChangeField('d', v)} />
-			<Button label="×" onClick={onRemove} variant="danger" />
+			<Button variant="icon" onClick={onRemove}>
+				<Icon icon="cross" />
+			</Button>
 		</div>
 	);
 }

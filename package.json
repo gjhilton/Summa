@@ -4,13 +4,16 @@
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
-		"dev": "npx panda codegen --config src/config/panda.config.ts && vite --config src/config/vite.config.ts",
+		"dev": "npx panda codegen --config src/config/panda.config.ts && vite --config src/config/vite.config.ts --host",
+		"dev:local": "vite --config src/config/vite.config.ts",
 		"build": "npx panda codegen --config src/config/panda.config.ts && tsc -b && vite build --config src/config/vite.config.ts",
 		"lint": "eslint . --config src/config/eslint.config.js",
 		"preview": "vite preview --config src/config/vite.config.ts",
 		"format": "prettier --write --config src/config/.prettierrc '**/*.{ts,tsx,json,css,md}'",
+		"prettier": "prettier --write --config src/config/.prettierrc '**/*.{ts,tsx,json,css,md}'",
 		"test": "vitest --config src/config/vitest.config.ts",
 		"test:run": "vitest run --config src/config/vitest.config.ts",
+		"test:watch": "vitest watch --config src/config/vitest.config.ts",
 		"test:coverage": "vitest run --coverage --config src/config/vitest.config.ts"
 	},
 	"dependencies": {

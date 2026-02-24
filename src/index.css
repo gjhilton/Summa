@@ -1,1 +1,22 @@
 @layer reset, base, tokens, recipes, utilities;
+
+@font-face {
+	font-family: 'Joscelyn';
+	src:
+		url('/fonts/Joscelyn/Joscelyn.woff2') format('woff2'),
+		url('/fonts/Joscelyn/Joscelyn.otf') format('opentype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+:root {
+	margin: 0 auto;
+	padding: 0;
+	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+	font-weight: 400;
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}

@@ -13,8 +13,8 @@ interface CalculationProps {
 	onReset: () => void;
 }
 
-const layout = css({ display: 'flex', flexDirection: 'column', gap: 'sm' });
-const toolbar = css({ display: 'flex', gap: 'sm', marginTop: 'sm' });
+const layout = css({ display: 'flex', flexDirection: 'column', gap: 'xs' });
+const toolbar = css({ display: 'flex', gap: 'sm', marginTop: 'lg' });
 
 export default function Calculation({
 	lines,
@@ -37,8 +37,8 @@ export default function Calculation({
 			))}
 			<Total display={totalDisplay} />
 			<div className={toolbar}>
-				<Button label="Add line" onClick={onAddLine} variant="primary" />
-				<Button label="Reset" onClick={onReset} variant="danger" />
+				<Button onClick={onAddLine}>Add line</Button>
+				<Button variant="danger" onClick={onReset}>Reset</Button>
 			</div>
 		</div>
 	);

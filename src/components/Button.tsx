@@ -1,38 +1,42 @@
 import { cva } from '@generated/css';
 
 interface ButtonProps {
-	label: string;
 	onClick: () => void;
-	variant?: 'primary' | 'danger';
+	variant?: 'primary' | 'danger' | 'icon';
+	children: React.ReactNode;
 }
 
 const buttonStyle = cva({
 	base: {
 		cursor: 'pointer',
-		py: 'xs',
-		px: 'md',
-		borderWidth: 'thin',
-		borderStyle: 'solid',
-		borderColor: 'current',
-		borderRadius: 'sm',
+		border: '1px solid {colors.ink}',
 		fontFamily: 'inherit',
-		fontSize: 'inherit',
+		transition: 'all 200ms ease-in-out',
+		_hover: { transform: 'scale(1.02)' },
+		_active: { transform: 'scale(0.95)' },
+		_focusVisible: { outline: 'medium solid {colors.ink}', outlineOffset: 'tiny' },
 	},
 	variants: {
 		variant: {
-			primary: { bg: 'primaryBg', color: 'primary' },
-			danger: { bg: 'errorBg', color: 'errorText' },
+			primary: { bg: 'paper', color: 'ink', fontSize: 'm', px: 'lg', py: 'sm' },
+			danger: { bg: 'ink', color: 'paper', fontSize: 'm', px: 'lg', py: 'sm' },
+			icon: {
+				bg: 'paper',
+				color: 'ink',
+				p: 'xs',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+			},
 		},
 	},
-	defaultVariants: {
-		variant: 'primary',
-	},
+	defaultVariants: { variant: 'primary' },
 });
 
-export default function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
+export default function Button({ onClick, variant = 'primary', children }: ButtonProps) {
 	return (
 		<button onClick={onClick} className={buttonStyle({ variant })}>
-			{label}
+			{children}
 		</button>
 	);
 }

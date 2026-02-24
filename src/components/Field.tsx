@@ -17,32 +17,30 @@ const container = css({
 });
 
 const supNormal = css({ fontSize: 's' });
-const supError = css({ fontSize: 's', color: 'errorText' });
+const supError = css({ fontSize: 's', color: 'error' });
 
-const fieldBase = css({
+const inputBase = css({
 	width: 'field',
 	textAlign: 'center',
 	padding: 'xs',
-	borderWidth: 'thin',
-	borderStyle: 'solid',
-	borderRadius: 'sm',
 	fontFamily: 'inherit',
-	fontSize: 'inherit',
+	fontSize: 'm',
+	transition: 'all 200ms ease-in-out',
+	_focusVisible: { outline: 'medium solid {colors.ink}', outlineOffset: 'tiny' },
 });
 
-const inputNormal = css({ borderColor: 'border', bg: 'paper' });
-const inputError = css({ borderColor: 'error', bg: 'errorBg' });
+const inputNormal = css({ border: '1px solid {colors.ink}', bg: 'paper' });
+const inputError = css({ border: '1px solid {colors.error}', bg: 'errorBg' });
 
 const readonlyField = css({
 	width: 'field',
 	textAlign: 'center',
 	padding: 'xs',
-	borderWidth: 'thin',
-	borderStyle: 'solid',
-	borderColor: 'border',
-	borderRadius: 'sm',
+	border: '1px solid {colors.ink}',
 	bg: 'muted',
 	display: 'inline-block',
+	fontFamily: 'joscelyn',
+	fontSize: 'm',
 });
 
 export default function Field({ value, label, error = false, onChange }: FieldProps) {
@@ -56,7 +54,7 @@ export default function Field({ value, label, error = false, onChange }: FieldPr
 					value={value}
 					onChange={e => onChange(e.target.value)}
 					aria-label={label}
-					className={cx(fieldBase, error ? inputError : inputNormal)}
+					className={cx(inputBase, error ? inputError : inputNormal)}
 				/>
 			) : (
 				<span className={readonlyField}>{value}</span>
