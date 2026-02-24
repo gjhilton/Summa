@@ -1,4 +1,4 @@
-import { css } from '@generated/css';
+import { css } from '../../dist/styled-system/css';
 
 const GITHUB_URL = 'https://github.com/gjhilton/Summa';
 const FUNERAL_GAMES_URL = 'http://funeralgames.co.uk';

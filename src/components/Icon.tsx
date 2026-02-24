@@ -1,4 +1,4 @@
-import { css } from '@generated/css';
+import { css } from '../../dist/styled-system/css';
 
 const PATHS = {
 	cross: 'M6 6l12 12M18 6L6 18',

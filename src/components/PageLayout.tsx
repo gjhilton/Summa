@@ -1,4 +1,4 @@
-import { css } from '@generated/css';
+import { css } from '../../dist/styled-system/css';
 
 const page = css({
 	maxWidth: '90%',

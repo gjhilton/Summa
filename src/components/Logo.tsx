@@ -1,4 +1,4 @@
-import { css } from '@generated/css';
+import { css } from '../../dist/styled-system/css';
 
 export const SIZE = { S: '150px', M: '300px', L: '500px' } as const;
 

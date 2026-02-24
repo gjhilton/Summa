@@ -1,4 +1,4 @@
-import { css } from '@generated/css';
+import { css } from '../../dist/styled-system/css';
 import { LsdStrings } from '../types/calculation';
 import Field from './Field';
 

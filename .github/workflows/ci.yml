@@ -47,7 +47,7 @@ jobs:
               run: npm ci
 
             - name: Generate Panda CSS
-              run: npx panda codegen --config src/config/panda.config.ts
+              run: npx panda codegen --config src/config/panda.config.mjs
 
             - name: Run unit tests
               run: npm run test:run

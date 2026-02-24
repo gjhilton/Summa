@@ -1,4 +1,4 @@
-import { css } from '@generated/css';
+import { css } from '../../dist/styled-system/css';
 import { LineState, LsdStrings } from '../types/calculation';
 import Line from './Line';
 import Total from './Total';

@@ -1,4 +1,4 @@
-import { cva } from '@generated/css';
+import { cva } from '../../dist/styled-system/css';
 import { focusRing } from '../styles/shared';
 
 interface ButtonProps {

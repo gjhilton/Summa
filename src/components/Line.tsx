@@ -1,4 +1,4 @@
-import { css, cx } from '@generated/css';
+import { css, cx } from '../../dist/styled-system/css';
 import { LsdStrings } from '../types/calculation';
 import { computeFieldWorking } from '../state/calculationLogic';
 import Field from './Field';
