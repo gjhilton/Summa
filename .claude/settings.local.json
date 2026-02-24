@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tail:*)",
+      "Bash(tsc:*)",
+      "Bash(vite build:*)",
+      "Bash(npx vite:*)",
+      "Bash(npx eslint:*)"
+    ]
+  }
+}
