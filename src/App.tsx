@@ -1,5 +1,7 @@
 import { css } from '@generated/css';
 import CalculationData from './state/CalculationData';
+import Logo from './components/Logo';
+import Footer from './components/Footer';
 
 const page = css({
 	maxWidth: '90%',
@@ -10,18 +12,16 @@ const page = css({
 	desktop: { maxWidth: '800px' },
 });
 
-const heading = css({
-	fontFamily: 'joscelyn',
-	fontSize: 'xl',
-	fontWeight: 'bold',
-	marginBottom: '3xl',
-});
+const logoWrap = css({ marginBottom: '3xl' });
 
 export default function App() {
 	return (
 		<div className={page}>
-			<h1 className={heading}>Summa</h1>
+			<div className={logoWrap}>
+				<Logo size="S" />
+			</div>
 			<CalculationData />
+			<Footer />
 		</div>
 	);
 }
