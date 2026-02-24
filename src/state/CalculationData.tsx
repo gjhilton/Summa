@@ -7,6 +7,7 @@ import {
 	initialState,
 } from './calculationLogic';
 import Calculation from '../components/Calculation';
+import { FEATURES } from '../features';
 
 interface CalculationDataProps {
 	showWorking: boolean;
@@ -15,11 +16,13 @@ interface CalculationDataProps {
 const STORAGE_KEY = 'summa_calculation';
 
 function loadState(): CalculationState {
-	try {
-		const saved = localStorage.getItem(STORAGE_KEY);
-		if (saved) return JSON.parse(saved) as CalculationState;
-	} catch {
-		// ignore parse errors
+	if (FEATURES.persistCalculation) {
+		try {
+			const saved = localStorage.getItem(STORAGE_KEY);
+			if (saved) return JSON.parse(saved) as CalculationState;
+		} catch {
+			// ignore parse errors
+		}
 	}
 	return initialState();
 }
@@ -28,7 +31,9 @@ export default function CalculationData({ showWorking }: CalculationDataProps) {
 	const [state, setState] = useState<CalculationState>(loadState);
 
 	useEffect(() => {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+		if (FEATURES.persistCalculation) {
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+		}
 	}, [state]);
 
 	function updateField(lineId: string, field: 'l' | 's' | 'd', value: string): void {
@@ -47,7 +52,7 @@ export default function CalculationData({ showWorking }: CalculationDataProps) {
 	}
 
 	function resetCalculation(): void {
-		localStorage.removeItem(STORAGE_KEY);
+		if (FEATURES.persistCalculation) localStorage.removeItem(STORAGE_KEY);
 		setState(initialState());
 	}
 
