@@ -40,10 +40,9 @@ export default function Calculation({
 					onRemove={() => onRemoveLine(line.id)}
 				/>
 			))}
-			<Total display={totalDisplay} />
+			<Total display={totalDisplay} onReset={onReset} />
 			<div className={toolbar}>
 				<Button onClick={onAddLine}>Add line</Button>
-				<Button variant="danger" onClick={onReset}>Reset</Button>
 			</div>
 		</div>
 	);

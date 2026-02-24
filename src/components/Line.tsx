@@ -1,9 +1,10 @@
-import { css, cx } from '../generated/css';
+import { css } from '../generated/css';
 import { LsdStrings } from '../types/calculation';
 import { computeFieldWorking } from '../state/calculationLogic';
 import Field from './Field';
 import Button from './Button';
 import Icon from './Icon';
+import LedgerRow from './LedgerRow';
 
 interface LineProps {
 	literals: LsdStrings;
@@ -15,19 +16,22 @@ interface LineProps {
 	onRemove: () => void;
 }
 
-const lineBase = css({
-	display: 'flex',
-	alignItems: 'center',
-	gap: 'sm',
-	padding: 'sm',
-});
-
 const lineError = css({
 	borderWidth: 'thin',
 	borderStyle: 'solid',
 	borderColor: 'error',
 	bg: 'errorLineBg',
 });
+
+const opCol = css({
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'flex-end',
+	padding: 'xs',
+	userSelect: 'none',
+});
+
+const opSign = css({ fontWeight: 'bold' });
 
 const lineTotalText = css({
 	fontSize: 's',
@@ -57,18 +61,23 @@ export default function Line({
 		: undefined;
 
 	return (
-		<div className={cx(lineBase, error && lineError)}>
-			<Field value={literals.l} label="l" error={error} onChange={v => onChangeField('l', v)} working={working?.l} />
-			<Field value={literals.s} label="s" error={error} onChange={v => onChangeField('s', v)} working={working?.s} />
-			<Field value={literals.d} label="d" error={error} onChange={v => onChangeField('d', v)} working={working?.d} />
-			{showWorking && !error && totalPence > 0 && (
-				<span className={lineTotalText}>= {totalPence}<sup>d</sup></span>
-			)}
-			{canRemove && (
+		<LedgerRow className={error ? lineError : undefined}>
+			{canRemove ? (
 				<Button variant="icon" aria-label="Remove line" onClick={onRemove}>
 					<Icon icon="cross" />
 				</Button>
+			) : (
+				<span />
 			)}
-		</div>
+			<div className={opCol}>
+				<span className={opSign}>+</span>
+				{showWorking && !error && totalPence > 0 && (
+					<span className={lineTotalText}>= {totalPence}<sup>d</sup></span>
+				)}
+			</div>
+			<Field value={literals.l} label="l" error={error} onChange={v => onChangeField('l', v)} working={working?.l} />
+			<Field value={literals.s} label="s" error={error} onChange={v => onChangeField('s', v)} working={working?.s} />
+			<Field value={literals.d} label="d" error={error} onChange={v => onChangeField('d', v)} working={working?.d} />
+		</LedgerRow>
 	);
 }
