@@ -1,4 +1,5 @@
 import { css, cx } from '@generated/css';
+import { focusRing } from '../styles/shared';
 
 interface ToggleProps {
 	id: string;
@@ -23,12 +24,7 @@ const trackBase = css({
 	cursor: 'pointer',
 	transition: 'background-color 0.25s ease-in-out',
 	flexShrink: 0,
-	_focusVisible: {
-		outlineWidth: 'medium',
-		outlineStyle: 'solid',
-		outlineColor: 'ink',
-		outlineOffset: 'tiny',
-	},
+	_focusVisible: focusRing,
 	_active: { transform: 'scale(0.98)' },
 	_disabled: { opacity: 0.4, cursor: 'not-allowed' },
 });
@@ -43,7 +39,7 @@ const knobBase = css({
 	height: '27px',
 	borderRadius: 'full',
 	backgroundColor: 'paper',
-	boxShadow: '0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16)',
+	boxShadow: 'knob',
 	transition: 'left 0.25s ease-in-out',
 });
 

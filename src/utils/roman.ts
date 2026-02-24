@@ -1,4 +1,6 @@
-const CHAR_VALUES: Record<string, number> = {
+type RomanChar = 'i' | 'v' | 'x' | 'l' | 'c' | 'd' | 'm';
+
+const CHAR_VALUES: Record<RomanChar, number> = {
 	i: 1,
 	v: 5,
 	x: 10,
@@ -26,6 +28,10 @@ const ROMAN_TABLE: [number, string][] = [
 	[1, 'i'],
 ];
 
+function charValue(c: string): number {
+	return CHAR_VALUES[c as RomanChar] ?? 0;
+}
+
 /**
  * Validate a Roman numeral string (case-insensitive).
  * Accepts additive forms (iiii) and valid subtractive forms (iv, ix, xl, xc, cd, cm).
@@ -38,8 +44,8 @@ export function isValidRoman(input: string): boolean {
 	if (/vv/.test(s) || /ll/.test(s) || /dd/.test(s)) return false;
 
 	for (let i = 0; i < s.length - 1; i++) {
-		const curr = CHAR_VALUES[s[i]];
-		const next = CHAR_VALUES[s[i + 1]];
+		const curr = charValue(s[i]);
+		const next = charValue(s[i + 1]);
 		if (curr < next) {
 			if (!VALID_SUBTRACTIVE.has(s[i] + s[i + 1])) {
 				return false;
@@ -58,8 +64,8 @@ export function romanToInteger(input: string): number {
 	const s = input.toLowerCase();
 	let total = 0;
 	for (let i = 0; i < s.length; i++) {
-		const curr = CHAR_VALUES[s[i]];
-		const next = i + 1 < s.length ? CHAR_VALUES[s[i + 1]] : 0;
+		const curr = charValue(s[i]);
+		const next = i + 1 < s.length ? charValue(s[i + 1]) : 0;
 		if (curr < next) {
 			total -= curr;
 		} else {

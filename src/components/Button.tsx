@@ -1,4 +1,5 @@
 import { cva } from '@generated/css';
+import { focusRing } from '../styles/shared';
 
 interface ButtonProps {
 	onClick: () => void;
@@ -17,12 +18,7 @@ const buttonStyle = cva({
 		transition: 'all 200ms ease-in-out',
 		_hover: { transform: 'scale(1.02)' },
 		_active: { transform: 'scale(0.95)' },
-		_focusVisible: {
-			outlineWidth: 'medium',
-			outlineStyle: 'solid',
-			outlineColor: 'ink',
-			outlineOffset: 'tiny',
-		},
+		_focusVisible: focusRing,
 	},
 	variants: {
 		variant: {
@@ -43,7 +39,7 @@ const buttonStyle = cva({
 
 export default function Button({ onClick, variant = 'primary', 'aria-label': ariaLabel, children }: ButtonProps) {
 	return (
-		<button onClick={onClick} aria-label={ariaLabel} className={buttonStyle({ variant })}>
+		<button type="button" onClick={onClick} aria-label={ariaLabel} className={buttonStyle({ variant })}>
 			{children}
 		</button>
 	);

@@ -1,19 +1,11 @@
 import { css } from '@generated/css';
 import Button from './Button';
 import Footer from './Footer';
+import PageLayout from './PageLayout';
 
 interface AboutScreenProps {
 	onClose: () => void;
 }
-
-const page = css({
-	maxWidth: '90%',
-	marginLeft: 'auto',
-	marginRight: 'auto',
-	paddingTop: '3xl',
-	paddingBottom: '3xl',
-	desktop: { maxWidth: '800px' },
-});
 
 const heading = css({
 	fontFamily: 'joscelyn',
@@ -34,7 +26,7 @@ const backBar = css({ marginBottom: '3xl' });
 
 export default function AboutScreen({ onClose }: AboutScreenProps) {
 	return (
-		<div className={page}>
+		<PageLayout>
 			<div className={backBar}>
 				<Button onClick={onClose}>← Back</Button>
 			</div>
@@ -57,6 +49,6 @@ export default function AboutScreen({ onClose }: AboutScreenProps) {
 				</p>
 			</div>
 			<Footer />
-		</div>
+		</PageLayout>
 	);
 }

@@ -1,4 +1,5 @@
 import { css, cx } from '@generated/css';
+import { focusRing } from '../styles/shared';
 
 interface FieldProps {
 	value: string;
@@ -9,6 +10,7 @@ interface FieldProps {
 }
 
 const LABELS = { l: 'ℓ', s: 's', d: 'd' } as const;
+const ARIA_LABELS = { l: 'pounds', s: 'shillings', d: 'pence' } as const;
 
 const container = css({
 	display: 'flex',
@@ -20,25 +22,30 @@ const container = css({
 const supNormal = css({ fontSize: 's' });
 const supError = css({ fontSize: 's', color: 'error' });
 
-const inputBase = css({
+const fieldBase = css({
 	width: 'field',
 	textAlign: 'center',
 	padding: 'xs',
-	fontFamily: 'inherit',
-	fontSize: 'm',
-	transition: 'all 200ms ease-in-out',
 	borderWidth: 'thin',
 	borderStyle: 'solid',
-	_focusVisible: {
-		outlineWidth: 'medium',
-		outlineStyle: 'solid',
-		outlineColor: 'ink',
-		outlineOffset: 'tiny',
-	},
+	fontSize: 'm',
+});
+
+const inputStyle = css({
+	fontFamily: 'inherit',
+	transition: 'all 200ms ease-in-out',
+	_focusVisible: focusRing,
 });
 
 const inputNormal = css({ borderColor: 'ink', bg: 'paper' });
 const inputError = css({ borderColor: 'error', bg: 'errorBg' });
+
+const readonlyStyle = css({
+	borderColor: 'ink',
+	bg: 'muted',
+	display: 'inline-block',
+	fontFamily: 'joscelyn',
+});
 
 const workingText = css({
 	fontSize: 's',
@@ -46,19 +53,6 @@ const workingText = css({
 	opacity: 0.6,
 	fontStyle: 'italic',
 	textAlign: 'center',
-});
-
-const readonlyField = css({
-	width: 'field',
-	textAlign: 'center',
-	padding: 'xs',
-	borderWidth: 'thin',
-	borderStyle: 'solid',
-	borderColor: 'ink',
-	bg: 'muted',
-	display: 'inline-block',
-	fontFamily: 'joscelyn',
-	fontSize: 'm',
 });
 
 export default function Field({ value, label, error = false, onChange, working }: FieldProps) {
@@ -71,11 +65,11 @@ export default function Field({ value, label, error = false, onChange, working }
 					type="text"
 					value={value}
 					onChange={e => onChange(e.target.value)}
-					aria-label={{ l: 'pounds', s: 'shillings', d: 'pence' }[label]}
-					className={cx(inputBase, error ? inputError : inputNormal)}
+					aria-label={ARIA_LABELS[label]}
+					className={cx(fieldBase, inputStyle, error ? inputError : inputNormal)}
 				/>
 			) : (
-				<span className={readonlyField}>{value}</span>
+				<span className={cx(fieldBase, readonlyStyle)}>{value}</span>
 			)}
 			{onChange && working && <span className={workingText}>{working}</span>}
 		</Wrapper>

@@ -5,15 +5,7 @@ import Logo from './components/Logo';
 import Footer from './components/Footer';
 import Toggle from './components/Toggle';
 import AboutScreen from './components/AboutScreen';
-
-const page = css({
-	maxWidth: '90%',
-	marginLeft: 'auto',
-	marginRight: 'auto',
-	paddingTop: '3xl',
-	paddingBottom: '3xl',
-	desktop: { maxWidth: '800px' },
-});
+import PageLayout from './components/PageLayout';
 
 const header = css({
 	display: 'flex',
@@ -45,10 +37,15 @@ export default function App() {
 	}
 
 	return (
-		<div className={page}>
+		<PageLayout>
 			<header className={header}>
 				<Logo size="S" />
-				<button className={aboutLink} onClick={() => setScreen('about')}>
+				<button
+					type="button"
+					className={aboutLink}
+					aria-label="About"
+					onClick={() => setScreen('about')}
+				>
 					About
 				</button>
 			</header>
@@ -62,6 +59,6 @@ export default function App() {
 				/>
 			</div>
 			<Footer />
-		</div>
+		</PageLayout>
 	);
 }

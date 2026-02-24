@@ -46,12 +46,12 @@ export function computeGrandTotal(lines: LineState[]): {
 
 function computeLinePence(literals: LsdStrings): { totalPence: number; error: boolean } {
 	let totalPence = 0;
-	for (const f of ['l', 's', 'd'] as const) {
-		const v = literals[f];
-		if (!v) continue;
-		const norm = normalizeEarlyModernInput(v);
+	for (const field of ['l', 's', 'd'] as const) {
+		const value = literals[field];
+		if (!value) continue;
+		const norm = normalizeEarlyModernInput(value);
 		if (!isValidRoman(norm)) return { totalPence: 0, error: true };
-		totalPence += romanToInteger(norm) * PENCE_MULTIPLIERS[f];
+		totalPence += romanToInteger(norm) * PENCE_MULTIPLIERS[field];
 	}
 	return { totalPence, error: false };
 }
