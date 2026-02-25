@@ -48,6 +48,11 @@ export function formatComponent(value: number): string {
   return formatEarlyModernOutput(integerToRoman(value));
 }
 
+export function formatLsdDisplay(pence: number): LsdStrings {
+  const { l, s, d } = penceToLsd(pence);
+  return { l: formatComponent(l), s: formatComponent(s), d: formatComponent(d) };
+}
+
 /**
  * Compute grand total from all non-error lines, return updated totalPence and totalDisplay.
  */
@@ -58,15 +63,7 @@ export function computeGrandTotal(lines: AnyLineState[]): {
   const totalPence = lines
     .filter((line) => !line.error)
     .reduce((sum, line) => sum + line.totalPence, 0);
-  const { l, s, d } = penceToLsd(totalPence);
-  return {
-    totalPence,
-    totalDisplay: {
-      l: formatComponent(l),
-      s: formatComponent(s),
-      d: formatComponent(d),
-    },
-  };
+  return { totalPence, totalDisplay: formatLsdDisplay(totalPence) };
 }
 
 export function computeLinePence(literals: LsdStrings): {
@@ -129,7 +126,7 @@ function updateLine(
   return { ...line, literals, totalPence, error, fieldErrors };
 }
 
-function updateItemWithQuantity(
+export function updateIwqField(
   line: ItemWithQuantityState,
   field: "l" | "s" | "d",
   value: string,
@@ -148,7 +145,7 @@ function updateItemWithQuantity(
   };
 }
 
-function updateQuantityField(
+export function updateIwqQuantity(
   line: ItemWithQuantityState,
   value: string,
 ): ItemWithQuantityState {
@@ -177,7 +174,7 @@ export function processFieldUpdate(
   return lines.map((line) => {
     if (line.id !== lineId) return line;
     return isItemWithQuantity(line)
-      ? updateItemWithQuantity(line, field, value)
+      ? updateIwqField(line, field, value)
       : updateLine(line, field, value);
   });
 }
@@ -189,7 +186,7 @@ export function processQuantityUpdate(
 ): AnyLineState[] {
   return lines.map((line) =>
     line.id === lineId && isItemWithQuantity(line)
-      ? updateQuantityField(line, value)
+      ? updateIwqQuantity(line, value)
       : line,
   );
 }

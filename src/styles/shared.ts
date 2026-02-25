@@ -1,3 +1,5 @@
+import { css } from "../generated/css";
+
 /**
  * Shared focus ring applied to all interactive elements (buttons, inputs, toggles).
  */
@@ -17,3 +19,7 @@ export const workingRowStyles = {
   color: "ink",
   textAlign: "right",
 } as const;
+
+export const hidden = css({ visibility: "hidden" });
+
+export const lineError = css({ bg: "errorLineBg" });

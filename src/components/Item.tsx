@@ -1,11 +1,10 @@
 import { css } from "../generated/css";
 import { LsdStrings, LsdBooleans } from "../types/calculation";
-import { computeFieldWorking } from "../state/calculationLogic";
-import { workingRowStyles } from "../styles/shared";
-import Field from "./Field";
+import { workingRowStyles, hidden, lineError } from "../styles/shared";
 import Button from "./Button";
 import Icon from "./Icon";
 import LedgerRow from "./LedgerRow";
+import LsdFieldGroup from "./LsdFieldGroup";
 
 interface ItemProps {
   literals: LsdStrings;
@@ -18,12 +17,6 @@ interface ItemProps {
   onChangeField: (f: "l" | "s" | "d", v: string) => void;
   onRemove: () => void;
 }
-
-const hidden = css({ visibility: "hidden" });
-
-const lineError = css({
-  bg: "errorLineBg",
-});
 
 const opCol = css({
   display: "flex",
@@ -76,7 +69,7 @@ const opCross = css({
   },
 });
 
-const supD = css({ marginLeft: "2px" }); // pence superscript
+const supD = css({ marginLeft: "2px" }); // pence superscript in op working row
 
 export default function Item({
   literals,
@@ -89,24 +82,6 @@ export default function Item({
   onChangeField,
   onRemove,
 }: ItemProps) {
-  const toNode = (result: ReturnType<typeof computeFieldWorking>) =>
-    result ? (
-      <>
-        {result.prefix}
-        {result.pence}
-        <sup className={supD}>d</sup>
-      </>
-    ) : undefined;
-
-  const working =
-    showWorking && !error
-      ? {
-          l: toNode(computeFieldWorking(literals.l, "l")),
-          s: toNode(computeFieldWorking(literals.s, "s")),
-          d: toNode(computeFieldWorking(literals.d, "d")),
-        }
-      : undefined;
-
   return (
     <LedgerRow className={error ? lineError : undefined}>
       <Button
@@ -135,29 +110,12 @@ export default function Item({
           </span>
         )}
       </div>
-      <Field
-        value={literals.l}
-        label="l"
-        error={fieldErrors.l}
-        onChange={(v) => onChangeField("l", v)}
+      <LsdFieldGroup
+        values={literals}
+        fieldErrors={fieldErrors}
         showWorking={showWorking}
-        working={working?.l}
-      />
-      <Field
-        value={literals.s}
-        label="s"
-        error={fieldErrors.s}
-        onChange={(v) => onChangeField("s", v)}
-        showWorking={showWorking}
-        working={working?.s}
-      />
-      <Field
-        value={literals.d}
-        label="d"
-        error={fieldErrors.d}
-        onChange={(v) => onChangeField("d", v)}
-        showWorking={showWorking}
-        working={working?.d}
+        hasError={error}
+        onChange={onChangeField}
       />
       <span />
     </LedgerRow>

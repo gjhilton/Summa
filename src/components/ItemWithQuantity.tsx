@@ -1,16 +1,14 @@
 import { css, cx } from "../generated/css";
 import { ItemWithQuantityState } from "../types/calculation";
-import {
-  computeFieldWorking,
-  formatComponent,
-} from "../state/calculationLogic";
+import { formatLsdDisplay } from "../state/calculationLogic";
 import { normalizeEarlyModernInput } from "../utils/earlyModern";
 import { isValidRoman, romanToInteger } from "../utils/roman";
-import { penceToLsd } from "../utils/currency";
 import Field from "./Field";
 import Button from "./Button";
 import Icon from "./Icon";
 import LedgerRow from "./LedgerRow";
+import LsdFieldGroup from "./LsdFieldGroup";
+import { hidden, lineError } from "../styles/shared";
 
 interface ItemWithQuantityProps {
   line: ItemWithQuantityState;
@@ -24,10 +22,6 @@ interface ItemWithQuantityProps {
 // auto(remove) | 1fr(op) | 1em(() | 20%(qty) | auto(@) | 20%(l) | 20%(s) | 20%(d) | 1em())
 // The 1em bracket cols align with the new bracket cols in Item/Total rows.
 const COLUMNS = "auto 1fr 1em 20% auto 20% 20% 20% 1em";
-
-const hidden = css({ visibility: "hidden" });
-
-const lineError = css({ bg: "errorLineBg" });
 
 const inputRow = css({ fontStyle: "ritalic", fontWeight: "100" });
 
@@ -165,10 +159,6 @@ const multiplyCol = css({ gridColumn: "span 3" });
 
 const supD = css({ marginLeft: "2px" });
 
-function fmt(v: string) {
-  return v === "0" ? "—" : v;
-}
-
 export default function ItemWithQuantity({
   line,
   canRemove,
@@ -191,33 +181,10 @@ export default function ItemWithQuantity({
   const quantityInt =
     !quantityError && isValidRoman(qNorm) ? romanToInteger(qNorm) : null;
 
-  const subtotalLsd = penceToLsd(totalPence);
-  const subtotalDisplay = {
-    l: formatComponent(subtotalLsd.l),
-    s: formatComponent(subtotalLsd.s),
-    d: formatComponent(subtotalLsd.d),
-  };
-
-  const toNode = (result: ReturnType<typeof computeFieldWorking>) =>
-    result ? (
-      <>
-        {result.prefix}
-        {result.pence}
-        <sup className={supD}>d</sup>
-      </>
-    ) : undefined;
+  const subtotalDisplay = formatLsdDisplay(totalPence);
 
   const quantityWorking =
     showWorking && !error && quantityInt !== null ? quantityInt : undefined;
-
-  const inputWorking =
-    showWorking && !error
-      ? {
-          l: toNode(computeFieldWorking(literals.l, "l")),
-          s: toNode(computeFieldWorking(literals.s, "s")),
-          d: toNode(computeFieldWorking(literals.d, "d")),
-        }
-      : undefined;
 
   const multiplicationWorking =
     showWorking && !error && quantityInt !== null && basePence > 0 ? (
@@ -227,15 +194,6 @@ export default function ItemWithQuantity({
         <sup className={supD}>d</sup>
       </>
     ) : undefined;
-
-  const subtotalWorking =
-    showWorking && !error
-      ? {
-          l: toNode(computeFieldWorking(subtotalDisplay.l, "l")),
-          s: toNode(computeFieldWorking(subtotalDisplay.s, "s")),
-          d: toNode(computeFieldWorking(subtotalDisplay.d, "d")),
-        }
-      : undefined;
 
   const errorClass = error ? lineError : undefined;
 
@@ -264,29 +222,12 @@ export default function ItemWithQuantity({
         <span className={atSign} aria-hidden="true">
           <span className={mulSymbol} />
         </span>
-        <Field
-          value={literals.l}
-          label="l"
-          error={fieldErrors.l}
-          onChange={(v) => onChangeField("l", v)}
+        <LsdFieldGroup
+          values={literals}
+          fieldErrors={fieldErrors}
           showWorking={showWorking}
-          working={inputWorking?.l}
-        />
-        <Field
-          value={literals.s}
-          label="s"
-          error={fieldErrors.s}
-          onChange={(v) => onChangeField("s", v)}
-          showWorking={showWorking}
-          working={inputWorking?.s}
-        />
-        <Field
-          value={literals.d}
-          label="d"
-          error={fieldErrors.d}
-          onChange={(v) => onChangeField("d", v)}
-          showWorking={showWorking}
-          working={inputWorking?.d}
+          hasError={error}
+          onChange={onChangeField}
         />
         <span className={closeParenCol} aria-hidden="true" />
       </LedgerRow>
@@ -305,26 +246,12 @@ export default function ItemWithQuantity({
         <div className={subtotalOpCol}>
           <span className={eqSymbol} aria-hidden="true" />
         </div>
-        <Field
-          value={fmt(subtotalDisplay.l)}
-          label="l"
-          noBorder
+        <LsdFieldGroup
+          values={subtotalDisplay}
           showWorking={showWorking}
-          working={subtotalWorking?.l}
-        />
-        <Field
-          value={fmt(subtotalDisplay.s)}
-          label="s"
+          hasError={error}
           noBorder
-          showWorking={showWorking}
-          working={subtotalWorking?.s}
-        />
-        <Field
-          value={fmt(subtotalDisplay.d)}
-          label="d"
-          noBorder
-          showWorking={showWorking}
-          working={subtotalWorking?.d}
+          fmtZero
         />
         <span />
       </LedgerRow>

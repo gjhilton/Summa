@@ -11,10 +11,10 @@ import noWorkingImg from "../assets/no-working.png";
 import {
   computeLinePence,
   emptyItemWithQuantity,
-  processFieldUpdate,
-  processQuantityUpdate,
+  updateIwqField,
+  updateIwqQuantity,
 } from "../state/calculationLogic";
-import { AnyLineState, ItemWithQuantityState } from "../types/calculation";
+import { ItemWithQuantityState } from "../types/calculation";
 
 interface AboutScreenProps {
   onClose: () => void;
@@ -150,25 +150,18 @@ export default function AboutScreen({
   } = computeLinePence(demoLiterals);
 
   const [iwqLine, setIwqLine] = useState<ItemWithQuantityState>(() => {
-    const item = emptyItemWithQuantity();
-    let lines: AnyLineState[] = [item];
-    lines = processQuantityUpdate(lines, item.id, "iii");
-    lines = processFieldUpdate(lines, item.id, "s", "v");
-    lines = processFieldUpdate(lines, item.id, "d", "iiij");
-    return lines[0] as ItemWithQuantityState;
+    let item = emptyItemWithQuantity();
+    item = updateIwqQuantity(item, "iii");
+    item = updateIwqField(item, "s", "v");
+    item = updateIwqField(item, "d", "iiij");
+    return item;
   });
 
   const handleIwqField = (f: "l" | "s" | "d", v: string) =>
-    setIwqLine((prev) => {
-      const updated = processFieldUpdate([prev], prev.id, f, v);
-      return updated[0] as ItemWithQuantityState;
-    });
+    setIwqLine((prev) => updateIwqField(prev, f, v));
 
   const handleIwqQuantity = (v: string) =>
-    setIwqLine((prev) => {
-      const updated = processQuantityUpdate([prev], prev.id, v);
-      return updated[0] as ItemWithQuantityState;
-    });
+    setIwqLine((prev) => updateIwqQuantity(prev, v));
 
   return (
     <PageLayout>
