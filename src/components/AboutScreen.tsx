@@ -136,8 +136,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 
 				<h2 className={subheading}>How to use</h2>
 				<p>
-					Input each line of your calculation as pounds, shillings and pence in
-					Roman numerals. The total updates automatically. NB the example below is editable so you can experiment - try inputting and invalid value - like 'dog' - and seee what happens.
+					Input each line of your calculation as pounds, shillings and pence in Roman numerals. The total updates automatically. NB the example below is editable so you can experiment - try inputting an invalid value - like 'dog' - and seee what happens.
 				</p>
 				<div className={exampleFrame}>
 					<Line
@@ -158,9 +157,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 				</p>
 
 				<p>
-					The <em>Show working</em> switch toggles display of the intermediate
-					calculations, which can be useful for tracking down clerical errors in
-					the source material.
+					The <em>Show working</em> switch toggles display of the intermediate calculations, which can be useful for tracking down clerical errors in the source material.
 				</p>
 				<div className={exampleFrame}>
 					<Toggle
@@ -185,7 +182,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 				<h2 className={subheading}>Coming soon</h2>
 				<ul className={listUnordered}>
 					<li>Mobile device compatibility.</li>
-					<li>Support for ½d and ¼d.</li>
+					<li>Support for ½d (Obolus))</li>
 					<li>Improved printing.</li>
 					<li>Rows which calculate a quantity — e.g. xv feet @ iijd per foot.</li>
 				</ul>
