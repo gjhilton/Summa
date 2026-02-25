@@ -8,6 +8,7 @@ import Toggle from './Toggle';
 interface CalculationProps {
 	lines: LineState[];
 	totalDisplay: LsdStrings;
+	totalPence: number;
 	showWorking: boolean;
 	onShowWorkingChange: (v: boolean) => void;
 	onUpdateField: (lineId: string, f: 'l' | 's' | 'd', v: string) => void;
@@ -23,6 +24,7 @@ const bottomBar = css({ display: 'flex', alignItems: 'center', justifyContent: '
 export default function Calculation({
 	lines,
 	totalDisplay,
+	totalPence,
 	showWorking,
 	onShowWorkingChange,
 	onUpdateField,
@@ -48,7 +50,7 @@ export default function Calculation({
 			<div className={addBar}>
 				<Button onClick={onAddLine}>Add item</Button>
 			</div>
-			<Total display={totalDisplay} />
+			<Total display={totalDisplay} totalPence={totalPence} showWorking={showWorking} />
 			<div className={bottomBar}>
 				<Toggle
 					id="show-working"

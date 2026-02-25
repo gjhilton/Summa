@@ -57,6 +57,7 @@ export default function CalculationData() {
 		<Calculation
 			lines={state.lines}
 			totalDisplay={state.totalDisplay}
+			totalPence={state.totalPence}
 			showWorking={showWorking}
 			onShowWorkingChange={setShowWorking}
 			onUpdateField={updateField}
