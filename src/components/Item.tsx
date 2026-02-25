@@ -111,6 +111,7 @@ export default function Item({
 			>
 				<Icon icon="cross" />
 			</Button>
+			<span />
 			<div className={opCol}>
 				<div className={opMain}>
 					{!showWorking && showOp && <span className={opCross} aria-hidden="true" />}
@@ -124,6 +125,7 @@ export default function Item({
 			<Field value={literals.l} label="l" error={fieldErrors.l} onChange={v => onChangeField('l', v)} showWorking={showWorking} working={working?.l} />
 			<Field value={literals.s} label="s" error={fieldErrors.s} onChange={v => onChangeField('s', v)} showWorking={showWorking} working={working?.s} />
 			<Field value={literals.d} label="d" error={fieldErrors.d} onChange={v => onChangeField('d', v)} showWorking={showWorking} working={working?.d} />
+			<span />
 		</LedgerRow>
 	);
 }

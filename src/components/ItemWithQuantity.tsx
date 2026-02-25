@@ -18,9 +18,9 @@ interface ItemWithQuantityProps {
 	onRemove: () => void;
 }
 
-// auto(remove) | 1fr(op) | 20%(qty) | auto(@) | 20%(l) | 20%(s) | 20%(d)
-// The auto @ column is absorbed from the 1fr op col, so l/s/d still align with Item rows.
-const COLUMNS = 'auto 1fr 20% auto 20% 20% 20%';
+// auto(remove) | 1em(() | 1fr(op) | 20%(qty) | auto(@) | 20%(l) | 20%(s) | 20%(d) | 1em())
+// The 1em bracket cols align with the new bracket cols in Item/Total rows.
+const COLUMNS = 'auto 1em 1fr 20% auto 20% 20% 20% 1em';
 
 const hidden = css({ visibility: 'hidden' });
 
@@ -99,8 +99,6 @@ const eqSymbol = css({
 	},
 });
 
-const multiplyCol = css({ gridColumn: 'span 2' });
-
 const subtotalOpCol = css({
 	display: 'flex',
 	alignItems: 'center',
@@ -111,6 +109,56 @@ const subtotalOpCol = css({
 	fontSize: '6xl',
 	fontWeight: '100',
 });
+
+// Full-height ( bracket: left + top + bottom borders, 50% radius on left corners
+const openParenCol = css({
+	position: 'relative',
+	_before: {
+		content: '""',
+		position: 'absolute',
+		top: '4px',
+		bottom: '4px',
+		right: '2px',
+		width: '0.6em',
+		borderTopWidth: '1px',
+		borderTopStyle: 'solid',
+		borderTopColor: 'currentColor',
+		borderLeftWidth: '1px',
+		borderLeftStyle: 'solid',
+		borderLeftColor: 'currentColor',
+		borderBottomWidth: '1px',
+		borderBottomStyle: 'solid',
+		borderBottomColor: 'currentColor',
+		borderTopLeftRadius: '50%',
+		borderBottomLeftRadius: '50%',
+	},
+});
+
+// Full-height ) bracket: right + top + bottom borders, 50% radius on right corners
+const closeParenCol = css({
+	position: 'relative',
+	_before: {
+		content: '""',
+		position: 'absolute',
+		top: '4px',
+		bottom: '4px',
+		left: '2px',
+		width: '0.6em',
+		borderTopWidth: '1px',
+		borderTopStyle: 'solid',
+		borderTopColor: 'currentColor',
+		borderRightWidth: '1px',
+		borderRightStyle: 'solid',
+		borderRightColor: 'currentColor',
+		borderBottomWidth: '1px',
+		borderBottomStyle: 'solid',
+		borderBottomColor: 'currentColor',
+		borderTopRightRadius: '50%',
+		borderBottomRightRadius: '50%',
+	},
+});
+
+const multiplyCol = css({ gridColumn: 'span 2' });
 
 const supD = css({ marginLeft: '2px' });
 
@@ -167,7 +215,7 @@ export default function ItemWithQuantity({
 
 	return (
 		<>
-			{/* Input row: remove | op | qty | @ | l | s | d */}
+			{/* Input row: remove | ( | op | qty | × | l | s | d | ) */}
 			<LedgerRow columns={COLUMNS} className={cx(inputRow, errorClass)}>
 				<Button
 					variant="icon"
@@ -177,22 +225,26 @@ export default function ItemWithQuantity({
 				>
 					<Icon icon="cross" />
 				</Button>
+				<span className={openParenCol} aria-hidden="true" />
 				<div className={opMain} />
 				<Field value={quantity} label="q" error={quantityError} onChange={onChangeQuantity} showWorking={showWorking} working={quantityWorking} />
 				<span className={atSign} aria-hidden="true"><span className={mulSymbol} /></span>
 				<Field value={literals.l} label="l" error={fieldErrors.l} onChange={v => onChangeField('l', v)} showWorking={showWorking} working={inputWorking?.l} />
 				<Field value={literals.s} label="s" error={fieldErrors.s} onChange={v => onChangeField('s', v)} showWorking={showWorking} working={inputWorking?.s} />
 				<Field value={literals.d} label="d" error={fieldErrors.d} onChange={v => onChangeField('d', v)} showWorking={showWorking} working={inputWorking?.d} />
+				<span className={closeParenCol} aria-hidden="true" />
 			</LedgerRow>
 
-			{/* Subtotal row: empty | working(span 2) | = | l | s | d */}
+			{/* Subtotal row: empty | empty | working(span 2) | = | l | s | d | empty */}
 			<LedgerRow columns={COLUMNS} className={errorClass}>
+				<span />
 				<span />
 				<Field value={'\u00A0'} label="q" noBorder showWorking={showWorking} working={multiplicationWorking} className={multiplyCol} />
 				<div className={subtotalOpCol}><span className={eqSymbol} aria-hidden="true" /></div>
 				<Field value={fmt(subtotalDisplay.l)} label="l" noBorder showWorking={showWorking} working={subtotalWorking?.l} />
 				<Field value={fmt(subtotalDisplay.s)} label="s" noBorder showWorking={showWorking} working={subtotalWorking?.s} />
 				<Field value={fmt(subtotalDisplay.d)} label="d" noBorder showWorking={showWorking} working={subtotalWorking?.d} />
+				<span />
 			</LedgerRow>
 		</>
 	);

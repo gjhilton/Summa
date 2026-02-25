@@ -61,6 +61,7 @@ export default function Total({ display, totalPence, showWorking }: TotalProps) 
 	return (
 		<LedgerRow className={totalRow}>
 			<span />
+			<span />
 			<div className={summaCol}>
 				<div className={summaMain}><Logo size="S" /></div>
 				{showWorking && (
@@ -72,6 +73,7 @@ export default function Total({ display, totalPence, showWorking }: TotalProps) 
 			<Field value={fmt(display.l)} label="l" noBorder weight={display.l !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.l} />
 			<Field value={fmt(display.s)} label="s" noBorder weight={display.s !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.s} />
 			<Field value={fmt(display.d)} label="d" noBorder weight={display.d !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.d} />
+			<span />
 		</LedgerRow>
 	);
 }

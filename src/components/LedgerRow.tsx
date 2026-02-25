@@ -8,7 +8,7 @@ interface LedgerRowProps {
 
 const ledgerRow = css({
 	display: 'grid',
-	gridTemplateColumns: 'auto 1fr 20% 20% 20%',
+	gridTemplateColumns: 'auto 1em 1fr 20% 20% 20% 1em',
 	alignItems: 'stretch',
 	width: '100%',
 	padding: 'sm',
