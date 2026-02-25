@@ -31,7 +31,7 @@ const srOnly = css({
 	borderWidth: '0',
 });
 
-const heading = css({
+const pageHeading = css({
 	fontFamily: 'joscelyn',
 	fontSize: 'xl',
 	fontWeight: 'bold',
@@ -74,9 +74,7 @@ const getStartedButton = css({
 
 const logoWrap = css({ textAlign: 'center', marginBottom: '3xl' });
 
-const snapshot = css({
-	overflow: 'hidden',
-});
+const snapshot = css({ overflow: 'hidden' });
 
 const exampleFrame = css({
 	borderWidth: 'thin',
@@ -90,7 +88,7 @@ const sectionBlock = css({
 	display: 'flex',
 	flexDirection: 'column',
 	gap: 'xl',
-	marginTop:"4rem"
+	marginTop: '4rem',
 });
 
 const sectionHeading = css({
@@ -110,12 +108,20 @@ function Section({ heading, children }: { heading: string; children: React.React
 
 const noop = () => {};
 
-export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarted, useItemWithQuantity = false, onUseItemWithQuantityChange }: AboutScreenProps) {
+export default function AboutScreen({
+	onClose,
+	isFirstVisit = false,
+	onGetStarted,
+	useItemWithQuantity = false,
+	onUseItemWithQuantityChange,
+}: AboutScreenProps) {
 	const [example1Literals, setExample1Literals] = useState({ l: 'xx', s: 'v', d: 'iiij' });
 	const { totalPence: example1Pence, error: example1Error, fieldErrors: example1FieldErrors } = computeLinePence(example1Literals);
+
 	const [demoShowWorking, setDemoShowWorking] = useState(true);
 	const [demoLiterals, setDemoLiterals] = useState({ l: 'xx', s: 'v', d: 'iiij' });
-	const { totalPence: demoTotalPence_, error: demoError, fieldErrors: demoFieldErrors } = computeLinePence(demoLiterals);
+	const { totalPence: demoTotalPence, error: demoError, fieldErrors: demoFieldErrors } = computeLinePence(demoLiterals);
+
 	const [iwqLine, setIwqLine] = useState<ItemWithQuantityState>(() => {
 		const item = emptyItemWithQuantity();
 		let lines: AnyLineState[] = [item];
@@ -124,16 +130,19 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 		lines = processFieldUpdate(lines, item.id, 'd', 'iiij');
 		return lines[0] as ItemWithQuantityState;
 	});
+
 	const handleIwqField = (f: 'l' | 's' | 'd', v: string) =>
 		setIwqLine(prev => {
 			const updated = processFieldUpdate([prev], prev.id, f, v);
 			return updated[0] as ItemWithQuantityState;
 		});
+
 	const handleIwqQuantity = (v: string) =>
 		setIwqLine(prev => {
 			const updated = processQuantityUpdate([prev], prev.id, v);
 			return updated[0] as ItemWithQuantityState;
 		});
+
 	return (
 		<PageLayout>
 			{!isFirstVisit && (
@@ -146,21 +155,22 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 				<Logo size="M" />
 			</div>
 
-{isFirstVisit && onGetStarted && (
-	<>
-	<Section heading="No warranty / Cookies">
-					<p>This software is provided free of charge and with <strong>no warranty of correctness</strong>. It's beta software written in a few hours and almost certainly contains defects and errors. You are strongly advised to check any results you obtain from Summa.</p>
-					<p>We use cookies and local storage to persist your preferences and work between sessions. We don't collect user data or analytics of any kind to our knowledge, but we DO use Google fonts and they might.</p>
-					<p>By continuing you agree to the above.</p>
-				</Section>
-				<div className={getStartedBar}>
-					<Button onClick={onGetStarted} variant="danger" className={getStartedButton}>
-						Get started →
-					</Button>
-				</div></>
+			{isFirstVisit && onGetStarted && (
+				<>
+					<Section heading="No warranty / Cookies">
+						<p>This software is provided free of charge and with <strong>no warranty of correctness</strong>. It's beta software written in a few hours and almost certainly contains defects and errors. You are strongly advised to check any results you obtain from Summa.</p>
+						<p>We use cookies and local storage to persist your preferences and work between sessions. We don't collect user data or analytics of any kind to our knowledge, but we DO use Google fonts and they might.</p>
+						<p>By continuing you agree to the above.</p>
+					</Section>
+					<div className={getStartedBar}>
+						<Button onClick={onGetStarted} variant="danger" className={getStartedButton}>
+							Get started →
+						</Button>
+					</div>
+				</>
 			)}
 
-			<h2 className={heading}>About</h2>
+			<h2 className={pageHeading}>About</h2>
 			<div className={body}>
 				<p>
 					Summa is a simple spreadsheet for historians working with Early Modern
@@ -175,12 +185,6 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 					users the calculations can be error-prone, and in large quantities
 					quickly become tedious. Summa automates the calculation.
 				</p>
-
-
-
-
-
-
 
 				<Section heading="The Calculation">
 					<p>Summa uses the following algorithm:</p>
@@ -217,20 +221,15 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 
 				<Section heading="Advanced option: Items with Quantity">
 					{onUseItemWithQuantityChange && (
-						<>
-							<Toggle
-								id="about-use-iwq"
-								label={useItemWithQuantity ? "Feature enabled" : "Feature disabled"}
-								checked={useItemWithQuantity}
-								onChange={onUseItemWithQuantityChange}
-							/>
-
-						</>
+						<Toggle
+							id="about-use-iwq"
+							label={useItemWithQuantity ? 'Feature enabled' : 'Feature disabled'}
+							checked={useItemWithQuantity}
+							onChange={onUseItemWithQuantityChange}
+						/>
 					)}
-												
-					
 					<p>
-						If you choose to enable this advanced feature, you can add <em>Items with Quanitity</em> to your calculation. Items with Quantity comprise a quantity field and a unit cost in pounds shillings and pence bracketed together. From this the system computes the total cost by multiplication — which is shown on the following line (and then summed with any other items you have added).
+						If you choose to enable this advanced feature, you can add <em>Items with Quantity</em> to your calculation. Items with Quantity comprise a quantity field and a unit cost in pounds shillings and pence bracketed together. From this the system computes the total cost by multiplication — which is shown on the following line (and then summed with any other items you have added).
 					</p>
 					<div className={exampleFrame}>
 						<ItemWithQuantity
@@ -242,7 +241,6 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 							onRemove={noop}
 						/>
 					</div>
-					
 				</Section>
 
 				<Section heading="How to use: Show Working">
@@ -263,7 +261,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 							canRemove={false}
 							showOp={false}
 							showWorking={demoShowWorking}
-							totalPence={demoTotalPence_}
+							totalPence={demoTotalPence}
 							onChangeField={(f, v) => setDemoLiterals(prev => ({ ...prev, [f]: v }))}
 							onRemove={noop}
 						/>
@@ -281,10 +279,8 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 						<a href="https://github.com/gjhilton/Summa/issues">GitHub issues page</a>.
 					</p>
 				</Section>
-
-				
 			</div>
-			
+
 			<Footer />
 		</PageLayout>
 	);
