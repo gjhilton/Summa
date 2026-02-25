@@ -46,7 +46,7 @@
 
 ## 4. Validation
 
-* `quantity` must be a **strictly positive integer** (>0).
+* `quantity` must be a roman numeral representing a **strictly positive integer** (>0). MUST not be blank
 * Invalid `quantity` or l/s/d triggers **validation error**, following same behaviour as existing `Item`.
 * Invalid `ItemWithQuantity` contributes to totals exactly as invalid `Item` currently does.
 

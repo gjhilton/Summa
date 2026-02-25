@@ -5,6 +5,7 @@ import {
 	processFieldUpdate,
 	withNewLines,
 	initialState,
+	computeLinePence,
 } from './calculationLogic';
 import Calculation from '../components/Calculation';
 import { FEATURES } from '../features';
@@ -27,7 +28,13 @@ function loadState(): CalculationState {
 			// ignore parse errors
 		}
 	}
-	return initialState();
+	const state = initialState();
+	const literals = { l: 'iiil', s: 'iiijs', d: 'vd' };
+	const { totalPence, error, fieldErrors } = computeLinePence(literals);
+	const lines = state.lines.map((line, i) =>
+		i === 0 ? { ...line, literals, totalPence, error, fieldErrors } : line,
+	);
+	return withNewLines(state, lines);
 }
 
 export default function CalculationData() {
