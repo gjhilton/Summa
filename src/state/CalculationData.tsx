@@ -15,7 +15,14 @@ function loadState(): CalculationState {
 	if (FEATURES.persistCalculation) {
 		try {
 			const saved = localStorage.getItem(STORAGE_KEY);
-			if (saved) return JSON.parse(saved) as CalculationState;
+			if (saved) {
+				const parsed = JSON.parse(saved) as CalculationState;
+				const lines = parsed.lines.map(line => ({
+					...line,
+					fieldErrors: line.fieldErrors ?? { l: false, s: false, d: false },
+				}));
+				return { ...parsed, lines };
+			}
 		} catch {
 			// ignore parse errors
 		}

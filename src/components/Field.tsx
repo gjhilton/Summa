@@ -47,7 +47,7 @@ const inputStyle = css({
 	_focusVisible: focusRing,
 });
 
-const inputNormal = css({ borderBottomColor: 'ink', bg: 'paper' });
+const inputNormal = css({ borderBottomColor: 'ink', bg: 'transparent' });
 const inputError = css({ color: 'error' });
 
 const readonlyStyle = css({
@@ -58,6 +58,8 @@ const readonlyStyle = css({
 const readonlyNoBorder = css({ borderBottomColor: 'transparent' });
 const readonlyBold = css({ fontWeight: 'bold' });
 const readonlyLight = css({ fontWeight: '100' });
+
+const labelError = css({ color: 'error' });
 
 const labelBox = css({
 	display: 'inline-flex',
@@ -91,7 +93,7 @@ export default function Field({ value, label, error = false, noBorder = false, b
 				) : (
 					<span className={cx(fieldBase, readonlyStyle, noBorder && readonlyNoBorder, bold ? readonlyBold : readonlyLight)}>{value}</span>
 				)}
-				<span className={labelBox}>{LABELS[label]}</span>
+				<span className={cx(labelBox, error && labelError)}>{LABELS[label]}</span>
 			</FieldRow>
 			{showWorking && <span className={workingText}>{working}</span>}
 		</span>

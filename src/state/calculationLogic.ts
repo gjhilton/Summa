@@ -1,4 +1,4 @@
-import { LsdStrings, LineState, CalculationState } from '../types/calculation';
+import { LsdStrings, LsdBooleans, LineState, CalculationState } from '../types/calculation';
 import { normalizeEarlyModernInput, formatEarlyModernOutput } from '../utils/earlyModern';
 import { isValidRoman, romanToInteger, integerToRoman } from '../utils/roman';
 import { penceToLsd } from '../utils/currency';
@@ -9,6 +9,7 @@ export function emptyLine(): LineState {
 	return {
 		id: crypto.randomUUID(),
 		error: false,
+		fieldErrors: { l: false, s: false, d: false },
 		literals: { l: '', s: '', d: '' },
 		totalPence: 0,
 	};
@@ -44,22 +45,27 @@ export function computeGrandTotal(lines: LineState[]): {
 	};
 }
 
-function computeLinePence(literals: LsdStrings): { totalPence: number; error: boolean } {
+function computeLinePence(literals: LsdStrings): { totalPence: number; error: boolean; fieldErrors: LsdBooleans } {
 	let totalPence = 0;
+	const fieldErrors: LsdBooleans = { l: false, s: false, d: false };
 	for (const field of ['l', 's', 'd'] as const) {
 		const value = literals[field];
 		if (!value) continue;
 		const norm = normalizeEarlyModernInput(value);
-		if (!isValidRoman(norm)) return { totalPence: 0, error: true };
-		totalPence += romanToInteger(norm) * PENCE_MULTIPLIERS[field];
+		if (!isValidRoman(norm)) {
+			fieldErrors[field] = true;
+		} else {
+			totalPence += romanToInteger(norm) * PENCE_MULTIPLIERS[field];
+		}
 	}
-	return { totalPence, error: false };
+	const error = fieldErrors.l || fieldErrors.s || fieldErrors.d;
+	return { totalPence: error ? 0 : totalPence, error, fieldErrors };
 }
 
 function updateLine(line: LineState, field: 'l' | 's' | 'd', value: string): LineState {
 	const literals = { ...line.literals, [field]: value };
-	const { totalPence, error } = computeLinePence(literals);
-	return { ...line, literals, totalPence, error };
+	const { totalPence, error, fieldErrors } = computeLinePence(literals);
+	return { ...line, literals, totalPence, error, fieldErrors };
 }
 
 /**

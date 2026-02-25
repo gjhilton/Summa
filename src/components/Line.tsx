@@ -1,5 +1,5 @@
 import { css } from '../generated/css';
-import { LsdStrings } from '../types/calculation';
+import { LsdStrings, LsdBooleans } from '../types/calculation';
 import { computeFieldWorking } from '../state/calculationLogic';
 import { workingRowStyles } from '../styles/shared';
 import Field from './Field';
@@ -10,6 +10,7 @@ import LedgerRow from './LedgerRow';
 interface LineProps {
 	literals: LsdStrings;
 	error: boolean;
+	fieldErrors: LsdBooleans;
 	canRemove: boolean;
 	showOp: boolean;
 	showWorking: boolean;
@@ -81,6 +82,7 @@ const supD = css({ marginLeft: '2px' });
 export default function Line({
 	literals,
 	error,
+	fieldErrors,
 	canRemove,
 	showOp,
 	showWorking,
@@ -119,9 +121,9 @@ export default function Line({
 					</span>
 				)}
 			</div>
-			<Field value={literals.l} label="l" error={error} onChange={v => onChangeField('l', v)} showWorking={showWorking} working={working?.l} />
-			<Field value={literals.s} label="s" error={error} onChange={v => onChangeField('s', v)} showWorking={showWorking} working={working?.s} />
-			<Field value={literals.d} label="d" error={error} onChange={v => onChangeField('d', v)} showWorking={showWorking} working={working?.d} />
+			<Field value={literals.l} label="l" error={fieldErrors.l} onChange={v => onChangeField('l', v)} showWorking={showWorking} working={working?.l} />
+			<Field value={literals.s} label="s" error={fieldErrors.s} onChange={v => onChangeField('s', v)} showWorking={showWorking} working={working?.s} />
+			<Field value={literals.d} label="d" error={fieldErrors.d} onChange={v => onChangeField('d', v)} showWorking={showWorking} working={working?.d} />
 		</LedgerRow>
 	);
 }

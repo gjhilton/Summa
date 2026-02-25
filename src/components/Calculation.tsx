@@ -39,6 +39,7 @@ export default function Calculation({
 					key={line.id}
 					literals={line.literals}
 					error={line.error}
+					fieldErrors={line.fieldErrors}
 					canRemove={lines.length > 2}
 					showOp={i > 0}
 					showWorking={showWorking}
