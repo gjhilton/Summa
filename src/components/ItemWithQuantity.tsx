@@ -99,6 +99,8 @@ const eqSymbol = css({
 	},
 });
 
+const multiplyCol = css({ gridColumn: 'span 2' });
+
 const subtotalOpCol = css({
 	display: 'flex',
 	alignItems: 'center',
@@ -122,7 +124,7 @@ export default function ItemWithQuantity({
 	onChangeQuantity,
 	onRemove,
 }: ItemWithQuantityProps) {
-	const { literals, quantity, fieldErrors, quantityError, error, totalPence } = line;
+	const { literals, quantity, fieldErrors, quantityError, error, basePence, totalPence } = line;
 
 	const qNorm = normalizeEarlyModernInput(quantity);
 	const quantityInt = !quantityError && isValidRoman(qNorm) ? romanToInteger(qNorm) : null;
@@ -147,6 +149,10 @@ export default function ItemWithQuantity({
 				s: toNode(computeFieldWorking(literals.s, 's')),
 				d: toNode(computeFieldWorking(literals.d, 'd')),
 			}
+		: undefined;
+
+	const multiplicationWorking = showWorking && !error && quantityInt !== null && basePence > 0
+		? <>{quantityInt} × {basePence}<sup className={supD}>d</sup> = {totalPence}<sup className={supD}>d</sup></>
 		: undefined;
 
 	const subtotalWorking = showWorking && !error
@@ -179,11 +185,10 @@ export default function ItemWithQuantity({
 				<Field value={literals.d} label="d" error={fieldErrors.d} onChange={v => onChangeField('d', v)} showWorking={showWorking} working={inputWorking?.d} />
 			</LedgerRow>
 
-			{/* Subtotal row: empty | empty | empty | = | l | s | d */}
+			{/* Subtotal row: empty | working(span 2) | = | l | s | d */}
 			<LedgerRow columns={COLUMNS} className={errorClass}>
 				<span />
-				<span />
-				<span />
+				<Field value={'\u00A0'} label="q" noBorder showWorking={showWorking} working={multiplicationWorking} className={multiplyCol} />
 				<div className={subtotalOpCol}><span className={eqSymbol} aria-hidden="true" /></div>
 				<Field value={fmt(subtotalDisplay.l)} label="l" noBorder showWorking={showWorking} working={subtotalWorking?.l} />
 				<Field value={fmt(subtotalDisplay.s)} label="s" noBorder showWorking={showWorking} working={subtotalWorking?.s} />

@@ -77,7 +77,7 @@ const opCross = css({
 });
 
 
-const supD = css({ marginLeft: '2px' });
+const supD = css({ marginLeft: '2px' }); // pence superscript
 
 export default function Item({
 	literals,
