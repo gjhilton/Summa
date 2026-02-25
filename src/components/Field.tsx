@@ -84,6 +84,7 @@ export default function Field({ value, label, error = false, noBorder = false, b
 						type="text"
 						value={value}
 						onChange={e => onChange(e.target.value)}
+						spellCheck={false}
 						aria-label={ARIA_LABELS[label]}
 						className={cx(fieldBase, inputStyle, error ? inputError : inputNormal)}
 					/>

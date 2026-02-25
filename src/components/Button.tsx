@@ -34,6 +34,7 @@ const buttonStyle = cva({
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
+				borderWidth: '0',
 			},
 		},
 	},
