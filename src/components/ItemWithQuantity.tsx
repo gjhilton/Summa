@@ -107,25 +107,29 @@ const subtotalOpCol = css({
   fontWeight: "100",
 });
 
+const BRACKET_BEFORE = {
+  content: '""',
+  position: "absolute",
+  top: "-4px",
+  bottom: "-4px",
+  width: "1em",
+  borderTopWidth: "2px",
+  borderTopStyle: "solid",
+  borderTopColor: "currentColor",
+  borderBottomWidth: "2px",
+  borderBottomStyle: "solid",
+  borderBottomColor: "currentColor",
+} as const;
+
 // Full-height ( bracket: left + top + bottom borders, 50% radius on left corners
 const openParenCol = css({
   position: "relative",
   _before: {
-    content: '""',
-    position: "absolute",
-    top: "-4px",
-    bottom: "-4px",
+    ...BRACKET_BEFORE,
     right: "0",
-    width: "1em",
-    borderTopWidth: "2px",
-    borderTopStyle: "solid",
-    borderTopColor: "currentColor",
     borderLeftWidth: "2px",
     borderLeftStyle: "solid",
     borderLeftColor: "currentColor",
-    borderBottomWidth: "2px",
-    borderBottomStyle: "solid",
-    borderBottomColor: "currentColor",
     borderTopLeftRadius: "50%",
     borderBottomLeftRadius: "50%",
   },
@@ -135,21 +139,11 @@ const openParenCol = css({
 const closeParenCol = css({
   position: "relative",
   _before: {
-    content: '""',
-    position: "absolute",
-    top: "-4px",
-    bottom: "-4px",
+    ...BRACKET_BEFORE,
     left: "2px",
-    width: "1em",
-    borderTopWidth: "2px",
-    borderTopStyle: "solid",
-    borderTopColor: "currentColor",
     borderRightWidth: "2px",
     borderRightStyle: "solid",
     borderRightColor: "currentColor",
-    borderBottomWidth: "2px",
-    borderBottomStyle: "solid",
-    borderBottomColor: "currentColor",
     borderTopRightRadius: "50%",
     borderBottomRightRadius: "50%",
   },
