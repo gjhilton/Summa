@@ -9,7 +9,7 @@ import ItemWithQuantity from './ItemWithQuantity';
 import Toggle from './Toggle';
 import noWorkingImg from '../assets/no-working.png';
 import { computeLinePence, emptyItemWithQuantity, processFieldUpdate, processQuantityUpdate } from '../state/calculationLogic';
-import { AnyLineState, ItemWithQuantityState, isItemWithQuantity } from '../types/calculation';
+import { AnyLineState, ItemWithQuantityState } from '../types/calculation';
 
 interface AboutScreenProps {
 	onClose: () => void;
