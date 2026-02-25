@@ -7,7 +7,7 @@ import Logo from './Logo';
 import Line from './Line';
 import Toggle from './Toggle';
 import noWorkingImg from '../assets/no-working.png';
-import { computeFieldWorking } from '../state/calculationLogic';
+import { computeLinePence } from '../state/calculationLogic';
 
 interface AboutScreenProps {
 	onClose: () => void;
@@ -90,21 +90,12 @@ const exampleFrame = css({
 
 const noop = () => {};
 
-function demoTotalPence(l: string, s: string, d: string): { totalPence: number; error: boolean } {
-	let totalPence = 0;
-	for (const [v, f] of [[l, 'l'], [s, 's'], [d, 'd']] as [string, 'l' | 's' | 'd'][]) {
-		if (!v) continue;
-		const result = computeFieldWorking(v, f);
-		if (!result) return { totalPence: 0, error: true };
-		totalPence += result.pence;
-	}
-	return { totalPence, error: false };
-}
-
 export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarted }: AboutScreenProps) {
+	const [example1Literals, setExample1Literals] = useState({ l: 'xx', s: 'v', d: 'iiij' });
+	const { totalPence: example1Pence, error: example1Error, fieldErrors: example1FieldErrors } = computeLinePence(example1Literals);
 	const [demoShowWorking, setDemoShowWorking] = useState(true);
 	const [demoLiterals, setDemoLiterals] = useState({ l: 'xx', s: 'v', d: 'iiij' });
-	const { totalPence: demoTotalPence_, error: demoError } = demoTotalPence(demoLiterals.l, demoLiterals.s, demoLiterals.d);
+	const { totalPence: demoTotalPence_, error: demoError, fieldErrors: demoFieldErrors } = computeLinePence(demoLiterals);
 	return (
 		<PageLayout>
 			{!isFirstVisit && (
@@ -146,17 +137,18 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 				<h2 className={subheading}>How to use</h2>
 				<p>
 					Input each line of your calculation as pounds, shillings and pence in
-					Roman numerals. The total updates automatically.
+					Roman numerals. The total updates automatically. NB the example below is editable so you can experiment - try inputting and invalid value - like 'dog' - and seee what happens.
 				</p>
 				<div className={exampleFrame}>
 					<Line
-						literals={{ l: 'xx', s: 'v', d: 'iiij' }}
-						error={false}
+						literals={example1Literals}
+						error={example1Error}
+						fieldErrors={example1FieldErrors}
 						canRemove={false}
 						showOp={false}
 						showWorking={false}
-						totalPence={4864}
-						onChangeField={noop}
+						totalPence={example1Pence}
+						onChangeField={(f, v) => setExample1Literals(prev => ({ ...prev, [f]: v }))}
 						onRemove={noop}
 					/>
 				</div>
@@ -180,6 +172,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 					<Line
 						literals={demoLiterals}
 						error={demoError}
+						fieldErrors={demoFieldErrors}
 						canRemove={false}
 						showOp={false}
 						showWorking={demoShowWorking}

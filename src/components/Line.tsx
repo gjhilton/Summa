@@ -10,7 +10,7 @@ import LedgerRow from './LedgerRow';
 interface LineProps {
 	literals: LsdStrings;
 	error: boolean;
-	fieldErrors: LsdBooleans;
+	fieldErrors?: LsdBooleans;
 	canRemove: boolean;
 	showOp: boolean;
 	showWorking: boolean;
@@ -82,7 +82,7 @@ const supD = css({ marginLeft: '2px' });
 export default function Line({
 	literals,
 	error,
-	fieldErrors,
+	fieldErrors = { l: false, s: false, d: false },
 	canRemove,
 	showOp,
 	showWorking,

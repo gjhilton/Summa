@@ -45,7 +45,7 @@ export function computeGrandTotal(lines: LineState[]): {
 	};
 }
 
-function computeLinePence(literals: LsdStrings): { totalPence: number; error: boolean; fieldErrors: LsdBooleans } {
+export function computeLinePence(literals: LsdStrings): { totalPence: number; error: boolean; fieldErrors: LsdBooleans } {
 	let totalPence = 0;
 	const fieldErrors: LsdBooleans = { l: false, s: false, d: false };
 	for (const field of ['l', 's', 'd'] as const) {
