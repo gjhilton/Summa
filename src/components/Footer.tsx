@@ -14,7 +14,7 @@ export default function Footer() {
   return (
     <footer className={footer}>
       <div className={smallText}>
-        Concept, design and{" "}
+        Summa v{__APP_VERSION__}. Concept, design and{" "}
         <a href={GITHUB_URL} title="Summa on GitHub">
           code
         </a>{" "}
