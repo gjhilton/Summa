@@ -116,8 +116,8 @@ const openParenCol = css({
 	_before: {
 		content: '""',
 		position: 'absolute',
-		top: '4px',
-		bottom: '4px',
+		top: '-4px',
+		bottom: '-4px',
 		right: '0',
 		width: '0.6em',
 		borderTopWidth: '1px',
@@ -140,8 +140,8 @@ const closeParenCol = css({
 	_before: {
 		content: '""',
 		position: 'absolute',
-		top: '4px',
-		bottom: '4px',
+		top: '-4px',
+		bottom: '-4px',
 		left: '2px',
 		width: '0.6em',
 		borderTopWidth: '1px',
