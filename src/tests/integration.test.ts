@@ -1,16 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import {
 	emptyLine,
+	emptyItemWithQuantity,
 	processFieldUpdate,
+	processQuantityUpdate,
 	computeGrandTotal,
 	initialState,
 } from '../state/calculationLogic';
-import { LineState } from '../types/calculation';
+import { AnyLineState, isItemWithQuantity } from '../types/calculation';
 
 function applyUpdates(
-	lines: LineState[],
+	lines: AnyLineState[],
 	updates: { lineIndex: number; field: 'l' | 's' | 'd'; value: string }[],
-): LineState[] {
+): AnyLineState[] {
 	let result = lines;
 	for (const { lineIndex, field, value } of updates) {
 		result = processFieldUpdate(result, result[lineIndex].id, field, value);
@@ -185,5 +187,124 @@ describe('boundary values', () => {
 		]);
 		expect(lines[0].totalPence).toBe(8);
 		expect(lines[0].error).toBe(false);
+	});
+});
+
+describe('ItemWithQuantity logic', () => {
+	it('emptyItemWithQuantity has correct shape', () => {
+		const item = emptyItemWithQuantity();
+		expect(item.id).toBeTruthy();
+		expect(item.quantity).toBe('j');
+		expect(item.basePence).toBe(0);
+		expect(item.totalPence).toBe(0);
+		expect(item.error).toBe(false);
+		expect(item.quantityError).toBe(false);
+		expect(item.fieldErrors).toEqual({ l: false, s: false, d: false });
+		expect(item.literals).toEqual({ l: '', s: '', d: '' });
+	});
+
+	it('isItemWithQuantity identifies the type correctly', () => {
+		const item = emptyItemWithQuantity();
+		const line = emptyLine();
+		expect(isItemWithQuantity(item)).toBe(true);
+		expect(isItemWithQuantity(line)).toBe(false);
+	});
+
+	it('processQuantityUpdate recomputes totalPence', () => {
+		const item = emptyItemWithQuantity();
+		// Set price to 5d, quantity to iii (3) → totalPence = 15
+		let lines: AnyLineState[] = [item, emptyLine()];
+		lines = processFieldUpdate(lines, item.id, 'd', 'v');
+		lines = processQuantityUpdate(lines, item.id, 'iii');
+		const updated = lines[0];
+		expect(isItemWithQuantity(updated)).toBe(true);
+		if (isItemWithQuantity(updated)) {
+			expect(updated.basePence).toBe(5);
+			expect(updated.totalPence).toBe(15);
+			expect(updated.error).toBe(false);
+		}
+	});
+
+	it('processFieldUpdate on ItemWithQuantityState recomputes basePence and totalPence', () => {
+		const item = emptyItemWithQuantity();
+		// Set quantity = ii (2), then l/s/d = 0/0/6d → basePence=6, totalPence=12
+		let lines: AnyLineState[] = [item, emptyLine()];
+		lines = processQuantityUpdate(lines, item.id, 'ii');
+		lines = processFieldUpdate(lines, item.id, 'd', 'vi');
+		const updated = lines[0];
+		expect(isItemWithQuantity(updated)).toBe(true);
+		if (isItemWithQuantity(updated)) {
+			expect(updated.basePence).toBe(6);
+			expect(updated.totalPence).toBe(12);
+			expect(updated.error).toBe(false);
+		}
+	});
+
+	it('grand total includes ItemWithQuantityState.totalPence (multiplied)', () => {
+		// item: 5d × 3 = 15d; plain line: 7d → total = 22d
+		const item = emptyItemWithQuantity();
+		const line = emptyLine();
+		let lines: AnyLineState[] = [item, line];
+		lines = processFieldUpdate(lines, item.id, 'd', 'v');
+		lines = processQuantityUpdate(lines, item.id, 'iii');
+		lines = processFieldUpdate(lines, line.id, 'd', 'vii');
+		const { totalPence } = computeGrandTotal(lines);
+		expect(totalPence).toBe(22);
+	});
+
+	it('invalid quantity sets error=true and excludes from grand total', () => {
+		const item = emptyItemWithQuantity();
+		let lines: AnyLineState[] = [item, emptyLine()];
+		lines = processFieldUpdate(lines, item.id, 'd', 'v');
+		lines = processQuantityUpdate(lines, item.id, 'zz'); // invalid
+		const updated = lines[0];
+		expect(isItemWithQuantity(updated)).toBe(true);
+		if (isItemWithQuantity(updated)) {
+			expect(updated.quantityError).toBe(true);
+			expect(updated.error).toBe(true);
+			expect(updated.totalPence).toBe(0);
+		}
+		const { totalPence } = computeGrandTotal(lines);
+		expect(totalPence).toBe(0);
+	});
+
+	it('quantity=i (1) with valid l/s/d → totalPence = basePence', () => {
+		const item = emptyItemWithQuantity(); // quantity defaults to 'i'
+		let lines: AnyLineState[] = [item, emptyLine()];
+		// Set 1s 6d → basePence = 18
+		lines = processFieldUpdate(lines, item.id, 's', 'i');
+		lines = processFieldUpdate(lines, item.id, 'd', 'vi');
+		const updated = lines[0];
+		expect(isItemWithQuantity(updated)).toBe(true);
+		if (isItemWithQuantity(updated)) {
+			expect(updated.basePence).toBe(18);
+			expect(updated.totalPence).toBe(18); // 18 × 1
+			expect(updated.error).toBe(false);
+		}
+	});
+
+	it('empty quantity sets quantityError=true', () => {
+		const item = emptyItemWithQuantity();
+		let lines: AnyLineState[] = [item, emptyLine()];
+		lines = processQuantityUpdate(lines, item.id, '');
+		const updated = lines[0];
+		expect(isItemWithQuantity(updated)).toBe(true);
+		if (isItemWithQuantity(updated)) {
+			expect(updated.quantityError).toBe(true);
+			expect(updated.error).toBe(true);
+		}
+	});
+
+	it('invalid l/s/d field sets error=true on ItemWithQuantityState', () => {
+		const item = emptyItemWithQuantity();
+		let lines: AnyLineState[] = [item, emptyLine()];
+		lines = processFieldUpdate(lines, item.id, 'd', 'not-roman');
+		const updated = lines[0];
+		expect(isItemWithQuantity(updated)).toBe(true);
+		if (isItemWithQuantity(updated)) {
+			expect(updated.fieldErrors.d).toBe(true);
+			expect(updated.error).toBe(true);
+			expect(updated.totalPence).toBe(0);
+		}
 	});
 });

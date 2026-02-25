@@ -7,7 +7,7 @@ import Button from './Button';
 import Icon from './Icon';
 import LedgerRow from './LedgerRow';
 
-interface LineProps {
+interface ItemProps {
 	literals: LsdStrings;
 	error: boolean;
 	fieldErrors?: LsdBooleans;
@@ -77,9 +77,9 @@ const opCross = css({
 });
 
 
-const supD = css({ marginLeft: '2px' });
+const supD = css({ marginLeft: '2px' }); // pence superscript
 
-export default function Line({
+export default function Item({
 	literals,
 	error,
 	fieldErrors = { l: false, s: false, d: false },
@@ -89,7 +89,7 @@ export default function Line({
 	totalPence,
 	onChangeField,
 	onRemove,
-}: LineProps) {
+}: ItemProps) {
 	const toNode = (result: ReturnType<typeof computeFieldWorking>) =>
 		result ? <>{result.prefix}{result.pence}<sup className={supD}>d</sup></> : undefined;
 
@@ -111,6 +111,7 @@ export default function Line({
 			>
 				<Icon icon="cross" />
 			</Button>
+			<span />
 			<div className={opCol}>
 				<div className={opMain}>
 					{!showWorking && showOp && <span className={opCross} aria-hidden="true" />}
@@ -124,6 +125,7 @@ export default function Line({
 			<Field value={literals.l} label="l" error={fieldErrors.l} onChange={v => onChangeField('l', v)} showWorking={showWorking} working={working?.l} />
 			<Field value={literals.s} label="s" error={fieldErrors.s} onChange={v => onChangeField('s', v)} showWorking={showWorking} working={working?.s} />
 			<Field value={literals.d} label="d" error={fieldErrors.d} onChange={v => onChangeField('d', v)} showWorking={showWorking} working={working?.d} />
+			<span />
 		</LedgerRow>
 	);
 }

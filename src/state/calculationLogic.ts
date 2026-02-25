@@ -1,4 +1,4 @@
-import { LsdStrings, LsdBooleans, LineState, CalculationState } from '../types/calculation';
+import { LsdStrings, LsdBooleans, LineState, ItemWithQuantityState, AnyLineState, CalculationState, isItemWithQuantity } from '../types/calculation';
 import { normalizeEarlyModernInput, formatEarlyModernOutput } from '../utils/earlyModern';
 import { isValidRoman, romanToInteger, integerToRoman } from '../utils/roman';
 import { penceToLsd } from '../utils/currency';
@@ -15,11 +15,24 @@ export function emptyLine(): LineState {
 	};
 }
 
+export function emptyItemWithQuantity(): ItemWithQuantityState {
+	return {
+		id: crypto.randomUUID(),
+		error: false,
+		fieldErrors: { l: false, s: false, d: false },
+		quantityError: false,
+		literals: { l: '', s: '', d: '' },
+		quantity: 'j',
+		basePence: 0,
+		totalPence: 0,
+	};
+}
+
 /**
  * Format a non-negative integer for the total display.
  * Returns '0' for zero, otherwise applies early modern formatting.
  */
-function formatComponent(value: number): string {
+export function formatComponent(value: number): string {
 	if (value === 0) return '0';
 	return formatEarlyModernOutput(integerToRoman(value));
 }
@@ -27,7 +40,7 @@ function formatComponent(value: number): string {
 /**
  * Compute grand total from all non-error lines, return updated totalPence and totalDisplay.
  */
-export function computeGrandTotal(lines: LineState[]): {
+export function computeGrandTotal(lines: AnyLineState[]): {
 	totalPence: number;
 	totalDisplay: LsdStrings;
 } {
@@ -62,27 +75,73 @@ export function computeLinePence(literals: LsdStrings): { totalPence: number; er
 	return { totalPence: error ? 0 : totalPence, error, fieldErrors };
 }
 
+function computeItemWithQuantityPence(
+	literals: LsdStrings,
+	quantity: string,
+): { basePence: number; totalPence: number; error: boolean; fieldErrors: LsdBooleans; quantityError: boolean } {
+	const { totalPence: basePence, error: lsdError, fieldErrors } = computeLinePence(literals);
+	const qNorm = normalizeEarlyModernInput(quantity);
+	const quantityError = !quantity || !isValidRoman(qNorm);
+	const quantityInt = quantityError ? 0 : romanToInteger(qNorm);
+	const error = lsdError || quantityError;
+	const totalPence = error ? 0 : basePence * quantityInt;
+	return { basePence: lsdError ? 0 : basePence, totalPence, error, fieldErrors, quantityError };
+}
+
 function updateLine(line: LineState, field: 'l' | 's' | 'd', value: string): LineState {
 	const literals = { ...line.literals, [field]: value };
 	const { totalPence, error, fieldErrors } = computeLinePence(literals);
 	return { ...line, literals, totalPence, error, fieldErrors };
 }
 
+function updateItemWithQuantity(
+	line: ItemWithQuantityState,
+	field: 'l' | 's' | 'd',
+	value: string,
+): ItemWithQuantityState {
+	const literals = { ...line.literals, [field]: value };
+	const { basePence, totalPence, error, fieldErrors, quantityError } = computeItemWithQuantityPence(literals, line.quantity);
+	return { ...line, literals, basePence, totalPence, error, fieldErrors, quantityError };
+}
+
+function updateQuantityField(
+	line: ItemWithQuantityState,
+	value: string,
+): ItemWithQuantityState {
+	const { basePence, totalPence, error, fieldErrors, quantityError } = computeItemWithQuantityPence(line.literals, value);
+	return { ...line, quantity: value, basePence, totalPence, error, fieldErrors, quantityError };
+}
+
 /**
  * Apply a field update to the matching line in the array and recompute everything.
  */
 export function processFieldUpdate(
-	lines: LineState[],
+	lines: AnyLineState[],
 	lineId: string,
 	field: 'l' | 's' | 'd',
 	value: string,
-): LineState[] {
+): AnyLineState[] {
+	return lines.map(line => {
+		if (line.id !== lineId) return line;
+		return isItemWithQuantity(line)
+			? updateItemWithQuantity(line, field, value)
+			: updateLine(line, field, value);
+	});
+}
+
+export function processQuantityUpdate(
+	lines: AnyLineState[],
+	lineId: string,
+	value: string,
+): AnyLineState[] {
 	return lines.map(line =>
-		line.id === lineId ? updateLine(line, field, value) : line,
+		line.id === lineId && isItemWithQuantity(line)
+			? updateQuantityField(line, value)
+			: line,
 	);
 }
 
-export function withNewLines(prev: CalculationState, lines: LineState[]): CalculationState {
+export function withNewLines(prev: CalculationState, lines: AnyLineState[]): CalculationState {
 	const { totalPence, totalDisplay } = computeGrandTotal(lines);
 	return { ...prev, lines, totalPence, totalDisplay };
 }

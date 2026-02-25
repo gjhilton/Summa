@@ -10,8 +10,25 @@ export interface LineState {
 	totalPence: number;
 }
 
+export interface ItemWithQuantityState {
+	id: string;
+	error: boolean;
+	fieldErrors: LsdBooleans;
+	quantityError: boolean;
+	literals: LsdStrings;
+	quantity: string;
+	basePence: number;
+	totalPence: number;
+}
+
+export type AnyLineState = LineState | ItemWithQuantityState;
+
+export function isItemWithQuantity(line: AnyLineState): line is ItemWithQuantityState {
+	return 'quantity' in line;
+}
+
 export interface CalculationState {
-	lines: LineState[];
+	lines: AnyLineState[];
 	totalPence: number;
 	totalDisplay: LsdStrings;
 }

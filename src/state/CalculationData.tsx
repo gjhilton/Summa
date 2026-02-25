@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { CalculationState } from '../types/calculation';
 import {
 	emptyLine,
+	emptyItemWithQuantity,
 	processFieldUpdate,
+	processQuantityUpdate,
 	withNewLines,
 	initialState,
 	computeLinePence,
@@ -51,8 +53,16 @@ export default function CalculationData() {
 		setState(prev => withNewLines(prev, processFieldUpdate(prev.lines, lineId, field, value)));
 	}
 
+	function updateQuantity(lineId: string, value: string): void {
+		setState(prev => withNewLines(prev, processQuantityUpdate(prev.lines, lineId, value)));
+	}
+
 	function addLine(): void {
 		setState(prev => withNewLines(prev, [...prev.lines, emptyLine()]));
+	}
+
+	function addItemWithQuantity(): void {
+		setState(prev => withNewLines(prev, [...prev.lines, emptyItemWithQuantity()]));
 	}
 
 	function removeLine(lineId: string): void {
@@ -75,7 +85,9 @@ export default function CalculationData() {
 			showWorking={showWorking}
 			onShowWorkingChange={setShowWorking}
 			onUpdateField={updateField}
+			onUpdateQuantity={updateQuantity}
 			onAddLine={addLine}
+			onAddItemWithQuantity={addItemWithQuantity}
 			onRemoveLine={removeLine}
 			onReset={resetCalculation}
 		/>

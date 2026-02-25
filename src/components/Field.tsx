@@ -3,35 +3,36 @@ import { focusRing, workingRowStyles } from '../styles/shared';
 
 interface FieldProps {
 	value: string;
-	label: 'l' | 's' | 'd';
+	label: 'l' | 's' | 'd' | 'q';
 	error?: boolean;
 	noBorder?: boolean;
-	bold?: boolean;
+	weight?: 'bold' | 'light';
+	className?: string;
 	onChange?: (v: string) => void;
 	showWorking?: boolean;
 	working?: React.ReactNode;
 }
 
-const LABELS = { l: 'li', s: 's', d: 'd' } as const;
-const ARIA_LABELS = { l: 'pounds', s: 'shillings', d: 'pence' } as const;
+const LABELS = { l: 'li', s: 's', d: 'd', q: '' } as const;
+const ARIA_LABELS = { l: 'pounds', s: 'shillings', d: 'pence', q: 'quantity' } as const;
 
-const outerContainer = css({
+// Outer flex row: field inner + label side by side
+const fieldRow = css({
 	display: 'flex',
-	flexDirection: 'column',
 	alignItems: 'flex-start',
-	gap: 'xs',
 	width: '100%',
 });
 
-const fieldRow = css({
+// Inner column: value input/span stacked above working text
+const fieldInner = css({
 	display: 'flex',
-	alignItems: 'flex-end',
-	width: '100%',
+	flexDirection: 'column',
+	flex: 1,
+	minWidth: 0,
 });
 
 const fieldBase = css({
-	flex: 1,
-	minWidth: 0,
+	width: '100%',
 	textAlign: 'right',
 	padding: 'xs',
 	fontSize: 'xl',
@@ -47,7 +48,12 @@ const inputStyle = css({
 	_focusVisible: focusRing,
 });
 
-const inputNormal = css({ borderBottomColor: 'ink', bg: 'transparent' });
+const inputNormal = css({
+	borderBottomColor: 'rgba(0,0,0,0.1)',
+	bg: 'transparent',
+	_hover: { borderBottomColor: 'ink' },
+	_focus: { borderBottomColor: 'ink' },
+});
 const inputError = css({ color: 'error' });
 
 const readonlyStyle = css({
@@ -65,22 +71,22 @@ const labelBox = css({
 	display: 'inline-flex',
 	alignItems: 'flex-start',
 	justifyContent: 'center',
-	alignSelf: 'stretch',
 	padding: 'xs',
 	fontSize: 'l',
 	flexShrink: 0,
 });
 
+// Working text sits inside fieldInner, naturally aligned with the value above it
 const workingText = css({
 	...workingRowStyles,
-	paddingRight: '0.7rem',
+	paddingRight: 'xs',
 });
 
-export default function Field({ value, label, error = false, noBorder = false, bold = false, onChange, showWorking = false, working }: FieldProps) {
+export default function Field({ value, label, error = false, noBorder = false, weight, className, onChange, showWorking = false, working }: FieldProps) {
 	const FieldRow = onChange ? 'label' : 'span';
 	return (
-		<span className={outerContainer}>
-			<FieldRow className={fieldRow}>
+		<FieldRow className={cx(fieldRow, className)}>
+			<span className={fieldInner}>
 				{onChange ? (
 					<input
 						type="text"
@@ -91,11 +97,11 @@ export default function Field({ value, label, error = false, noBorder = false, b
 						className={cx(fieldBase, inputStyle, error ? inputError : inputNormal)}
 					/>
 				) : (
-					<span className={cx(fieldBase, readonlyStyle, noBorder && readonlyNoBorder, bold ? readonlyBold : readonlyLight)}>{value}</span>
+					<span className={cx(fieldBase, readonlyStyle, noBorder && readonlyNoBorder, weight === 'bold' && readonlyBold, weight === 'light' && readonlyLight)}>{value}</span>
 				)}
-				<span className={cx(labelBox, error && labelError)}>{LABELS[label]}</span>
-			</FieldRow>
-			{showWorking && <span className={workingText}>{working}</span>}
-		</span>
+				{showWorking && <span className={workingText}>{working}</span>}
+			</span>
+			{LABELS[label] && <span className={cx(labelBox, error && labelError)}>{LABELS[label]}</span>}
+		</FieldRow>
 	);
 }

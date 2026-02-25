@@ -4,10 +4,12 @@ import Button from './Button';
 import Footer from './Footer';
 import PageLayout from './PageLayout';
 import Logo from './Logo';
-import Line from './Line';
+import Item from './Item';
+import ItemWithQuantity from './ItemWithQuantity';
 import Toggle from './Toggle';
 import noWorkingImg from '../assets/no-working.png';
-import { computeLinePence } from '../state/calculationLogic';
+import { computeLinePence, emptyItemWithQuantity, processFieldUpdate, processQuantityUpdate } from '../state/calculationLogic';
+import { AnyLineState, ItemWithQuantityState } from '../types/calculation';
 
 interface AboutScreenProps {
 	onClose: () => void;
@@ -96,6 +98,24 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 	const [demoShowWorking, setDemoShowWorking] = useState(true);
 	const [demoLiterals, setDemoLiterals] = useState({ l: 'xx', s: 'v', d: 'iiij' });
 	const { totalPence: demoTotalPence_, error: demoError, fieldErrors: demoFieldErrors } = computeLinePence(demoLiterals);
+	const [iwqLine, setIwqLine] = useState<ItemWithQuantityState>(() => {
+		const item = emptyItemWithQuantity();
+		let lines: AnyLineState[] = [item];
+		lines = processQuantityUpdate(lines, item.id, 'iii');
+		lines = processFieldUpdate(lines, item.id, 's', 'v');
+		lines = processFieldUpdate(lines, item.id, 'd', 'iiij');
+		return lines[0] as ItemWithQuantityState;
+	});
+	const handleIwqField = (f: 'l' | 's' | 'd', v: string) =>
+		setIwqLine(prev => {
+			const updated = processFieldUpdate([prev], prev.id, f, v);
+			return updated[0] as ItemWithQuantityState;
+		});
+	const handleIwqQuantity = (v: string) =>
+		setIwqLine(prev => {
+			const updated = processQuantityUpdate([prev], prev.id, v);
+			return updated[0] as ItemWithQuantityState;
+		});
 	return (
 		<PageLayout>
 			{!isFirstVisit && (
@@ -134,12 +154,12 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 					<li>Convert each amount to Roman numerals.</li>
 				</ol>
 
-				<h2 className={subheading}>How to use</h2>
+				<h2 className={subheading}>How to use: Items</h2>
 				<p>
 					Input each line of your calculation as pounds, shillings and pence in Roman numerals. The total updates automatically. NB the example below is editable so you can experiment - try inputting an invalid value - like 'dog' - and seee what happens.
 				</p>
 				<div className={exampleFrame}>
-					<Line
+					<Item
 						literals={example1Literals}
 						error={example1Error}
 						fieldErrors={example1FieldErrors}
@@ -155,7 +175,23 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 				<p>
 					To add another line item, click the <em>Add item</em> button.
 				</p>
+<h2 className={subheading}>How to use: Items with Quantity</h2>
+				<p>
+					Items with Quantity comprise a quantity field and a unit cost in pounds shillings and pence bracketed together. From this the system computes the total cost by multiplication - which is shown on the following line (and then summed with any other items you have added).
+				</p>
 
+<div className={exampleFrame}>
+					<ItemWithQuantity
+						line={iwqLine}
+						canRemove={false}
+						showWorking={false}
+						onChangeField={handleIwqField}
+						onChangeQuantity={handleIwqQuantity}
+						onRemove={noop}
+					/>
+				</div>
+
+				<h2 className={subheading}>How to use: Show Working</h2>
 				<p>
 					The <em>Show working</em> switch toggles display of the intermediate calculations, which can be useful for tracking down clerical errors in the source material.
 				</p>
@@ -166,7 +202,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 						checked={demoShowWorking}
 						onChange={setDemoShowWorking}
 					/>
-					<Line
+					<Item
 						literals={demoLiterals}
 						error={demoError}
 						fieldErrors={demoFieldErrors}
@@ -191,7 +227,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 					<a href="https://github.com/gjhilton/Summa/issues">GitHub issues page</a>.
 				</p>
 
-				<h2>No warranty / Cookies</h2>
+				<h2 className={subheading}>No warranty / Cookies</h2>
 				<p>This software is provided free of charge and with <strong>no warranty of correctness</strong>. It's beta software written in a few hours and almost certainly contains  defects and errors. You are strongly advised to check any results you obtain from Summa.</p>
 				<p>We use cookies and local storage to persist your preferences and work between sessions. We dont collect user data or analytics of any kind to our knowledge, but we DO use Google fonts and they might.</p>
 				<p>By continuing you agree to the above.</p>
