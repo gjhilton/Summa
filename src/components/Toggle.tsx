@@ -24,6 +24,8 @@ const trackBase = css({
 	cursor: 'pointer',
 	transition: 'background-color 0.25s ease-in-out',
 	flexShrink: 0,
+	outlineWidth: '0',
+	outlineStyle: 'none',
 	_focusVisible: focusRing,
 	_active: { transform: 'scale(0.98)' },
 	_disabled: { opacity: 0.4, cursor: 'not-allowed' },

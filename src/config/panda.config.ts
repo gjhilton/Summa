@@ -13,6 +13,7 @@ export default defineConfig({
 				colors: {
 					ink: { value: 'black' },
 					paper: { value: 'white' },
+					lemonchiffon: { value: 'lemonchiffon' },
 					muted: { value: '#f9fafb' },        // read-only field background
 					border: { value: '{colors.ink}' },
 					primary: { value: '#008cff' },

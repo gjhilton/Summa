@@ -1,6 +1,7 @@
 import { css } from '../generated/css';
 import { LsdStrings } from '../types/calculation';
 import { computeFieldWorking } from '../state/calculationLogic';
+import { workingRowStyles } from '../styles/shared';
 import Field from './Field';
 import Button from './Button';
 import Icon from './Icon';
@@ -30,10 +31,24 @@ const opCol = css({
 	display: 'flex',
 	flexDirection: 'column',
 	alignItems: 'flex-end',
-	padding: 'xs',
+	paddingLeft: 'xs',
+	paddingRight: 'xs',
 	userSelect: 'none',
+	gap: 'xs',
+});
+
+const opMain = css({
+	flex: 1,
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'flex-end',
 	fontSize: '6xl',
-	fontWeight: "100"
+	fontWeight: '100',
+});
+
+const opWorkingRow = css({
+	...workingRowStyles,
+	whiteSpace: 'nowrap',
 });
 
 const opCross = css({
@@ -63,11 +78,8 @@ const opCross = css({
 	},
 });
 
-const lineTotalText = css({
-	fontSize: 's',
-	fontStyle: 'italic',
-	whiteSpace: 'nowrap',
-});
+
+const supD = css({ marginLeft: '2px' });
 
 export default function Line({
 	literals,
@@ -80,7 +92,7 @@ export default function Line({
 	onRemove,
 }: LineProps) {
 	const toNode = (result: ReturnType<typeof computeFieldWorking>) =>
-		result ? <>{result.prefix}{result.pence}<sup>d</sup></> : undefined;
+		result ? <>{result.prefix}{result.pence}<sup className={supD}>d</sup></> : undefined;
 
 	const working = showWorking && !error
 		? {
@@ -101,14 +113,18 @@ export default function Line({
 				<Icon icon="cross" />
 			</Button>
 			<div className={opCol}>
-				{showOp && <span className={opCross} aria-hidden="true" />}
-				{showWorking && !error && totalPence > 0 && (
-					<span className={lineTotalText}>= {totalPence}<sup>d</sup></span>
+				<div className={opMain}>
+					{!showWorking && showOp && <span className={opCross} aria-hidden="true" />}
+				</div>
+				{showWorking && (
+					<span className={opWorkingRow}>
+						{!error && totalPence > 0 && <>{totalPence}<sup className={supD}>d</sup> =</>}
+					</span>
 				)}
 			</div>
-			<Field value={literals.l} label="l" error={error} onChange={v => onChangeField('l', v)} working={working?.l} />
-			<Field value={literals.s} label="s" error={error} onChange={v => onChangeField('s', v)} working={working?.s} />
-			<Field value={literals.d} label="d" error={error} onChange={v => onChangeField('d', v)} working={working?.d} />
+			<Field value={literals.l} label="l" error={error} onChange={v => onChangeField('l', v)} showWorking={showWorking} working={working?.l} />
+			<Field value={literals.s} label="s" error={error} onChange={v => onChangeField('s', v)} showWorking={showWorking} working={working?.s} />
+			<Field value={literals.d} label="d" error={error} onChange={v => onChangeField('d', v)} showWorking={showWorking} working={working?.d} />
 		</LedgerRow>
 	);
 }

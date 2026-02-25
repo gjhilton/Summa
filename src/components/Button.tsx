@@ -17,6 +17,8 @@ const buttonStyle = cva({
 		borderColor: 'ink',
 		fontFamily: 'inherit',
 		transition: 'all 200ms ease-in-out',
+		outlineWidth: '0',
+		outlineStyle: 'none',
 		_hover: { transform: 'scale(1.02)' },
 		_active: { transform: 'scale(0.95)' },
 		_focusVisible: focusRing,

@@ -1,5 +1,5 @@
 import { css, cx } from '../generated/css';
-import { focusRing } from '../styles/shared';
+import { focusRing, workingRowStyles } from '../styles/shared';
 
 interface FieldProps {
 	value: string;
@@ -8,6 +8,7 @@ interface FieldProps {
 	noBorder?: boolean;
 	bold?: boolean;
 	onChange?: (v: string) => void;
+	showWorking?: boolean;
 	working?: React.ReactNode;
 }
 
@@ -41,6 +42,8 @@ const fieldBase = css({
 const inputStyle = css({
 	fontFamily: 'inherit',
 	transition: 'all 200ms ease-in-out',
+	outlineWidth: '0',
+	outlineStyle: 'none',
 	_focusVisible: focusRing,
 });
 
@@ -67,14 +70,11 @@ const labelBox = css({
 });
 
 const workingText = css({
-	fontSize: 's',
-	color: 'ink',
-	opacity: 0.6,
-	fontStyle: 'italic',
-	textAlign: 'right',
+	...workingRowStyles,
+	paddingRight: '0.7rem',
 });
 
-export default function Field({ value, label, error = false, noBorder = false, bold = false, onChange, working }: FieldProps) {
+export default function Field({ value, label, error = false, noBorder = false, bold = false, onChange, showWorking = false, working }: FieldProps) {
 	const FieldRow = onChange ? 'label' : 'span';
 	return (
 		<span className={outerContainer}>
@@ -92,7 +92,7 @@ export default function Field({ value, label, error = false, noBorder = false, b
 				)}
 				<span className={labelBox}>{LABELS[label]}</span>
 			</FieldRow>
-			{working && <span className={workingText}>{working}</span>}
+			{showWorking && <span className={workingText}>{working}</span>}
 		</span>
 	);
 }
