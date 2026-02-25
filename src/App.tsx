@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import MainScreen from './components/MainScreen';
 import AboutScreen from './components/AboutScreen';
 import UnsupportedScreen from './components/UnsupportedScreen';
+import { usePreferences } from './state/preferences';
 
 const PORTRAIT_MOBILE = '(max-width: 600px) and (orientation: portrait)';
 
@@ -24,6 +25,7 @@ export default function App() {
 	});
 	const [screen, setScreen] = useState<'main' | 'about'>(() => isFirstVisit ? 'about' : 'main');
 	const isPortraitMobile = useIsPortraitMobile();
+	const [prefs, updatePrefs] = usePreferences();
 
 	function handleGetStarted() {
 		try { localStorage.setItem(VISITED_KEY, '1'); } catch { /* ignore */ }
@@ -39,9 +41,11 @@ export default function App() {
 				onClose={() => setScreen('main')}
 				isFirstVisit={isFirstVisit}
 				onGetStarted={handleGetStarted}
+				useItemWithQuantity={prefs.useItemWithQuantity}
+				onUseItemWithQuantityChange={v => updatePrefs({ useItemWithQuantity: v })}
 			/>
 		);
 	}
 
-	return <MainScreen onAbout={() => setScreen('about')} />;
+	return <MainScreen onAbout={() => setScreen('about')} useItemWithQuantity={prefs.useItemWithQuantity} />;
 }

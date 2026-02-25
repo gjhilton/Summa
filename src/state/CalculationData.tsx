@@ -31,7 +31,7 @@ function loadState(): CalculationState {
 		}
 	}
 	const state = initialState();
-	const literals = { l: 'iiil', s: 'iiijs', d: 'vd' };
+	const literals = { l: 'ij', s: 'x', d: 'v' };
 	const { totalPence, error, fieldErrors } = computeLinePence(literals);
 	const lines = state.lines.map((line, i) =>
 		i === 0 ? { ...line, literals, totalPence, error, fieldErrors } : line,
@@ -39,7 +39,7 @@ function loadState(): CalculationState {
 	return withNewLines(state, lines);
 }
 
-export default function CalculationData() {
+export default function CalculationData({ useItemWithQuantity }: { useItemWithQuantity: boolean }) {
 	const [state, setState] = useState<CalculationState>(loadState);
 	const [showWorking, setShowWorking] = useState(false);
 
@@ -90,6 +90,7 @@ export default function CalculationData() {
 			onAddItemWithQuantity={addItemWithQuantity}
 			onRemoveLine={removeLine}
 			onReset={resetCalculation}
+			useItemWithQuantity={useItemWithQuantity}
 		/>
 	);
 }

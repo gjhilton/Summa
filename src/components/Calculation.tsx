@@ -18,6 +18,7 @@ interface CalculationProps {
 	onAddItemWithQuantity: () => void;
 	onRemoveLine: (id: string) => void;
 	onReset: () => void;
+	useItemWithQuantity: boolean;
 }
 
 const layout = css({ display: 'flex', flexDirection: 'column', gap: 'xs' });
@@ -36,6 +37,7 @@ export default function Calculation({
 	onAddItemWithQuantity,
 	onRemoveLine,
 	onReset,
+	useItemWithQuantity,
 }: CalculationProps) {
 	return (
 		<div className={layout}>
@@ -67,7 +69,7 @@ export default function Calculation({
 			)}
 			<div className={addBar}>
 				<Button onClick={onAddLine}>Add item</Button>
-				<Button onClick={onAddItemWithQuantity}>Add item with quantity</Button>
+				{useItemWithQuantity && <Button onClick={onAddItemWithQuantity}>Add item with quantity</Button>}
 			</div>
 			<Total display={totalDisplay} totalPence={totalPence} showWorking={showWorking} />
 			<div className={bottomBar}>

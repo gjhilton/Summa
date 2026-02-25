@@ -5,6 +5,7 @@ import PageLayout from './PageLayout';
 
 interface MainScreenProps {
 	onAbout: () => void;
+	useItemWithQuantity: boolean;
 }
 
 const header = css({
@@ -26,7 +27,7 @@ const aboutLink = css({
 	_hover: { opacity: 0.6 },
 });
 
-export default function MainScreen({ onAbout }: MainScreenProps) {
+export default function MainScreen({ onAbout, useItemWithQuantity }: MainScreenProps) {
 	return (
 		<PageLayout>
 			<header className={header}>
@@ -39,7 +40,7 @@ export default function MainScreen({ onAbout }: MainScreenProps) {
 					About
 				</button>
 			</header>
-			<CalculationData />
+			<CalculationData useItemWithQuantity={useItemWithQuantity} />
 			<Footer />
 		</PageLayout>
 	);
