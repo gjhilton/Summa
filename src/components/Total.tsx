@@ -44,6 +44,8 @@ const summaWorkingRow = css({
 
 const supD = css({ marginLeft: '2px' });
 
+const dimmed = css({ opacity: '0.3' });
+
 function fmt(v: string) { return v === '0' ? '—' : v; }
 
 export default function Total({ display, totalPence, showWorking }: TotalProps) {
@@ -70,9 +72,9 @@ export default function Total({ display, totalPence, showWorking }: TotalProps) 
 					</span>
 				)}
 			</div>
-			<Field value={fmt(display.l)} label="l" noBorder weight={display.l !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.l} />
-			<Field value={fmt(display.s)} label="s" noBorder weight={display.s !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.s} />
-			<Field value={fmt(display.d)} label="d" noBorder weight={display.d !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.d} />
+			<Field value={fmt(display.l)} label="l" noBorder weight={display.l !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.l} className={display.l === '0' ? dimmed : undefined} />
+			<Field value={fmt(display.s)} label="s" noBorder weight={display.s !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.s} className={display.s === '0' ? dimmed : undefined} />
+			<Field value={fmt(display.d)} label="d" noBorder weight={display.d !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.d} className={display.d === '0' ? dimmed : undefined} />
 			<span />
 		</LedgerRow>
 	);
