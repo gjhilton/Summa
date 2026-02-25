@@ -5,6 +5,8 @@ interface FieldProps {
 	value: string;
 	label: 'l' | 's' | 'd';
 	error?: boolean;
+	noBorder?: boolean;
+	bold?: boolean;
 	onChange?: (v: string) => void;
 	working?: React.ReactNode;
 }
@@ -50,6 +52,10 @@ const readonlyStyle = css({
 	borderBottomColor: 'ink',
 });
 
+const readonlyNoBorder = css({ borderBottomColor: 'transparent' });
+const readonlyBold = css({ fontWeight: 'bold' });
+const readonlyLight = css({ fontWeight: '100' });
+
 const labelBox = css({
 	display: 'inline-flex',
 	alignItems: 'flex-start',
@@ -68,7 +74,7 @@ const workingText = css({
 	textAlign: 'right',
 });
 
-export default function Field({ value, label, error = false, onChange, working }: FieldProps) {
+export default function Field({ value, label, error = false, noBorder = false, bold = false, onChange, working }: FieldProps) {
 	const FieldRow = onChange ? 'label' : 'span';
 	return (
 		<span className={outerContainer}>
@@ -82,7 +88,7 @@ export default function Field({ value, label, error = false, onChange, working }
 						className={cx(fieldBase, inputStyle, error ? inputError : inputNormal)}
 					/>
 				) : (
-					<span className={cx(fieldBase, readonlyStyle)}>{value}</span>
+					<span className={cx(fieldBase, readonlyStyle, noBorder && readonlyNoBorder, bold ? readonlyBold : readonlyLight)}>{value}</span>
 				)}
 				<span className={labelBox}>{LABELS[label]}</span>
 			</FieldRow>
