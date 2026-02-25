@@ -26,7 +26,7 @@ const hidden = css({ visibility: 'hidden' });
 
 const lineError = css({ bg: 'errorLineBg' });
 
-const inputRow = css({ fontStyle: 'italic', fontWeight: '100' });
+const inputRow = css({ fontStyle: 'ritalic', fontWeight: '100' });
 
 const opMain = css({
 	flex: 1,
@@ -119,14 +119,14 @@ const openParenCol = css({
 		top: '-4px',
 		bottom: '-4px',
 		right: '0',
-		width: '0.6em',
-		borderTopWidth: '1px',
+		width: '1em',
+		borderTopWidth: '2px',
 		borderTopStyle: 'solid',
 		borderTopColor: 'currentColor',
-		borderLeftWidth: '1px',
+		borderLeftWidth: '2px',
 		borderLeftStyle: 'solid',
 		borderLeftColor: 'currentColor',
-		borderBottomWidth: '1px',
+		borderBottomWidth: '2px',
 		borderBottomStyle: 'solid',
 		borderBottomColor: 'currentColor',
 		borderTopLeftRadius: '50%',
@@ -143,14 +143,14 @@ const closeParenCol = css({
 		top: '-4px',
 		bottom: '-4px',
 		left: '2px',
-		width: '0.6em',
-		borderTopWidth: '1px',
+		width: '1em',
+		borderTopWidth: '2px',
 		borderTopStyle: 'solid',
 		borderTopColor: 'currentColor',
-		borderRightWidth: '1px',
+		borderRightWidth: '2px',
 		borderRightStyle: 'solid',
 		borderRightColor: 'currentColor',
-		borderBottomWidth: '1px',
+		borderBottomWidth: '2px',
 		borderBottomStyle: 'solid',
 		borderBottomColor: 'currentColor',
 		borderTopRightRadius: '50%',

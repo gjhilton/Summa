@@ -48,7 +48,12 @@ const inputStyle = css({
 	_focusVisible: focusRing,
 });
 
-const inputNormal = css({ borderBottomColor: 'ink', bg: 'transparent' });
+const inputNormal = css({
+	borderBottomColor: 'rgba(0,0,0,0.1)',
+	bg: 'transparent',
+	_hover: { borderBottomColor: 'ink' },
+	_focus: { borderBottomColor: 'ink' },
+});
 const inputError = css({ color: 'error' });
 
 const readonlyStyle = css({
