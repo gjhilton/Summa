@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { css } from '../generated/css';
+import { css, cx } from '../generated/css';
 import Button from './Button';
 import Footer from './Footer';
 import PageLayout from './PageLayout';
 import Logo from './Logo';
 import Line from './Line';
 import Toggle from './Toggle';
+import noWorkingImg from '../assets/no-working.png';
 import { computeFieldWorking } from '../state/calculationLogic';
 
 interface AboutScreenProps {
@@ -75,6 +76,10 @@ const getStartedButton = css({
 
 const logoWrap = css({ textAlign: 'center', marginBottom: '3xl' });
 
+const snapshot = css({
+	overflow: 'hidden',
+});
+
 const exampleFrame = css({
 	borderWidth: 'thin',
 	borderStyle: 'solid',
@@ -113,10 +118,14 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 			</div>
 			<h2 className={heading}>About</h2>
 			<div className={body}>
+	
 				<p>
 					Summa is a simple spreadsheet for historians working with Early Modern
 					British ledgers, accounts and similar documents.
 				</p>
+							<div className={cx(exampleFrame, snapshot)}>
+					<img src={noWorkingImg} alt="Summa calculation" style={{ width: '90%', display: 'block', margin: '0 auto' }} />
+				</div>
 				<p>
 					For clerks of the era, summing columns of figures expressed as pounds,
 					shillings and pence in Roman numerals was second nature. For modern
