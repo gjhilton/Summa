@@ -174,6 +174,11 @@ export default function AboutScreen({ onClose }: AboutScreenProps) {
 					Please suggest features which would make Summa more useful on the{' '}
 					<a href="https://github.com/gjhilton/Summa/issues">GitHub issues page</a>.
 				</p>
+
+				<h2>No warranty / Cookies</h2>
+				<p>This software is provided free of charge and with <strong>no warranty of correctness</strong>. It's beta software written in a few hours and almost certainly contains  defects and errors. You are strongly advised to check any results you obtain from Summa.</p>
+				<p>We use cookies and local storage to persist your preferences and work between sessions. We dont collect user data or analytics of any kind to our knowledge, but we DO use Google fonts and they might.</p>
+				<p>By continuing you agree to the above.</p>
 			</div>
 			<Footer />
 		</PageLayout>
