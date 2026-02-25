@@ -3,17 +3,17 @@ import { focusRing, workingRowStyles } from '../styles/shared';
 
 interface FieldProps {
 	value: string;
-	label: 'l' | 's' | 'd';
+	label: 'l' | 's' | 'd' | 'q';
 	error?: boolean;
 	noBorder?: boolean;
-	bold?: boolean;
+	weight?: 'bold' | 'light';
 	onChange?: (v: string) => void;
 	showWorking?: boolean;
 	working?: React.ReactNode;
 }
 
-const LABELS = { l: 'li', s: 's', d: 'd' } as const;
-const ARIA_LABELS = { l: 'pounds', s: 'shillings', d: 'pence' } as const;
+const LABELS = { l: 'li', s: 's', d: 'd', q: '' } as const;
+const ARIA_LABELS = { l: 'pounds', s: 'shillings', d: 'pence', q: 'quantity' } as const;
 
 const outerContainer = css({
 	display: 'flex',
@@ -76,7 +76,7 @@ const workingText = css({
 	paddingRight: '0.7rem',
 });
 
-export default function Field({ value, label, error = false, noBorder = false, bold = false, onChange, showWorking = false, working }: FieldProps) {
+export default function Field({ value, label, error = false, noBorder = false, weight, onChange, showWorking = false, working }: FieldProps) {
 	const FieldRow = onChange ? 'label' : 'span';
 	return (
 		<span className={outerContainer}>
@@ -91,9 +91,9 @@ export default function Field({ value, label, error = false, noBorder = false, b
 						className={cx(fieldBase, inputStyle, error ? inputError : inputNormal)}
 					/>
 				) : (
-					<span className={cx(fieldBase, readonlyStyle, noBorder && readonlyNoBorder, bold ? readonlyBold : readonlyLight)}>{value}</span>
+					<span className={cx(fieldBase, readonlyStyle, noBorder && readonlyNoBorder, weight === 'bold' && readonlyBold, weight === 'light' && readonlyLight)}>{value}</span>
 				)}
-				<span className={cx(labelBox, error && labelError)}>{LABELS[label]}</span>
+				{LABELS[label] && <span className={cx(labelBox, error && labelError)}>{LABELS[label]}</span>}
 			</FieldRow>
 			{showWorking && <span className={workingText}>{working}</span>}
 		</span>

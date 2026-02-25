@@ -4,7 +4,7 @@ import Button from './Button';
 import Footer from './Footer';
 import PageLayout from './PageLayout';
 import Logo from './Logo';
-import Line from './Line';
+import Item from './Item';
 import Toggle from './Toggle';
 import noWorkingImg from '../assets/no-working.png';
 import { computeLinePence } from '../state/calculationLogic';
@@ -139,7 +139,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 					Input each line of your calculation as pounds, shillings and pence in Roman numerals. The total updates automatically. NB the example below is editable so you can experiment - try inputting an invalid value - like 'dog' - and seee what happens.
 				</p>
 				<div className={exampleFrame}>
-					<Line
+					<Item
 						literals={example1Literals}
 						error={example1Error}
 						fieldErrors={example1FieldErrors}
@@ -166,7 +166,7 @@ export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarte
 						checked={demoShowWorking}
 						onChange={setDemoShowWorking}
 					/>
-					<Line
+					<Item
 						literals={demoLiterals}
 						error={demoError}
 						fieldErrors={demoFieldErrors}

@@ -69,9 +69,9 @@ export default function Total({ display, totalPence, showWorking }: TotalProps) 
 					</span>
 				)}
 			</div>
-			<Field value={fmt(display.l)} label="l" noBorder bold={display.l !== '0'} showWorking={showWorking} working={working?.l} />
-			<Field value={fmt(display.s)} label="s" noBorder bold={display.s !== '0'} showWorking={showWorking} working={working?.s} />
-			<Field value={fmt(display.d)} label="d" noBorder bold={display.d !== '0'} showWorking={showWorking} working={working?.d} />
+			<Field value={fmt(display.l)} label="l" noBorder weight={display.l !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.l} />
+			<Field value={fmt(display.s)} label="s" noBorder weight={display.s !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.s} />
+			<Field value={fmt(display.d)} label="d" noBorder weight={display.d !== '0' ? 'bold' : 'light'} showWorking={showWorking} working={working?.d} />
 		</LedgerRow>
 	);
 }

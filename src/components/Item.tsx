@@ -7,7 +7,7 @@ import Button from './Button';
 import Icon from './Icon';
 import LedgerRow from './LedgerRow';
 
-interface LineProps {
+interface ItemProps {
 	literals: LsdStrings;
 	error: boolean;
 	fieldErrors?: LsdBooleans;
@@ -79,7 +79,7 @@ const opCross = css({
 
 const supD = css({ marginLeft: '2px' });
 
-export default function Line({
+export default function Item({
 	literals,
 	error,
 	fieldErrors = { l: false, s: false, d: false },
@@ -89,7 +89,7 @@ export default function Line({
 	totalPence,
 	onChangeField,
 	onRemove,
-}: LineProps) {
+}: ItemProps) {
 	const toNode = (result: ReturnType<typeof computeFieldWorking>) =>
 		result ? <>{result.prefix}{result.pence}<sup className={supD}>d</sup></> : undefined;
 
