@@ -10,6 +10,8 @@ import { computeFieldWorking } from '../state/calculationLogic';
 
 interface AboutScreenProps {
 	onClose: () => void;
+	isFirstVisit?: boolean;
+	onGetStarted?: () => void;
 }
 
 const srOnly = css({
@@ -58,6 +60,19 @@ const listUnordered = css({
 
 const backBar = css({ marginBottom: '3xl' });
 
+const getStartedBar = css({
+	display: 'flex',
+	justifyContent: 'center',
+	marginTop: '3xl',
+	marginBottom: '3xl',
+});
+
+const getStartedButton = css({
+	fontSize: 'xl',
+	px: '4xl',
+	py: 'lg',
+});
+
 const logoWrap = css({ textAlign: 'center', marginBottom: '3xl' });
 
 const exampleFrame = css({
@@ -81,15 +96,17 @@ function demoTotalPence(l: string, s: string, d: string): { totalPence: number; 
 	return { totalPence, error: false };
 }
 
-export default function AboutScreen({ onClose }: AboutScreenProps) {
+export default function AboutScreen({ onClose, isFirstVisit = false, onGetStarted }: AboutScreenProps) {
 	const [demoShowWorking, setDemoShowWorking] = useState(true);
 	const [demoLiterals, setDemoLiterals] = useState({ l: 'xx', s: 'v', d: 'iiij' });
 	const { totalPence: demoTotalPence_, error: demoError } = demoTotalPence(demoLiterals.l, demoLiterals.s, demoLiterals.d);
 	return (
 		<PageLayout>
-			<div className={backBar}>
-				<Button onClick={onClose}>← Back</Button>
-			</div>
+			{!isFirstVisit && (
+				<div className={backBar}>
+					<Button onClick={onClose}>← Back</Button>
+				</div>
+			)}
 			<h1 className={srOnly}>Summa</h1>
 			<div className={logoWrap}>
 				<Logo size="M" />
@@ -180,6 +197,13 @@ export default function AboutScreen({ onClose }: AboutScreenProps) {
 				<p>We use cookies and local storage to persist your preferences and work between sessions. We dont collect user data or analytics of any kind to our knowledge, but we DO use Google fonts and they might.</p>
 				<p>By continuing you agree to the above.</p>
 			</div>
+			{isFirstVisit && onGetStarted && (
+				<div className={getStartedBar}>
+					<Button onClick={onGetStarted} variant="danger" className={getStartedButton}>
+						Get started →
+					</Button>
+				</div>
+			)}
 			<Footer />
 		</PageLayout>
 	);

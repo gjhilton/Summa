@@ -16,14 +16,31 @@ function useIsPortraitMobile() {
 	return matches;
 }
 
+const VISITED_KEY = 'summa_visited';
+
 export default function App() {
-	const [screen, setScreen] = useState<'main' | 'about'>('main');
+	const [isFirstVisit, setIsFirstVisit] = useState(() => {
+		try { return !localStorage.getItem(VISITED_KEY); } catch { return false; }
+	});
+	const [screen, setScreen] = useState<'main' | 'about'>(() => isFirstVisit ? 'about' : 'main');
 	const isPortraitMobile = useIsPortraitMobile();
+
+	function handleGetStarted() {
+		try { localStorage.setItem(VISITED_KEY, '1'); } catch {}
+		setIsFirstVisit(false);
+		setScreen('main');
+	}
 
 	if (isPortraitMobile) return <UnsupportedScreen />;
 
 	if (screen === 'about') {
-		return <AboutScreen onClose={() => setScreen('main')} />;
+		return (
+			<AboutScreen
+				onClose={() => setScreen('main')}
+				isFirstVisit={isFirstVisit}
+				onGetStarted={handleGetStarted}
+			/>
+		);
 	}
 
 	return <MainScreen onAbout={() => setScreen('about')} />;
