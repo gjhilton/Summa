@@ -8,7 +8,7 @@ import Button from "./Button";
 import Icon from "./Icon";
 import LedgerRow from "./LedgerRow";
 import LsdFieldGroup from "./LsdFieldGroup";
-import { hidden, lineError } from "../styles/shared";
+import { hidden, lineError, removeIcon } from "../styles/shared";
 
 interface ItemWithQuantityProps {
   line: ItemWithQuantityState;
@@ -36,23 +36,25 @@ const atSign = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  paddingLeft: "xs",
-  paddingRight: "xs",
+  paddingLeft: "sm",
+  paddingRight: "sm",
   fontSize: "6xl",
   fontWeight: "100",
   userSelect: "none",
 });
+
+const SYMBOL_LINE_WEIGHT = "2px"; // renders at 1px after scale(0.5)
 
 const mulSymbol = css({
   display: "inline-block",
   position: "relative",
   width: "0.5em",
   height: "0.5em",
-  transform: "rotate(45deg)",
+  transform: "rotate(45deg) scale(0.5)",
   _before: {
     content: '""',
     position: "absolute",
-    width: "1px",
+    width: SYMBOL_LINE_WEIGHT,
     height: "100%",
     left: "50%",
     top: "0",
@@ -62,7 +64,7 @@ const mulSymbol = css({
   _after: {
     content: '""',
     position: "absolute",
-    height: "1px",
+    height: SYMBOL_LINE_WEIGHT,
     width: "100%",
     top: "50%",
     left: "0",
@@ -76,10 +78,11 @@ const eqSymbol = css({
   position: "relative",
   width: "0.5em",
   height: "0.5em",
+  transform: "scale(0.5)",
   _before: {
     content: '""',
     position: "absolute",
-    height: "1px",
+    height: SYMBOL_LINE_WEIGHT,
     width: "100%",
     top: "33%",
     left: "0",
@@ -88,7 +91,7 @@ const eqSymbol = css({
   _after: {
     content: '""',
     position: "absolute",
-    height: "1px",
+    height: SYMBOL_LINE_WEIGHT,
     width: "100%",
     top: "67%",
     left: "0",
@@ -100,8 +103,8 @@ const subtotalOpCol = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-end",
-  paddingLeft: "xs",
-  paddingRight: "xs",
+  paddingLeft: "sm",
+  paddingRight: "sm",
   userSelect: "none",
   fontSize: "6xl",
   fontWeight: "100",
@@ -111,6 +114,8 @@ const BRACKET_WIDTH = "1em";
 const BRACKET_INSET = "-4px";
 // LedgerRow padding is "sm" (0.5rem); two adjacent rows have a 1rem gap between content areas.
 // 100% = height of the bracket cell = height of the subtotal row (both rows are equal height).
+// LABEL_ROW_HEIGHT accounts for the "extended cost" annotation row that sits between the two LedgerRows.
+// Label rows have zero height; labels are visually offset into the next LedgerRow's padding area.
 const BRACKET_BOTTOM = "calc(-1rem - 100% - 4px)";
 const BRACKET_LINE_WEIGHT = "2px";
 const BRACKET_LINE_STYLE = "solid";
@@ -162,6 +167,26 @@ const closeParenCol = css({
 
 const multiplyCol = css({ gridColumn: "span 3" });
 
+const labelRow = css({
+  display: "grid",
+  paddingLeft: "sm",
+  paddingRight: "sm",
+  height: "0",
+  overflow: "visible",
+  alignItems: "start",
+});
+
+const fieldLabel = css({
+  fontSize: "0.6rem",
+  textTransform: "uppercase",
+  userSelect: "none",
+  textAlign: "left",
+  letterSpacing: "0.06em",
+  // push down past LedgerRow padding-top (0.5rem) and bracket top inset (-4px)
+  transform: "translateY(0.6rem)",
+  pointerEvents: "none",
+});
+
 const supD = css({ marginLeft: "2px" });
 
 export default function ItemWithQuantity({
@@ -186,7 +211,12 @@ export default function ItemWithQuantity({
   const quantityInt =
     !quantityError && isValidRoman(qNorm) ? romanToInteger(qNorm) : null;
 
-  const subtotalDisplay = formatLsdDisplay(totalPence);
+  const rawSubtotal = formatLsdDisplay(totalPence);
+  const subtotalDisplay = {
+    l: rawSubtotal.l === "0" ? "" : rawSubtotal.l,
+    s: rawSubtotal.s === "0" ? "" : rawSubtotal.s,
+    d: rawSubtotal.d === "0" ? "" : rawSubtotal.d,
+  };
 
   const quantityWorking =
     showWorking && !error && quantityInt !== null ? quantityInt : undefined;
@@ -204,12 +234,21 @@ export default function ItemWithQuantity({
 
   return (
     <>
+      {/* Annotation row above input fields */}
+      <div
+        className={cx(labelRow, errorClass)}
+        style={{ gridTemplateColumns: COLUMNS }}
+      >
+        <span style={{ gridColumn: "4" }} className={fieldLabel}>quantity</span>
+        <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>unit cost</span>
+      </div>
+
       {/* Input row: remove | ( | op | qty | × | l | s | d | ) */}
       <LedgerRow columns={COLUMNS} className={cx(inputRow, errorClass)}>
         <Button
           variant="icon"
           aria-label="Remove item"
-          className={canRemove ? undefined : hidden}
+          className={cx(removeIcon, canRemove ? undefined : hidden)}
           onClick={onRemove}
         >
           <Icon icon="cross" />
@@ -237,6 +276,14 @@ export default function ItemWithQuantity({
         <span className={closeParenCol} aria-hidden="true" />
       </LedgerRow>
 
+      {/* Annotation row above subtotal fields */}
+      <div
+        className={cx(labelRow, errorClass)}
+        style={{ gridTemplateColumns: COLUMNS }}
+      >
+        <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>extended cost</span>
+      </div>
+
       {/* Subtotal row: empty | working(span 3) | = | l | s | d | empty */}
       <LedgerRow columns={COLUMNS} className={errorClass}>
         <span />
@@ -256,7 +303,6 @@ export default function ItemWithQuantity({
           showWorking={showWorking}
           hasError={error}
           noBorder
-          fmtZero
         />
         <span />
       </LedgerRow>

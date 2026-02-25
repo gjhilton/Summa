@@ -23,3 +23,5 @@ export const workingRowStyles = {
 export const hidden = css({ visibility: "hidden" });
 
 export const lineError = css({ bg: "errorLineBg" });
+
+export const removeIcon = css({ color: "error" });

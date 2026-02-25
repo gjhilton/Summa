@@ -24,8 +24,8 @@ const summaCol = css({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-end",
-  paddingLeft: "xs",
-  paddingRight: "xs",
+  paddingLeft: "sm",
+  paddingRight: "sm",
   gap: "xs",
 });
 

@@ -1,6 +1,6 @@
-import { css } from "../generated/css";
+import { css, cx } from "../generated/css";
 import { LsdStrings, LsdBooleans } from "../types/calculation";
-import { workingRowStyles, hidden, lineError } from "../styles/shared";
+import { workingRowStyles, hidden, lineError, removeIcon } from "../styles/shared";
 import Button from "./Button";
 import Icon from "./Icon";
 import LedgerRow from "./LedgerRow";
@@ -22,8 +22,8 @@ const opCol = css({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-end",
-  paddingLeft: "xs",
-  paddingRight: "xs",
+  paddingLeft: "sm",
+  paddingRight: "sm",
   userSelect: "none",
   gap: "xs",
 });
@@ -55,7 +55,7 @@ const opCross = css({
     left: "50%",
     top: "0",
     transform: "translateX(-50%)",
-    bg: "currentColor",
+    bg: "transparent",
   },
   _after: {
     content: '""',
@@ -65,7 +65,7 @@ const opCross = css({
     top: "50%",
     left: "0",
     transform: "translateY(-50%)",
-    bg: "currentColor",
+    bg: "transparent",
   },
 });
 
@@ -87,7 +87,7 @@ export default function Item({
       <Button
         variant="icon"
         aria-label="Remove line"
-        className={canRemove ? undefined : hidden}
+        className={cx(removeIcon, canRemove ? undefined : hidden)}
         onClick={onRemove}
       >
         <Icon icon="cross" />
