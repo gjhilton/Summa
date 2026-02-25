@@ -12,7 +12,8 @@
       "Bash(python3:*)",
       "mcp__plugin_playwright_playwright__browser_navigate",
       "Bash(npm install:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(npx prettier:*)"
     ]
   }
 }
