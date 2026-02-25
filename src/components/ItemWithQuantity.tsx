@@ -109,16 +109,20 @@ const subtotalOpCol = css({
 
 const BRACKET_WIDTH = "1em";
 const BRACKET_INSET = "-4px";
+// LedgerRow padding is "sm" (0.5rem); two adjacent rows have a 1rem gap between content areas.
+// 100% = height of the bracket cell = height of the subtotal row (both rows are equal height).
+const BRACKET_BOTTOM = "calc(-1rem - 100% - 4px)";
 const BRACKET_LINE_WEIGHT = "2px";
 const BRACKET_LINE_STYLE = "solid";
 const BRACKET_LINE_COLOR = "currentColor";
-const BRACKET_RADIUS = "50%";
+// Fixed radius (not 50%) so the curve stays circular when the bracket spans two rows.
+const BRACKET_RADIUS = "0.5em";
 
 const BRACKET_BEFORE = {
   content: '""',
   position: "absolute",
   top: BRACKET_INSET,
-  bottom: BRACKET_INSET,
+  bottom: BRACKET_BOTTOM,
   width: BRACKET_WIDTH,
   borderTopWidth: BRACKET_LINE_WEIGHT,
   borderTopStyle: BRACKET_LINE_STYLE,
