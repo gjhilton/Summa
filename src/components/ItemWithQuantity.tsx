@@ -107,18 +107,25 @@ const subtotalOpCol = css({
   fontWeight: "100",
 });
 
+const BRACKET_WIDTH = "1em";
+const BRACKET_INSET = "-4px";
+const BRACKET_LINE_WEIGHT = "2px";
+const BRACKET_LINE_STYLE = "solid";
+const BRACKET_LINE_COLOR = "currentColor";
+const BRACKET_RADIUS = "50%";
+
 const BRACKET_BEFORE = {
   content: '""',
   position: "absolute",
-  top: "-4px",
-  bottom: "-4px",
-  width: "1em",
-  borderTopWidth: "2px",
-  borderTopStyle: "solid",
-  borderTopColor: "currentColor",
-  borderBottomWidth: "2px",
-  borderBottomStyle: "solid",
-  borderBottomColor: "currentColor",
+  top: BRACKET_INSET,
+  bottom: BRACKET_INSET,
+  width: BRACKET_WIDTH,
+  borderTopWidth: BRACKET_LINE_WEIGHT,
+  borderTopStyle: BRACKET_LINE_STYLE,
+  borderTopColor: BRACKET_LINE_COLOR,
+  borderBottomWidth: BRACKET_LINE_WEIGHT,
+  borderBottomStyle: BRACKET_LINE_STYLE,
+  borderBottomColor: BRACKET_LINE_COLOR,
 } as const;
 
 // Full-height ( bracket: left + top + bottom borders, 50% radius on left corners
@@ -127,11 +134,11 @@ const openParenCol = css({
   _before: {
     ...BRACKET_BEFORE,
     right: "0",
-    borderLeftWidth: "2px",
-    borderLeftStyle: "solid",
-    borderLeftColor: "currentColor",
-    borderTopLeftRadius: "50%",
-    borderBottomLeftRadius: "50%",
+    borderLeftWidth: BRACKET_LINE_WEIGHT,
+    borderLeftStyle: BRACKET_LINE_STYLE,
+    borderLeftColor: BRACKET_LINE_COLOR,
+    borderTopLeftRadius: BRACKET_RADIUS,
+    borderBottomLeftRadius: BRACKET_RADIUS,
   },
 });
 
@@ -140,12 +147,12 @@ const closeParenCol = css({
   position: "relative",
   _before: {
     ...BRACKET_BEFORE,
-    left: "2px",
-    borderRightWidth: "2px",
-    borderRightStyle: "solid",
-    borderRightColor: "currentColor",
-    borderTopRightRadius: "50%",
-    borderBottomRightRadius: "50%",
+    left: BRACKET_LINE_WEIGHT,
+    borderRightWidth: BRACKET_LINE_WEIGHT,
+    borderRightStyle: BRACKET_LINE_STYLE,
+    borderRightColor: BRACKET_LINE_COLOR,
+    borderTopRightRadius: BRACKET_RADIUS,
+    borderBottomRightRadius: BRACKET_RADIUS,
   },
 });
 
