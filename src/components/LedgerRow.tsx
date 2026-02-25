@@ -5,7 +5,7 @@ interface LedgerRowProps {
 	className?: string;
 }
 
-export const ledgerRow = css({
+const ledgerRow = css({
 	display: 'grid',
 	gridTemplateColumns: 'auto 1fr 20% 20% 20%',
 	alignItems: 'stretch',

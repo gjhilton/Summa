@@ -21,9 +21,6 @@ interface LineProps {
 const hidden = css({ visibility: 'hidden' });
 
 const lineError = css({
-	borderWidth: 'thin',
-	borderStyle: 'solid',
-	borderColor: 'error',
 	bg: 'errorLineBg',
 });
 

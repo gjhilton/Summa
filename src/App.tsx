@@ -26,7 +26,7 @@ export default function App() {
 	const isPortraitMobile = useIsPortraitMobile();
 
 	function handleGetStarted() {
-		try { localStorage.setItem(VISITED_KEY, '1'); } catch {}
+		try { localStorage.setItem(VISITED_KEY, '1'); } catch { /* ignore */ }
 		setIsFirstVisit(false);
 		setScreen('main');
 	}

@@ -48,7 +48,7 @@ const inputStyle = css({
 });
 
 const inputNormal = css({ borderBottomColor: 'ink', bg: 'paper' });
-const inputError = css({ borderBottomColor: 'error', bg: 'errorBg' });
+const inputError = css({ color: 'error' });
 
 const readonlyStyle = css({
 	display: 'inline-block',
