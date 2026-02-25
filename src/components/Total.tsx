@@ -1,20 +1,21 @@
 import { css } from '../generated/css';
 import { LsdStrings } from '../types/calculation';
 import Field from './Field';
-import Button from './Button';
-import Icon from './Icon';
 import LedgerRow from './LedgerRow';
+import Logo from './Logo';
 
 interface TotalProps {
 	display: LsdStrings;
-	onReset: () => void;
 }
 
 const totalRow = css({
 	borderTopWidth: 'medium',
 	borderTopStyle: 'solid',
 	borderTopColor: 'ink',
-	fontWeight: 'bold',
+	/*fontWeight: 'bold',*/
+	marginBottom: "6rem",
+	marginTop: "0.5rem",
+	paddingTop: "2rem"
 });
 
 const summaCol = css({
@@ -22,16 +23,15 @@ const summaCol = css({
 	alignItems: 'center',
 	justifyContent: 'flex-end',
 	fontFamily: 'joscelyn',
+	fontSize: 'xl',
 	padding: 'xs',
 });
 
-export default function Total({ display, onReset }: TotalProps) {
+export default function Total({ display }: TotalProps) {
 	return (
 		<LedgerRow className={totalRow}>
-			<Button variant="icon" aria-label="Reset" onClick={() => window.confirm('Reset all lines?') && onReset()}>
-				<Icon icon="reset" />
-			</Button>
-			<span className={summaCol}>Summa</span>
+			<span />
+			<span className={summaCol}><Logo size="S" /></span>
 			<Field value={display.l} label="l" />
 			<Field value={display.s} label="s" />
 			<Field value={display.d} label="d" />

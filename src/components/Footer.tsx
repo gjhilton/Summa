@@ -3,11 +3,10 @@ import { css } from '../generated/css';
 const GITHUB_URL = 'https://github.com/gjhilton/Summa';
 const FUNERAL_GAMES_URL = 'http://funeralgames.co.uk';
 
-const footer = css({ marginTop: '5xl' });
+const footer = css({ marginTop: 'xl' });
 
 const smallText = css({
 	fontSize: 's',
-	marginTop: 'lg',
 	fontStyle: 'italic',
 });
 

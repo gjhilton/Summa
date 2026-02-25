@@ -2,6 +2,7 @@ import { css } from '../generated/css';
 import Button from './Button';
 import Footer from './Footer';
 import PageLayout from './PageLayout';
+import Logo from './Logo';
 
 interface AboutScreenProps {
 	onClose: () => void;
@@ -24,11 +25,16 @@ const body = css({
 
 const backBar = css({ marginBottom: '3xl' });
 
+const logoWrap = css({ textAlign: 'center', marginBottom: '3xl' });
+
 export default function AboutScreen({ onClose }: AboutScreenProps) {
 	return (
 		<PageLayout>
 			<div className={backBar}>
 				<Button onClick={onClose}>← Back</Button>
+			</div>
+			<div className={logoWrap}>
+				<Logo size="M" />
 			</div>
 			<h1 className={heading}>About</h1>
 			<div className={body}>

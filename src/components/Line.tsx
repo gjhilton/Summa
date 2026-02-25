@@ -32,14 +32,40 @@ const opCol = css({
 	alignItems: 'flex-end',
 	padding: 'xs',
 	userSelect: 'none',
+	fontSize: '6xl',
+	fontWeight: "100"
 });
 
-const opSign = css({ fontWeight: 'bold' });
+const opCross = css({
+	display: 'inline-block',
+	position: 'relative',
+	width: '0.5em',
+	height: '0.5em',
+	_before: {
+		content: '""',
+		position: 'absolute',
+		width: '1px',
+		height: '100%',
+		left: '50%',
+		top: '0',
+		transform: 'translateX(-50%)',
+		bg: 'currentColor',
+	},
+	_after: {
+		content: '""',
+		position: 'absolute',
+		height: '1px',
+		width: '100%',
+		top: '50%',
+		left: '0',
+		transform: 'translateY(-50%)',
+		bg: 'currentColor',
+	},
+});
 
 const lineTotalText = css({
 	fontSize: 's',
 	fontStyle: 'italic',
-	opacity: 0.6,
 	whiteSpace: 'nowrap',
 });
 
@@ -75,7 +101,7 @@ export default function Line({
 				<Icon icon="cross" />
 			</Button>
 			<div className={opCol}>
-				{showOp && <span className={opSign}>+</span>}
+				{showOp && <span className={opCross} aria-hidden="true" />}
 				{showWorking && !error && totalPence > 0 && (
 					<span className={lineTotalText}>= {totalPence}<sup>d</sup></span>
 				)}

@@ -32,7 +32,7 @@ const fieldBase = css({
 	textAlign: 'right',
 	padding: 'xs',
 	fontSize: 'xl',
-	borderBottomWidth: 'thin',
+	borderBottomWidth: '1px',
 	borderBottomStyle: 'solid',
 });
 
@@ -56,7 +56,7 @@ const labelBox = css({
 	justifyContent: 'center',
 	alignSelf: 'stretch',
 	padding: 'xs',
-	fontSize: 's',
+	fontSize: 'l',
 	flexShrink: 0,
 });
 

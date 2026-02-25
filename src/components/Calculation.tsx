@@ -3,11 +3,13 @@ import { LineState, LsdStrings } from '../types/calculation';
 import Line from './Line';
 import Total from './Total';
 import Button from './Button';
+import Toggle from './Toggle';
 
 interface CalculationProps {
 	lines: LineState[];
 	totalDisplay: LsdStrings;
 	showWorking: boolean;
+	onShowWorkingChange: (v: boolean) => void;
 	onUpdateField: (lineId: string, f: 'l' | 's' | 'd', v: string) => void;
 	onAddLine: () => void;
 	onRemoveLine: (id: string) => void;
@@ -15,12 +17,14 @@ interface CalculationProps {
 }
 
 const layout = css({ display: 'flex', flexDirection: 'column', gap: 'xs' });
-const toolbar = css({ display: 'flex', gap: 'sm', marginTop: 'lg' });
+const addBar = css({ marginTop: 'lg' });
+const bottomBar = css({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'lg' });
 
 export default function Calculation({
 	lines,
 	totalDisplay,
 	showWorking,
+	onShowWorkingChange,
 	onUpdateField,
 	onAddLine,
 	onRemoveLine,
@@ -41,9 +45,18 @@ export default function Calculation({
 					onRemove={() => onRemoveLine(line.id)}
 				/>
 			))}
-			<Total display={totalDisplay} onReset={onReset} />
-			<div className={toolbar}>
-				<Button onClick={onAddLine}>Add line</Button>
+			<div className={addBar}>
+				<Button onClick={onAddLine}>Add item</Button>
+			</div>
+			<Total display={totalDisplay} />
+			<div className={bottomBar}>
+				<Toggle
+					id="show-working"
+					label="Show working"
+					checked={showWorking}
+					onChange={onShowWorkingChange}
+				/>
+				<Button onClick={() => window.confirm('Reset all lines?') && onReset()}>Clear</Button>
 			</div>
 		</div>
 	);

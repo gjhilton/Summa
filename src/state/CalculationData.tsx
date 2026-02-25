@@ -9,10 +9,6 @@ import {
 import Calculation from '../components/Calculation';
 import { FEATURES } from '../features';
 
-interface CalculationDataProps {
-	showWorking: boolean;
-}
-
 const STORAGE_KEY = 'summa_calculation';
 
 function loadState(): CalculationState {
@@ -27,8 +23,9 @@ function loadState(): CalculationState {
 	return initialState();
 }
 
-export default function CalculationData({ showWorking }: CalculationDataProps) {
+export default function CalculationData() {
 	const [state, setState] = useState<CalculationState>(loadState);
+	const [showWorking, setShowWorking] = useState(false);
 
 	useEffect(() => {
 		if (FEATURES.persistCalculation) {
@@ -61,6 +58,7 @@ export default function CalculationData({ showWorking }: CalculationDataProps) {
 			lines={state.lines}
 			totalDisplay={state.totalDisplay}
 			showWorking={showWorking}
+			onShowWorkingChange={setShowWorking}
 			onUpdateField={updateField}
 			onAddLine={addLine}
 			onRemoveLine={removeLine}
