@@ -18,9 +18,9 @@ interface ItemWithQuantityProps {
 	onRemove: () => void;
 }
 
-// auto(remove) | 1em(() | 1fr(op) | 20%(qty) | auto(@) | 20%(l) | 20%(s) | 20%(d) | 1em())
+// auto(remove) | 1fr(op) | 1em(() | 20%(qty) | auto(@) | 20%(l) | 20%(s) | 20%(d) | 1em())
 // The 1em bracket cols align with the new bracket cols in Item/Total rows.
-const COLUMNS = 'auto 1em 1fr 20% auto 20% 20% 20% 1em';
+const COLUMNS = 'auto 1fr 1em 20% auto 20% 20% 20% 1em';
 
 const hidden = css({ visibility: 'hidden' });
 
@@ -118,7 +118,7 @@ const openParenCol = css({
 		position: 'absolute',
 		top: '4px',
 		bottom: '4px',
-		right: '2px',
+		right: '0',
 		width: '0.6em',
 		borderTopWidth: '1px',
 		borderTopStyle: 'solid',
@@ -158,7 +158,7 @@ const closeParenCol = css({
 	},
 });
 
-const multiplyCol = css({ gridColumn: 'span 2' });
+const multiplyCol = css({ gridColumn: 'span 3' });
 
 const supD = css({ marginLeft: '2px' });
 
@@ -225,8 +225,8 @@ export default function ItemWithQuantity({
 				>
 					<Icon icon="cross" />
 				</Button>
-				<span className={openParenCol} aria-hidden="true" />
 				<div className={opMain} />
+				<span className={openParenCol} aria-hidden="true" />
 				<Field value={quantity} label="q" error={quantityError} onChange={onChangeQuantity} showWorking={showWorking} working={quantityWorking} />
 				<span className={atSign} aria-hidden="true"><span className={mulSymbol} /></span>
 				<Field value={literals.l} label="l" error={fieldErrors.l} onChange={v => onChangeField('l', v)} showWorking={showWorking} working={inputWorking?.l} />
@@ -235,9 +235,8 @@ export default function ItemWithQuantity({
 				<span className={closeParenCol} aria-hidden="true" />
 			</LedgerRow>
 
-			{/* Subtotal row: empty | empty | working(span 2) | = | l | s | d | empty */}
+			{/* Subtotal row: empty | working(span 3) | = | l | s | d | empty */}
 			<LedgerRow columns={COLUMNS} className={errorClass}>
-				<span />
 				<span />
 				<Field value={'\u00A0'} label="q" noBorder showWorking={showWorking} working={multiplicationWorking} className={multiplyCol} />
 				<div className={subtotalOpCol}><span className={eqSymbol} aria-hidden="true" /></div>
