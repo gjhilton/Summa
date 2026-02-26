@@ -71,6 +71,7 @@ const readonlyBold = css({ fontWeight: "bold" });
 const readonlyLight = css({ fontWeight: "100" });
 
 const labelError = css({ color: "error" });
+const labelDim = css({ opacity: "0.3" });
 
 const labelBox = css({
   display: "inline-flex",
@@ -131,7 +132,7 @@ export default function Field({
         {showWorking && <span className={workingText}>{working}</span>}
       </span>
       {LABELS[label] && (
-        <span className={cx(labelBox, error && labelError)}>
+        <span className={cx(labelBox, error && labelError, !value && labelDim)}>
           {LABELS[label]}
         </span>
       )}

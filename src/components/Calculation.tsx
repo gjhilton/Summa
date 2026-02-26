@@ -27,11 +27,12 @@ interface CalculationProps {
 
 const layout = css({ display: "flex", flexDirection: "column", gap: "xs" });
 const addBar = css({ marginTop: "lg", display: "flex", gap: "sm", justifyContent: "flex-end" });
+const rowCountBar = css({ textAlign: "right", marginTop: "lg", fontSize: "m" });
 const bottomBar = css({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  marginTop: "lg",
+  marginTop: "xs",
 });
 
 export default function Calculation({
@@ -77,10 +78,10 @@ export default function Calculation({
         ),
       )}
       <div className={addBar}>
-        <Button onClick={onAddLine}>Add item</Button>
+        <Button onClick={onAddLine}>New line item</Button>
         {useItemWithQuantity && (
           <Button onClick={onAddItemWithQuantity}>
-            Add extended item
+            New extended item
           </Button>
         )}
       </div>
@@ -89,6 +90,7 @@ export default function Calculation({
         totalPence={totalPence}
         showWorking={showWorking}
       />
+      <div className={rowCountBar}>Total items: {lines.length}</div>
       <div className={bottomBar}>
         <Toggle
           id="show-working"
