@@ -28,7 +28,7 @@ const buttonStyle = cva({
       primary: { bg: "paper", color: "ink", fontSize: "m", px: "lg", py: "sm" },
       danger: { bg: "ink", color: "paper", fontSize: "m", px: "lg", py: "sm" },
       icon: {
-        bg: "paper",
+        bg: "transparent",
         color: "ink",
         p: "xs",
         display: "flex",
