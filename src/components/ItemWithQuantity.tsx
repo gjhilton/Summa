@@ -178,7 +178,17 @@ const labelRow = css({
 
 const itemGroup = css({
   "--lbl-opacity": "0",
-  _hover: { "--lbl-opacity": "1" },
+  "--rm-color": "currentColor",
+  "--rm-fill": "transparent",
+  "--rm-x": "currentColor",
+  "--rm-opacity": "0.2",
+  _hover: {
+    "--lbl-opacity": "1",
+    "--rm-color": "var(--colors-error)",
+    "--rm-fill": "var(--colors-error)",
+    "--rm-x": "white",
+    "--rm-opacity": "1",
+  },
 });
 
 const fieldLabel = css({
@@ -258,7 +268,7 @@ export default function ItemWithQuantity({
           className={cx(removeIcon, canRemove ? undefined : hidden)}
           onClick={onRemove}
         >
-          <Icon icon="trash" />
+          <Icon icon="trash" size={16} />
         </Button>
         <div className={opMain} />
         <span className={openParenCol} aria-hidden="true" />

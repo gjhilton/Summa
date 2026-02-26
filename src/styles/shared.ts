@@ -24,4 +24,4 @@ export const hidden = css({ visibility: "hidden" });
 
 export const lineError = css({ bg: "errorLineBg" });
 
-export const removeIcon = css({ color: "error" });
+export const removeIcon = css({ color: "var(--rm-color)", opacity: "var(--rm-opacity)" });
