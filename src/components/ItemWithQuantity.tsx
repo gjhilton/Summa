@@ -258,7 +258,7 @@ export default function ItemWithQuantity({
           className={cx(removeIcon, canRemove ? undefined : hidden)}
           onClick={onRemove}
         >
-          <Icon icon="cross" />
+          <Icon icon="trash" />
         </Button>
         <div className={opMain} />
         <span className={openParenCol} aria-hidden="true" />

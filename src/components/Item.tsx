@@ -90,7 +90,7 @@ export default function Item({
         className={cx(removeIcon, canRemove ? undefined : hidden)}
         onClick={onRemove}
       >
-        <Icon icon="cross" />
+        <Icon icon="trash" />
       </Button>
       <span />
       <div className={opCol}>
