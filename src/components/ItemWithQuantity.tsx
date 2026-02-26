@@ -176,6 +176,11 @@ const labelRow = css({
   alignItems: "start",
 });
 
+const itemGroup = css({
+  "--lbl-opacity": "0",
+  _hover: { "--lbl-opacity": "1" },
+});
+
 const fieldLabel = css({
   fontSize: "0.6rem",
   textTransform: "uppercase",
@@ -185,6 +190,8 @@ const fieldLabel = css({
   // push down past LedgerRow padding-top (0.5rem) and bracket top inset (-4px)
   transform: "translateY(0.6rem)",
   pointerEvents: "none",
+  opacity: "var(--lbl-opacity)",
+  transition: "opacity 0.15s",
 });
 
 const supD = css({ marginLeft: "2px" });
@@ -233,7 +240,7 @@ export default function ItemWithQuantity({
   const errorClass = error ? lineError : undefined;
 
   return (
-    <>
+    <div className={itemGroup}>
       {/* Annotation row above input fields */}
       <div
         className={cx(labelRow, errorClass)}
@@ -306,6 +313,6 @@ export default function ItemWithQuantity({
         />
         <span />
       </LedgerRow>
-    </>
+    </div>
   );
 }
