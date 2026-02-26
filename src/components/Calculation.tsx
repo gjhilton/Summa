@@ -26,7 +26,7 @@ interface CalculationProps {
 }
 
 const layout = css({ display: "flex", flexDirection: "column", gap: "xs" });
-const addBar = css({ marginTop: "lg", display: "flex", gap: "sm" });
+const addBar = css({ marginTop: "lg", display: "flex", gap: "sm", justifyContent: "flex-end" });
 const bottomBar = css({
   display: "flex",
   alignItems: "center",
@@ -80,7 +80,7 @@ export default function Calculation({
         <Button onClick={onAddLine}>Add item</Button>
         {useItemWithQuantity && (
           <Button onClick={onAddItemWithQuantity}>
-            Add item with quantity
+            Add extended item
           </Button>
         )}
       </div>

@@ -266,7 +266,7 @@ export default function AboutScreen({
           </p>
         </Section>
 
-        <Section heading="Advanced option: Items with Quantity">
+        <Section heading="Advanced option: Extended Items">
           {onUseItemWithQuantityChange && (
             <Toggle
               id="about-use-iwq"
@@ -279,12 +279,11 @@ export default function AboutScreen({
           )}
           <p>
             If you choose to enable this advanced feature, you can add{" "}
-            <em>Items with Quantity</em> to your calculation. Items with
-            Quantity comprise a quantity field and a unit cost in pounds
-            shillings and pence bracketed together. From this the system
-            computes the total cost by multiplication — which is shown on the
-            following line (and then summed with any other items you have
-            added).
+            <em>Extended Items</em> to your calculation. Extended Items
+            comprise a quantity field and a unit cost in pounds shillings and
+            pence bracketed together. From this the system computes the
+            extended cost by multiplication — which is shown on the following
+            line (and then summed with any other items you have added).
           </p>
           <div className={exampleFrame}>
             <ItemWithQuantity
