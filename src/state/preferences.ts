@@ -3,11 +3,11 @@ import { useState } from "react";
 const PREFERENCES_KEY = "summa_preferences";
 
 export interface Preferences {
-  useItemWithQuantity: boolean;
+  useExtendedItem: boolean;
 }
 
 const DEFAULTS: Preferences = {
-  useItemWithQuantity: false,
+  useExtendedItem: false,
 };
 
 function load(): Preferences {

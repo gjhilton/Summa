@@ -53,9 +53,9 @@ export default function App() {
         onClose={() => setScreen("main")}
         isFirstVisit={isFirstVisit}
         onGetStarted={handleGetStarted}
-        useItemWithQuantity={prefs.useItemWithQuantity}
-        onUseItemWithQuantityChange={(v) =>
-          updatePrefs({ useItemWithQuantity: v })
+        useExtendedItem={prefs.useExtendedItem}
+        onUseExtendedItemChange={(v) =>
+          updatePrefs({ useExtendedItem: v })
         }
       />
     );
@@ -64,7 +64,7 @@ export default function App() {
   return (
     <MainScreen
       onAbout={() => setScreen("about")}
-      useItemWithQuantity={prefs.useItemWithQuantity}
+      useExtendedItem={prefs.useExtendedItem}
     />
   );
 }

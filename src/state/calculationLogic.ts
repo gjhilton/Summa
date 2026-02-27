@@ -2,10 +2,11 @@ import {
   LsdStrings,
   LsdBooleans,
   LineState,
-  ItemWithQuantityState,
+  ExtendedItemState,
   AnyLineState,
   CalculationState,
-  isItemWithQuantity,
+  ItemType,
+  isExtendedItem,
 } from "../types/calculation";
 import {
   normalizeEarlyModernInput,
@@ -19,6 +20,7 @@ const PENCE_MULTIPLIERS = { l: 240, s: 12, d: 1 } as const;
 export function emptyLine(): LineState {
   return {
     id: crypto.randomUUID(),
+    itemType: ItemType.LINE_ITEM,
     error: false,
     fieldErrors: { l: false, s: false, d: false },
     literals: { l: "", s: "", d: "" },
@@ -26,9 +28,10 @@ export function emptyLine(): LineState {
   };
 }
 
-export function emptyItemWithQuantity(): ItemWithQuantityState {
+export function emptyExtendedItem(): ExtendedItemState {
   return {
     id: crypto.randomUUID(),
+    itemType: ItemType.EXTENDED_ITEM,
     error: false,
     fieldErrors: { l: false, s: false, d: false },
     quantityError: false,
@@ -87,7 +90,7 @@ export function computeLinePence(literals: LsdStrings): {
   return { totalPence: error ? 0 : totalPence, error, fieldErrors };
 }
 
-function computeItemWithQuantityPence(
+function computeExtendedItemPence(
   literals: LsdStrings,
   quantity: string,
 ): {
@@ -126,14 +129,14 @@ function updateLine(
   return { ...line, literals, totalPence, error, fieldErrors };
 }
 
-export function updateIwqField(
-  line: ItemWithQuantityState,
+export function updateExtendedItemField(
+  line: ExtendedItemState,
   field: "l" | "s" | "d",
   value: string,
-): ItemWithQuantityState {
+): ExtendedItemState {
   const literals = { ...line.literals, [field]: value };
   const { basePence, totalPence, error, fieldErrors, quantityError } =
-    computeItemWithQuantityPence(literals, line.quantity);
+    computeExtendedItemPence(literals, line.quantity);
   return {
     ...line,
     literals,
@@ -145,12 +148,12 @@ export function updateIwqField(
   };
 }
 
-export function updateIwqQuantity(
-  line: ItemWithQuantityState,
+export function updateExtendedItemQuantity(
+  line: ExtendedItemState,
   value: string,
-): ItemWithQuantityState {
+): ExtendedItemState {
   const { basePence, totalPence, error, fieldErrors, quantityError } =
-    computeItemWithQuantityPence(line.literals, value);
+    computeExtendedItemPence(line.literals, value);
   return {
     ...line,
     quantity: value,
@@ -173,8 +176,8 @@ export function processFieldUpdate(
 ): AnyLineState[] {
   return lines.map((line) => {
     if (line.id !== lineId) return line;
-    return isItemWithQuantity(line)
-      ? updateIwqField(line, field, value)
+    return isExtendedItem(line)
+      ? updateExtendedItemField(line, field, value)
       : updateLine(line, field, value);
   });
 }
@@ -185,8 +188,8 @@ export function processQuantityUpdate(
   value: string,
 ): AnyLineState[] {
   return lines.map((line) =>
-    line.id === lineId && isItemWithQuantity(line)
-      ? updateIwqQuantity(line, value)
+    line.id === lineId && isExtendedItem(line)
+      ? updateExtendedItemQuantity(line, value)
       : line,
   );
 }

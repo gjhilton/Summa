@@ -5,23 +5,23 @@ import Footer from "./Footer";
 import PageLayout from "./PageLayout";
 import Logo from "./Logo";
 import Item from "./Item";
-import ItemWithQuantity from "./ItemWithQuantity";
+import ExtendedItem from "./ExtendedItem";
 import Toggle from "./Toggle";
 import noWorkingImg from "../assets/no-working.png";
 import {
   computeLinePence,
-  emptyItemWithQuantity,
-  updateIwqField,
-  updateIwqQuantity,
+  emptyExtendedItem,
+  updateExtendedItemField,
+  updateExtendedItemQuantity,
 } from "../state/calculationLogic";
-import { ItemWithQuantityState } from "../types/calculation";
+import { ExtendedItemState } from "../types/calculation";
 
 interface AboutScreenProps {
   onClose: () => void;
   isFirstVisit?: boolean;
   onGetStarted?: () => void;
-  useItemWithQuantity?: boolean;
-  onUseItemWithQuantityChange?: (v: boolean) => void;
+  useExtendedItem?: boolean;
+  onUseExtendedItemChange?: (v: boolean) => void;
 }
 
 const srOnly = css({
@@ -123,8 +123,8 @@ export default function AboutScreen({
   onClose,
   isFirstVisit = false,
   onGetStarted,
-  useItemWithQuantity = false,
-  onUseItemWithQuantityChange,
+  useExtendedItem = false,
+  onUseExtendedItemChange,
 }: AboutScreenProps) {
   const [example1Literals, setExample1Literals] = useState({
     l: "xx",
@@ -149,19 +149,19 @@ export default function AboutScreen({
     fieldErrors: demoFieldErrors,
   } = computeLinePence(demoLiterals);
 
-  const [iwqLine, setIwqLine] = useState<ItemWithQuantityState>(() => {
-    let item = emptyItemWithQuantity();
-    item = updateIwqQuantity(item, "iii");
-    item = updateIwqField(item, "s", "v");
-    item = updateIwqField(item, "d", "iiij");
+  const [extendedItem, setExtendedItem] = useState<ExtendedItemState>(() => {
+    let item = emptyExtendedItem();
+    item = updateExtendedItemQuantity(item, "iii");
+    item = updateExtendedItemField(item, "s", "v");
+    item = updateExtendedItemField(item, "d", "iiij");
     return item;
   });
 
-  const handleIwqField = (f: "l" | "s" | "d", v: string) =>
-    setIwqLine((prev) => updateIwqField(prev, f, v));
+  const handleExtendedItemField = (f: "l" | "s" | "d", v: string) =>
+    setExtendedItem((prev) => updateExtendedItemField(prev, f, v));
 
-  const handleIwqQuantity = (v: string) =>
-    setIwqLine((prev) => updateIwqQuantity(prev, v));
+  const handleExtendedItemQuantity = (v: string) =>
+    setExtendedItem((prev) => updateExtendedItemQuantity(prev, v));
 
   return (
     <PageLayout>
@@ -267,14 +267,14 @@ export default function AboutScreen({
         </Section>
 
         <Section heading="Advanced option: Extended Items">
-          {onUseItemWithQuantityChange && (
+          {onUseExtendedItemChange && (
             <Toggle
               id="about-use-iwq"
               label={
-                useItemWithQuantity ? "Feature enabled" : "Feature disabled"
+                useExtendedItem ? "Feature enabled" : "Feature disabled"
               }
-              checked={useItemWithQuantity}
-              onChange={onUseItemWithQuantityChange}
+              checked={useExtendedItem}
+              onChange={onUseExtendedItemChange}
             />
           )}
           <p>
@@ -286,12 +286,12 @@ export default function AboutScreen({
             line (and then summed with any other items you have added).
           </p>
           <div className={exampleFrame}>
-            <ItemWithQuantity
-              line={iwqLine}
+            <ExtendedItem
+              line={extendedItem}
               canRemove={false}
               showWorking={false}
-              onChangeField={handleIwqField}
-              onChangeQuantity={handleIwqQuantity}
+              onChangeField={handleExtendedItemField}
+              onChangeQuantity={handleExtendedItemQuantity}
               onRemove={noop}
             />
           </div>

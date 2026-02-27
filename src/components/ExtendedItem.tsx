@@ -1,5 +1,5 @@
 import { css, cx } from "../generated/css";
-import { ItemWithQuantityState } from "../types/calculation";
+import { ExtendedItemState } from "../types/calculation";
 import { formatLsdDisplay } from "../state/calculationLogic";
 import { normalizeEarlyModernInput } from "../utils/earlyModern";
 import { isValidRoman, romanToInteger } from "../utils/roman";
@@ -10,8 +10,8 @@ import LedgerRow from "./LedgerRow";
 import LsdFieldGroup from "./LsdFieldGroup";
 import { hidden, lineError, removeIcon } from "../styles/shared";
 
-interface ItemWithQuantityProps {
-  line: ItemWithQuantityState;
+interface ExtendedItemProps {
+  line: ExtendedItemState;
   canRemove: boolean;
   showWorking: boolean;
   onChangeField: (f: "l" | "s" | "d", v: string) => void;
@@ -206,14 +206,14 @@ const fieldLabel = css({
 
 const supD = css({ marginLeft: "2px" });
 
-export default function ItemWithQuantity({
+export default function ExtendedItem({
   line,
   canRemove,
   showWorking,
   onChangeField,
   onChangeQuantity,
   onRemove,
-}: ItemWithQuantityProps) {
+}: ExtendedItemProps) {
   const {
     literals,
     quantity,

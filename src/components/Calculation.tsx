@@ -2,10 +2,10 @@ import { css } from "../generated/css";
 import {
   AnyLineState,
   LsdStrings,
-  isItemWithQuantity,
+  isExtendedItem,
 } from "../types/calculation";
 import Item from "./Item";
-import ItemWithQuantity from "./ItemWithQuantity";
+import ExtendedItem from "./ExtendedItem";
 import Total from "./Total";
 import Button from "./Button";
 import Toggle from "./Toggle";
@@ -19,10 +19,10 @@ interface CalculationProps {
   onUpdateField: (lineId: string, f: "l" | "s" | "d", v: string) => void;
   onUpdateQuantity: (lineId: string, v: string) => void;
   onAddLine: () => void;
-  onAddItemWithQuantity: () => void;
+  onAddExtendedItem: () => void;
   onRemoveLine: (id: string) => void;
   onReset: () => void;
-  useItemWithQuantity: boolean;
+  useExtendedItem: boolean;
 }
 
 const layout = css({ display: "flex", flexDirection: "column", gap: "xs" });
@@ -44,16 +44,16 @@ export default function Calculation({
   onUpdateField,
   onUpdateQuantity,
   onAddLine,
-  onAddItemWithQuantity,
+  onAddExtendedItem,
   onRemoveLine,
   onReset,
-  useItemWithQuantity,
+  useExtendedItem,
 }: CalculationProps) {
   return (
     <div className={layout}>
       {lines.map((line, i) =>
-        isItemWithQuantity(line) ? (
-          <ItemWithQuantity
+        isExtendedItem(line) ? (
+          <ExtendedItem
             key={line.id}
             line={line}
             canRemove={lines.length > 2}
@@ -79,8 +79,8 @@ export default function Calculation({
       )}
       <div className={addBar}>
         <Button onClick={onAddLine}>New line item</Button>
-        {useItemWithQuantity && (
-          <Button onClick={onAddItemWithQuantity}>
+        {useExtendedItem && (
+          <Button onClick={onAddExtendedItem}>
             New extended item
           </Button>
         )}

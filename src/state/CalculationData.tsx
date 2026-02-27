@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { CalculationState } from "../types/calculation";
 import {
   emptyLine,
-  emptyItemWithQuantity,
+  emptyExtendedItem,
   processFieldUpdate,
   processQuantityUpdate,
   withNewLines,
@@ -40,9 +40,9 @@ function loadState(): CalculationState {
 }
 
 export default function CalculationData({
-  useItemWithQuantity,
+  useExtendedItem,
 }: {
-  useItemWithQuantity: boolean;
+  useExtendedItem: boolean;
 }) {
   const [state, setState] = useState<CalculationState>(loadState);
   const [showWorking, setShowWorking] = useState(false);
@@ -73,9 +73,9 @@ export default function CalculationData({
     setState((prev) => withNewLines(prev, [...prev.lines, emptyLine()]));
   }
 
-  function addItemWithQuantity(): void {
+  function addExtendedItem(): void {
     setState((prev) =>
-      withNewLines(prev, [...prev.lines, emptyItemWithQuantity()]),
+      withNewLines(prev, [...prev.lines, emptyExtendedItem()]),
     );
   }
 
@@ -104,10 +104,10 @@ export default function CalculationData({
       onUpdateField={updateField}
       onUpdateQuantity={updateQuantity}
       onAddLine={addLine}
-      onAddItemWithQuantity={addItemWithQuantity}
+      onAddExtendedItem={addExtendedItem}
       onRemoveLine={removeLine}
       onReset={resetCalculation}
-      useItemWithQuantity={useItemWithQuantity}
+      useExtendedItem={useExtendedItem}
     />
   );
 }
