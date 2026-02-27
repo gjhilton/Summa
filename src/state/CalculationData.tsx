@@ -41,8 +41,10 @@ function loadState(): CalculationState {
 
 export default function CalculationData({
   useExtendedItem,
+  onUseExtendedItemChange,
 }: {
   useExtendedItem: boolean;
+  onUseExtendedItemChange: (v: boolean) => void;
 }) {
   const [state, setState] = useState<CalculationState>(loadState);
   const [showWorking, setShowWorking] = useState(false);
@@ -108,6 +110,7 @@ export default function CalculationData({
       onRemoveLine={removeLine}
       onReset={resetCalculation}
       useExtendedItem={useExtendedItem}
+      onUseExtendedItemChange={onUseExtendedItemChange}
     />
   );
 }

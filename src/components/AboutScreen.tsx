@@ -14,14 +14,14 @@ import {
   updateExtendedItemField,
   updateExtendedItemQuantity,
 } from "../state/calculationLogic";
-import { ExtendedItemState } from "../types/calculation";
+import { toLineView } from "../state/displayLogic";
+import { ExtendedItemState, ItemType } from "../types/calculation";
+import { ExtendedItemView } from "../types/lineView";
 
 interface AboutScreenProps {
   onClose: () => void;
   isFirstVisit?: boolean;
   onGetStarted?: () => void;
-  useExtendedItem?: boolean;
-  onUseExtendedItemChange?: (v: boolean) => void;
 }
 
 const srOnly = css({
@@ -123,8 +123,6 @@ export default function AboutScreen({
   onClose,
   isFirstVisit = false,
   onGetStarted,
-  useExtendedItem = false,
-  onUseExtendedItemChange,
 }: AboutScreenProps) {
   const [example1Literals, setExample1Literals] = useState({
     l: "xx",
@@ -248,13 +246,17 @@ export default function AboutScreen({
           </p>
           <div className={exampleFrame}>
             <Item
-              literals={example1Literals}
-              error={example1Error}
-              fieldErrors={example1FieldErrors}
+              view={{
+                id: "example1",
+                itemType: ItemType.LINE_ITEM,
+                literals: example1Literals,
+                error: example1Error,
+                fieldErrors: example1FieldErrors,
+                totalPence: example1Pence,
+                showOp: false,
+              }}
               canRemove={false}
-              showOp={false}
               showWorking={false}
-              totalPence={example1Pence}
               onChangeField={(f, v) =>
                 setExample1Literals((prev) => ({ ...prev, [f]: v }))
               }
@@ -267,18 +269,9 @@ export default function AboutScreen({
         </Section>
 
         <Section heading="Advanced option: Extended Items">
-          {onUseExtendedItemChange && (
-            <Toggle
-              id="about-use-iwq"
-              label={
-                useExtendedItem ? "Feature enabled" : "Feature disabled"
-              }
-              checked={useExtendedItem}
-              onChange={onUseExtendedItemChange}
-            />
-          )}
           <p>
-            If you choose to enable this advanced feature, you can add{" "}
+            If you choose to enable this advanced feature (via the{" "}
+            <em>Advanced options</em> toggle on the main screen), you can add{" "}
             <em>Extended Items</em> to your calculation. Extended Items
             comprise a quantity field and a unit cost in pounds shillings and
             pence bracketed together. From this the system computes the
@@ -287,7 +280,7 @@ export default function AboutScreen({
           </p>
           <div className={exampleFrame}>
             <ExtendedItem
-              line={extendedItem}
+              view={toLineView(extendedItem, false) as ExtendedItemView}
               canRemove={false}
               showWorking={false}
               onChangeField={handleExtendedItemField}
@@ -311,13 +304,17 @@ export default function AboutScreen({
               onChange={setDemoShowWorking}
             />
             <Item
-              literals={demoLiterals}
-              error={demoError}
-              fieldErrors={demoFieldErrors}
+              view={{
+                id: "demo",
+                itemType: ItemType.LINE_ITEM,
+                literals: demoLiterals,
+                error: demoError,
+                fieldErrors: demoFieldErrors,
+                totalPence: demoTotalPence,
+                showOp: false,
+              }}
               canRemove={false}
-              showOp={false}
               showWorking={demoShowWorking}
-              totalPence={demoTotalPence}
               onChangeField={(f, v) =>
                 setDemoLiterals((prev) => ({ ...prev, [f]: v }))
               }

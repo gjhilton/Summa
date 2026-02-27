@@ -1,22 +1,15 @@
 import { css, cx } from "../generated/css";
-import { ExtendedItemState } from "../types/calculation";
-import { formatLsdDisplay } from "../state/calculationLogic";
-import { normalizeEarlyModernInput } from "../utils/earlyModern";
-import { isValidRoman, romanToInteger } from "../utils/roman";
+import { ExtendedItemView, BaseLineItemProps } from "../types/lineView";
 import Field from "./Field";
 import Button from "./Button";
 import Icon from "./Icon";
 import LedgerRow from "./LedgerRow";
 import LsdFieldGroup from "./LsdFieldGroup";
-import { hidden, lineError, removeIcon } from "../styles/shared";
+import { hidden, lineError, removeIcon, lineHoverVars } from "../styles/shared";
 
-interface ExtendedItemProps {
-  line: ExtendedItemState;
-  canRemove: boolean;
-  showWorking: boolean;
-  onChangeField: (f: "l" | "s" | "d", v: string) => void;
+interface ExtendedItemProps extends BaseLineItemProps {
+  view: ExtendedItemView;
   onChangeQuantity: (v: string) => void;
-  onRemove: () => void;
 }
 
 // auto(remove) | 1fr(op) | 1em(() | 20%(qty) | auto(@) | 20%(l) | 20%(s) | 20%(d) | 1em())
@@ -178,16 +171,8 @@ const labelRow = css({
 
 const itemGroup = css({
   "--lbl-opacity": "0",
-  "--rm-color": "currentColor",
-  "--rm-fill": "transparent",
-  "--rm-x": "currentColor",
-  "--rm-opacity": "0.2",
   _hover: {
     "--lbl-opacity": "1",
-    "--rm-color": "var(--colors-error)",
-    "--rm-fill": "var(--colors-error)",
-    "--rm-x": "white",
-    "--rm-opacity": "1",
   },
 });
 
@@ -207,7 +192,7 @@ const fieldLabel = css({
 const supD = css({ marginLeft: "2px" });
 
 export default function ExtendedItem({
-  line,
+  view,
   canRemove,
   showWorking,
   onChangeField,
@@ -222,18 +207,9 @@ export default function ExtendedItem({
     error,
     basePence,
     totalPence,
-  } = line;
-
-  const qNorm = normalizeEarlyModernInput(quantity);
-  const quantityInt =
-    !quantityError && isValidRoman(qNorm) ? romanToInteger(qNorm) : null;
-
-  const rawSubtotal = formatLsdDisplay(totalPence);
-  const subtotalDisplay = {
-    l: rawSubtotal.l === "0" ? "" : rawSubtotal.l,
-    s: rawSubtotal.s === "0" ? "" : rawSubtotal.s,
-    d: rawSubtotal.d === "0" ? "" : rawSubtotal.d,
-  };
+    quantityInt,
+    subtotalDisplay,
+  } = view;
 
   const quantityWorking =
     showWorking && !error && quantityInt !== null ? quantityInt : undefined;
@@ -250,7 +226,7 @@ export default function ExtendedItem({
   const errorClass = error ? lineError : undefined;
 
   return (
-    <div className={itemGroup}>
+    <div className={cx(itemGroup, lineHoverVars)}>
       {/* Annotation row above input fields */}
       <div
         className={cx(labelRow, errorClass)}

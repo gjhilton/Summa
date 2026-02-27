@@ -25,3 +25,16 @@ export const hidden = css({ visibility: "hidden" });
 export const lineError = css({ bg: "errorLineBg" });
 
 export const removeIcon = css({ color: "var(--rm-color)", opacity: "var(--rm-opacity)" });
+
+export const lineHoverVars = css({
+  "--rm-color": "currentColor",
+  "--rm-fill": "transparent",
+  "--rm-x": "currentColor",
+  "--rm-opacity": "0.2",
+  _hover: {
+    "--rm-color": "var(--colors-error)",
+    "--rm-fill": "var(--colors-error)",
+    "--rm-x": "white",
+    "--rm-opacity": "1",
+  },
+});

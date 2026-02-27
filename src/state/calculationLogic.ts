@@ -17,9 +17,20 @@ import { penceToLsd } from "../utils/currency";
 
 const PENCE_MULTIPLIERS = { l: 240, s: 12, d: 1 } as const;
 
+function generateId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  // Fallback for non-secure HTTP contexts (e.g. LAN dev access over plain HTTP)
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
 export function emptyLine(): LineState {
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     itemType: ItemType.LINE_ITEM,
     error: false,
     fieldErrors: { l: false, s: false, d: false },
@@ -30,7 +41,7 @@ export function emptyLine(): LineState {
 
 export function emptyExtendedItem(): ExtendedItemState {
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     itemType: ItemType.EXTENDED_ITEM,
     error: false,
     fieldErrors: { l: false, s: false, d: false },

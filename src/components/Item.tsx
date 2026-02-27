@@ -1,35 +1,14 @@
 import { css, cx } from "../generated/css";
-import { LsdStrings, LsdBooleans } from "../types/calculation";
-import { workingRowStyles, hidden, lineError, removeIcon } from "../styles/shared";
+import { LineItemView, BaseLineItemProps } from "../types/lineView";
+import { workingRowStyles, hidden, lineError, removeIcon, lineHoverVars } from "../styles/shared";
 import Button from "./Button";
 import Icon from "./Icon";
 import LedgerRow from "./LedgerRow";
 import LsdFieldGroup from "./LsdFieldGroup";
 
-interface ItemProps {
-  literals: LsdStrings;
-  error: boolean;
-  fieldErrors?: LsdBooleans;
-  canRemove: boolean;
-  showOp: boolean;
-  showWorking: boolean;
-  totalPence: number;
-  onChangeField: (f: "l" | "s" | "d", v: string) => void;
-  onRemove: () => void;
+interface ItemProps extends BaseLineItemProps {
+  view: LineItemView;
 }
-
-const itemRow = css({
-  "--rm-color": "currentColor",
-  "--rm-fill": "transparent",
-  "--rm-x": "currentColor",
-  "--rm-opacity": "0.2",
-  _hover: {
-    "--rm-color": "var(--colors-error)",
-    "--rm-fill": "var(--colors-error)",
-    "--rm-x": "white",
-    "--rm-opacity": "1",
-  },
-});
 
 const opCol = css({
   display: "flex",
@@ -85,18 +64,15 @@ const opCross = css({
 const supD = css({ marginLeft: "2px" }); // pence superscript in op working row
 
 export default function Item({
-  literals,
-  error,
-  fieldErrors = { l: false, s: false, d: false },
+  view,
   canRemove,
-  showOp,
   showWorking,
-  totalPence,
   onChangeField,
   onRemove,
 }: ItemProps) {
+  const { literals, error, fieldErrors, totalPence, showOp } = view;
   return (
-    <LedgerRow className={cx(itemRow, error ? lineError : undefined)}>
+    <LedgerRow className={cx(lineHoverVars, error ? lineError : undefined)}>
       <Button
         variant="icon"
         aria-label="Remove line"

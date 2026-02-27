@@ -6,6 +6,7 @@ import PageLayout from "./PageLayout";
 interface MainScreenProps {
   onAbout: () => void;
   useExtendedItem: boolean;
+  onUseExtendedItemChange: (v: boolean) => void;
 }
 
 const header = css({
@@ -30,6 +31,7 @@ const aboutLink = css({
 export default function MainScreen({
   onAbout,
   useExtendedItem,
+  onUseExtendedItemChange,
 }: MainScreenProps) {
   return (
     <PageLayout>
@@ -43,7 +45,7 @@ export default function MainScreen({
           About
         </button>
       </header>
-      <CalculationData useExtendedItem={useExtendedItem} />
+      <CalculationData useExtendedItem={useExtendedItem} onUseExtendedItemChange={onUseExtendedItemChange} />
       <Footer />
     </PageLayout>
   );

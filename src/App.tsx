@@ -53,10 +53,6 @@ export default function App() {
         onClose={() => setScreen("main")}
         isFirstVisit={isFirstVisit}
         onGetStarted={handleGetStarted}
-        useExtendedItem={prefs.useExtendedItem}
-        onUseExtendedItemChange={(v) =>
-          updatePrefs({ useExtendedItem: v })
-        }
       />
     );
   }
@@ -65,6 +61,7 @@ export default function App() {
     <MainScreen
       onAbout={() => setScreen("about")}
       useExtendedItem={prefs.useExtendedItem}
+      onUseExtendedItemChange={(v) => updatePrefs({ useExtendedItem: v })}
     />
   );
 }

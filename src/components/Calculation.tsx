@@ -1,9 +1,6 @@
 import { css } from "../generated/css";
-import {
-  AnyLineState,
-  LsdStrings,
-  isExtendedItem,
-} from "../types/calculation";
+import { AnyLineState, ItemType, LsdStrings } from "../types/calculation";
+import { toLineView } from "../state/displayLogic";
 import Item from "./Item";
 import ExtendedItem from "./ExtendedItem";
 import Total from "./Total";
@@ -23,6 +20,7 @@ interface CalculationProps {
   onRemoveLine: (id: string) => void;
   onReset: () => void;
   useExtendedItem: boolean;
+  onUseExtendedItemChange: (v: boolean) => void;
 }
 
 const layout = css({ display: "flex", flexDirection: "column", gap: "xs" });
@@ -34,6 +32,8 @@ const bottomBar = css({
   justifyContent: "space-between",
   marginTop: "xs",
 });
+
+const toggleStack = css({ display: "flex", flexDirection: "column", gap: "xs" });
 
 export default function Calculation({
   lines,
@@ -48,32 +48,30 @@ export default function Calculation({
   onRemoveLine,
   onReset,
   useExtendedItem,
+  onUseExtendedItemChange,
 }: CalculationProps) {
+  const views = lines.map((line, i) => toLineView(line, i > 0));
   return (
     <div className={layout}>
-      {lines.map((line, i) =>
-        isExtendedItem(line) ? (
+      {views.map((view) =>
+        view.itemType === ItemType.EXTENDED_ITEM ? (
           <ExtendedItem
-            key={line.id}
-            line={line}
+            key={view.id}
+            view={view}
             canRemove={lines.length > 2}
             showWorking={showWorking}
-            onChangeField={(f, v) => onUpdateField(line.id, f, v)}
-            onChangeQuantity={(v) => onUpdateQuantity(line.id, v)}
-            onRemove={() => onRemoveLine(line.id)}
+            onChangeField={(f, v) => onUpdateField(view.id, f, v)}
+            onChangeQuantity={(v) => onUpdateQuantity(view.id, v)}
+            onRemove={() => onRemoveLine(view.id)}
           />
         ) : (
           <Item
-            key={line.id}
-            literals={line.literals}
-            error={line.error}
-            fieldErrors={line.fieldErrors}
+            key={view.id}
+            view={view}
             canRemove={lines.length > 2}
-            showOp={i > 0}
             showWorking={showWorking}
-            totalPence={line.totalPence}
-            onChangeField={(f, v) => onUpdateField(line.id, f, v)}
-            onRemove={() => onRemoveLine(line.id)}
+            onChangeField={(f, v) => onUpdateField(view.id, f, v)}
+            onRemove={() => onRemoveLine(view.id)}
           />
         ),
       )}
@@ -92,12 +90,20 @@ export default function Calculation({
       />
       <div className={rowCountBar}>Total items: {lines.length}</div>
       <div className={bottomBar}>
-        <Toggle
-          id="show-working"
-          label="Show working"
-          checked={showWorking}
-          onChange={onShowWorkingChange}
-        />
+        <div className={toggleStack}>
+          <Toggle
+            id="show-working"
+            label="Show working"
+            checked={showWorking}
+            onChange={onShowWorkingChange}
+          />
+          <Toggle
+            id="advanced-options"
+            label="Advanced options"
+            checked={useExtendedItem}
+            onChange={onUseExtendedItemChange}
+          />
+        </div>
         <Button onClick={() => window.confirm("Reset all lines?") && onReset()}>
           Clear
         </Button>
