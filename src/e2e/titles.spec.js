@@ -21,7 +21,9 @@ test.describe('item titles', () => {
 		await expect(titleInput).toHaveValue('Wages');
 	});
 
-	test('title persists after entering a value in the same row', async ({ page }) => {
+	test('title persists after entering a value in the same row', async ({
+		page,
+	}) => {
 		await goto(page);
 		const titleInput = page.getByLabel('Line title').first();
 		await titleInput.fill('Rent');
@@ -67,7 +69,9 @@ test.describe('item titles', () => {
 		await expect(titleInput).toHaveValue('Quarter total');
 	});
 
-	test('subtotal title shows in breadcrumb after navigating in', async ({ page }) => {
+	test('subtotal title shows in breadcrumb after navigating in', async ({
+		page,
+	}) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
@@ -78,7 +82,9 @@ test.describe('item titles', () => {
 		await expect(page.getByText('Quarter total')).toBeVisible();
 	});
 
-	test('sub-calculation title input updates the breadcrumb', async ({ page }) => {
+	test('sub-calculation title input updates the breadcrumb', async ({
+		page,
+	}) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);

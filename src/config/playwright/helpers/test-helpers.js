@@ -16,7 +16,7 @@ export async function goto(page) {
 		localStorage.setItem('summa_visited', '1');
 	});
 	await page.reload();
-	page.once('dialog', (dialog) => dialog.accept());
+	page.once('dialog', dialog => dialog.accept());
 	await page.getByRole('button', { name: 'Clear', exact: true }).click();
 }
 

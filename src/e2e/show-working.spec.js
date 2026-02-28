@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { goto, enterValue, enableShowWorking, getItemsCount } from '../config/playwright/helpers/test-helpers.js';
+import {
+	goto,
+	enterValue,
+	enableShowWorking,
+	getItemsCount,
+} from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('show working', () => {
 	test('show working toggle is present', async ({ page }) => {
@@ -8,14 +13,18 @@ test.describe('show working', () => {
 		await expect(toggle).toBeVisible();
 	});
 
-	test('enabling show working reveals working annotations', async ({ page }) => {
+	test('enabling show working reveals working annotations', async ({
+		page,
+	}) => {
 		await goto(page);
 		await enterValue(page, 0, 's', 'v'); // 5s = 60d
 		await enableShowWorking(page);
 		await expect(page.getByText(/60/).first()).toBeVisible();
 	});
 
-	test('disabling show working hides working annotations', async ({ page }) => {
+	test('disabling show working hides working annotations', async ({
+		page,
+	}) => {
 		await goto(page);
 		await enterValue(page, 0, 's', 'v');
 		const toggle = page.getByRole('switch', { name: /show working/i });
@@ -24,7 +33,9 @@ test.describe('show working', () => {
 		await expect(page.getByText('60')).not.toBeVisible();
 	});
 
-	test('item count shown in total row when show working enabled', async ({ page }) => {
+	test('item count shown in total row when show working enabled', async ({
+		page,
+	}) => {
 		await goto(page);
 		await enableShowWorking(page);
 		await expect(getItemsCount(page)).toBeVisible();

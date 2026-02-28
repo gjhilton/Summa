@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { goto, toggleAdvancedOptions } from '../config/playwright/helpers/test-helpers.js';
+import {
+	goto,
+	toggleAdvancedOptions,
+} from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('advanced mode', () => {
 	test('advanced options toggle is present', async ({ page }) => {
@@ -14,14 +17,18 @@ test.describe('advanced mode', () => {
 		await expect(btn).not.toBeVisible();
 	});
 
-	test('enabling advanced mode shows new extended item button', async ({ page }) => {
+	test('enabling advanced mode shows new extended item button', async ({
+		page,
+	}) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		const btn = page.getByRole('button', { name: /new extended item/i });
 		await expect(btn).toBeVisible();
 	});
 
-	test('enabling advanced mode shows new subtotal item button', async ({ page }) => {
+	test('enabling advanced mode shows new subtotal item button', async ({
+		page,
+	}) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		const btn = page.getByRole('button', { name: /new subtotal item/i });

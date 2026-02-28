@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { goto, enterValue, getTotalField } from '../config/playwright/helpers/test-helpers.js';
+import {
+	goto,
+	enterValue,
+	getTotalField,
+} from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('basic calculation', () => {
 	test('page loads and shows the Summa logo', async ({ page }) => {

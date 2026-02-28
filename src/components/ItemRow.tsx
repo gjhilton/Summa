@@ -1,7 +1,7 @@
-import { css } from "../generated/css";
-import LedgerRow from "./LedgerRow";
-import Icon from "./Icon";
-import { useDragHandle } from "./SortableItem";
+import { css } from '../generated/css';
+import LedgerRow from './LedgerRow';
+import Icon from './Icon';
+import { useDragHandle } from './DragHandleContext';
 
 /**
  * Slot-based row for all ledger item types.
@@ -15,60 +15,60 @@ import { useDragHandle } from "./SortableItem";
  *   col 9 1em   = right bracket / trailing spacer
  */
 interface ItemRowProps {
-  className?: string;
-  noDragHandle?: boolean;
-  remove?: React.ReactNode;
-  leftBracket?: React.ReactNode;
-  title?: React.ReactNode;
-  operator?: React.ReactNode;
-  currency: React.ReactNode;
-  rightBracket?: React.ReactNode;
+	className?: string;
+	noDragHandle?: boolean;
+	remove?: React.ReactNode;
+	leftBracket?: React.ReactNode;
+	title?: React.ReactNode;
+	operator?: React.ReactNode;
+	currency: React.ReactNode;
+	rightBracket?: React.ReactNode;
 }
 
 const dragHandle = css({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "grab",
-  color: "ink",
-  opacity: "0.25",
-  touchAction: "none",
-  userSelect: "none",
-  _hover: { opacity: "0.6" },
-  _active: { cursor: "grabbing" },
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'center',
+	cursor: 'grab',
+	color: 'ink',
+	opacity: '0.25',
+	touchAction: 'none',
+	userSelect: 'none',
+	_hover: { opacity: '0.6' },
+	_active: { cursor: 'grabbing' },
 });
 
 export default function ItemRow({
-  className,
-  noDragHandle = false,
-  remove,
-  leftBracket,
-  title,
-  operator,
-  currency,
-  rightBracket,
+	className,
+	noDragHandle = false,
+	remove,
+	leftBracket,
+	title,
+	operator,
+	currency,
+	rightBracket,
 }: ItemRowProps) {
-  const drag = useDragHandle();
-  return (
-    <LedgerRow className={className}>
-      {!noDragHandle && drag ? (
-        <button
-          className={dragHandle}
-          aria-label="Drag to reorder"
-          {...drag.listeners}
-          {...drag.attributes}
-        >
-          <Icon icon="grip" size={14} />
-        </button>
-      ) : (
-        <span />
-      )}
-      {remove ?? <span />}
-      {leftBracket ?? <span />}
-      {title ?? <span />}
-      {operator ?? <span />}
-      {currency}
-      {rightBracket ?? <span />}
-    </LedgerRow>
-  );
+	const drag = useDragHandle();
+	return (
+		<LedgerRow className={className}>
+			{!noDragHandle && drag ? (
+				<button
+					className={dragHandle}
+					aria-label="Drag to reorder"
+					{...drag.listeners}
+					{...drag.attributes}
+				>
+					<Icon icon="grip" size={14} />
+				</button>
+			) : (
+				<span />
+			)}
+			{remove ?? <span />}
+			{leftBracket ?? <span />}
+			{title ?? <span />}
+			{operator ?? <span />}
+			{currency}
+			{rightBracket ?? <span />}
+		</LedgerRow>
+	);
 }
