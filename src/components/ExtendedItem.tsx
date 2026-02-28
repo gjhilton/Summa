@@ -1,16 +1,16 @@
 import { css, cx } from '../generated/css';
 import { ExtendedItemView, BaseLineItemProps } from '../types/lineView';
-import Field from './Field';
-import CurrencyFields from './CurrencyFields';
-import { supD as supDClass } from './CurrencyFields.styles';
-import { workingRowNowrap } from './PenceWorkingRow.styles';
 import { lineError, lineHoverVars } from './LineItem.styles';
+import CurrencyFields from './CurrencyFields';
+import Field from './Field';
+import ItemRow from './ItemRow';
+import OperatorSymbol from './OperatorSymbol';
+import RemoveButton from './RemoveButton';
+import SupD from './SupD';
+import TitleInput from './TitleInput';
+import WorkingRow from './WorkingRow';
 
 const LEDGER_COLUMNS = '1.5rem 1.5rem 1em 1fr auto 20% 20% 20% 1em';
-import TitleInput from './TitleInput';
-import RemoveButton from './RemoveButton';
-import OperatorSymbol from './OperatorSymbol';
-import ItemRow from './ItemRow';
 
 interface ExtendedItemProps extends BaseLineItemProps {
 	view: ExtendedItemView;
@@ -161,8 +161,8 @@ export default function ExtendedItem({
 		showWorking && !error && quantityInt !== null && basePence > 0 ? (
 			<>
 				{quantityInt} × {basePence}
-				<sup className={supDClass}>d</sup> = {totalPence}
-				<sup className={supDClass}>d</sup>
+				<SupD /> = {totalPence}
+				<SupD />
 			</>
 		) : undefined;
 
@@ -255,9 +255,7 @@ export default function ExtendedItem({
 							ariaLabel="Item title"
 						/>
 						{showWorking && (
-							<span className={workingRowNowrap}>
-								{multiplicationWorking}
-							</span>
+							<WorkingRow>{multiplicationWorking}</WorkingRow>
 						)}
 					</div>
 				}

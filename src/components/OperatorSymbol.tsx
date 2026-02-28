@@ -60,7 +60,10 @@ export default function OperatorSymbol({
 }) {
 	return (
 		<span
-			className={cx(base, type === 'multiply' ? multiplyStyle : equalsStyle)}
+			className={cx(
+				base,
+				type === 'multiply' ? multiplyStyle : equalsStyle
+			)}
 			aria-hidden="true"
 		/>
 	);

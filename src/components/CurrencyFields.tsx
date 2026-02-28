@@ -1,7 +1,7 @@
 import { css } from '../generated/css';
 import { LsdStrings, LsdBooleans } from '../types/calculation';
 import { computeFieldWorking } from '../state/calculationLogic';
-import { supD } from './CurrencyFields.styles';
+import SupD from './SupD';
 import Field from './Field';
 
 interface CurrencyFieldsProps {
@@ -28,7 +28,7 @@ function renderWorkingNode(result: ReturnType<typeof computeFieldWorking>) {
 		<>
 			{result.prefix}
 			{result.pence}
-			<sup className={supD}>d</sup>
+			<SupD />
 		</>
 	);
 }

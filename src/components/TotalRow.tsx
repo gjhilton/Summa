@@ -1,7 +1,7 @@
 import { css } from '../generated/css';
 import { LsdStrings } from '../types/calculation';
-import { workingRowNowrap } from './PenceWorkingRow.styles';
 import PenceWorkingRow from './PenceWorkingRow';
+import WorkingRow from './WorkingRow';
 import Logo from './Logo';
 import CurrencyFields from './CurrencyFields';
 import ItemRow from './ItemRow';
@@ -73,9 +73,7 @@ export default function TotalRow({
 					</div>
 					{showWorking && (
 						<div className={workingAnnotationRow}>
-							<span className={workingRowNowrap}>
-								Items: {itemCount}
-							</span>
+							<WorkingRow>Items: {itemCount}</WorkingRow>
 							<PenceWorkingRow
 								showWorking={showWorking}
 								pence={totalPence}

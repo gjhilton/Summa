@@ -6,8 +6,9 @@ interface DragHandleContextValue {
 	attributes: ReturnType<typeof useSortable>['attributes'];
 }
 
-export const DragHandleContext =
-	createContext<DragHandleContextValue | null>(null);
+export const DragHandleContext = createContext<DragHandleContextValue | null>(
+	null
+);
 
 export function useDragHandle() {
 	return useContext(DragHandleContext);

@@ -1,5 +1,5 @@
-import { supD } from './CurrencyFields.styles';
-import { workingRowNowrap } from './PenceWorkingRow.styles';
+import SupD from './SupD';
+import WorkingRow from './WorkingRow';
 
 interface PenceWorkingRowProps {
 	showWorking: boolean;
@@ -14,13 +14,13 @@ export default function PenceWorkingRow({
 }: PenceWorkingRowProps) {
 	if (!showWorking) return null;
 	return (
-		<span className={workingRowNowrap}>
+		<WorkingRow>
 			{!error && pence > 0 && (
 				<>
 					{pence}
-					<sup className={supD}>d</sup> =
+					<SupD /> =
 				</>
 			)}
-		</span>
+		</WorkingRow>
 	);
 }
