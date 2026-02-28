@@ -173,8 +173,8 @@ export default function ExtendedItem({
         className={cx(labelRow, errorClass)}
         style={{ gridTemplateColumns: LEDGER_COLUMNS }}
       >
-        <span style={{ gridColumn: "3" }} className={fieldLabel}>quantity</span>
-        <span style={{ gridColumn: "5 / span 3" }} className={fieldLabel}>unit cost</span>
+        <span style={{ gridColumn: "4" }} className={fieldLabel}>quantity</span>
+        <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>unit cost</span>
       </div>
 
       {/* Input row: remove | ( | qty | empty | × | l | s | d | ) */}
@@ -216,12 +216,13 @@ export default function ExtendedItem({
         className={cx(labelRow, errorClass)}
         style={{ gridTemplateColumns: LEDGER_COLUMNS }}
       >
-        <span style={{ gridColumn: "5 / span 3" }} className={fieldLabel}>extended cost</span>
+        <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>extended cost</span>
       </div>
 
       {/* Subtotal row: empty | spacer | title+working | empty | = | l | s | d | trailing */}
       <ItemRow
         className={errorClass}
+        noDragHandle
         title={
           <div className={subtotalTitleCol}>
             <TitleInput value={title} onChange={onChangeTitle} />

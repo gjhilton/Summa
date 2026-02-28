@@ -54,16 +54,17 @@ export const titleInput = css({
 
 /**
  * Universal ledger column grid shared by all row types.
- * col 1 auto  = remove button
- * col 2 1em   = ( bracket (ExtendedItem) or spacer
- * col 3 1fr   = title / qty  (all titles and ExtendedItem qty align here)
- * col 4 auto  = × / = operator (ExtendedItem) or spacer
- * col 5 20%   = l (pounds)
- * col 6 20%   = s (shillings)
- * col 7 20%   = d (pence)
- * col 8 1em   = ) bracket (ExtendedItem) or trailing spacer
+ * col 1 1.5rem = drag handle (built-in to ItemRow)
+ * col 2 1.5rem = remove button
+ * col 3 1em   = ( bracket (ExtendedItem) or spacer
+ * col 4 1fr   = title / qty  (all titles and ExtendedItem qty align here)
+ * col 5 auto  = × / = operator (ExtendedItem) or spacer
+ * col 6 20%   = l (pounds)
+ * col 7 20%   = s (shillings)
+ * col 8 20%   = d (pence)
+ * col 9 1em   = ) bracket (ExtendedItem) or trailing spacer
  */
-export const LEDGER_COLUMNS = "1.5rem 1em 1fr auto 20% 20% 20% 1em";
+export const LEDGER_COLUMNS = "1.5rem 1.5rem 1em 1fr auto 20% 20% 20% 1em";
 
 export const lineHoverVars = css({
   "--rm-color": "currentColor",

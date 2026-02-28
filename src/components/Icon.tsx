@@ -10,7 +10,7 @@ const PATHS = {
 } as const;
 
 type PathIcon = keyof typeof PATHS;
-export type IconType = PathIcon | "circle-x";
+export type IconType = PathIcon | "circle-x" | "grip";
 
 interface IconProps {
   icon: IconType;
@@ -27,6 +27,17 @@ const iconStyle = css({
 });
 
 export default function Icon({ icon, size = 20, strokeWidth = 2 }: IconProps) {
+  if (icon === "grip") {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "inline-block", verticalAlign: "middle" }}>
+        {([4.5, 12, 19.5] as const).map((y) =>
+          ([8, 16] as const).map((x) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r={1.5} fill="currentColor" />
+          ))
+        )}
+      </svg>
+    );
+  }
   if (icon === "circle-x") {
     return (
       <svg

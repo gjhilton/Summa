@@ -24,6 +24,7 @@ import {
   recomputeSubtotal,
   IdPath,
 } from "./calculationLogic";
+import { arrayMove } from "@dnd-kit/sortable";
 import Calculation from "../components/Calculation";
 import SubCalculationHeader from "../components/SubCalculationHeader";
 import { FEATURES } from "../features";
@@ -141,6 +142,10 @@ export default function CalculationData({
     mutate((lines) => [...lines, emptySubtotalItem()]);
   }
 
+  function reorderLines(oldIndex: number, newIndex: number): void {
+    mutate((lines) => arrayMove(lines, oldIndex, newIndex));
+  }
+
   function removeLine(lineId: string): void {
     if (currentLines.length <= 2) return;
     mutate((lines) => lines.filter((l) => l.id !== lineId));
@@ -200,6 +205,7 @@ export default function CalculationData({
         onAddExtendedItem={addExtendedItem}
         onAddSubtotalItem={addSubtotalItem}
         onRemoveLine={removeLine}
+        onReorderLines={reorderLines}
         onReset={resetCalculation}
         useExtendedItem={useExtendedItem}
         onUseExtendedItemChange={onUseExtendedItemChange}
