@@ -123,7 +123,7 @@ export default function CalculationHeader({
         )}
         <div className={buttonGroup}>
           <Button onClick={onClear}>{onDone ? "Clear page" : "Clear"}</Button>
-          {onDone && <Button onClick={onDone}>Done</Button>}
+          {onDone && <Button onClick={onDone}>← Done</Button>}
         </div>
       </div>
     </div>

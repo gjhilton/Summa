@@ -41,7 +41,6 @@ const srOnly = css({
 });
 
 const pageHeading = css({
-  fontFamily: "joscelyn",
   fontSize: "xl",
   fontWeight: "bold",
   marginBottom: "3xl",
@@ -91,6 +90,7 @@ const exampleFrame = css({
   borderColor: "ink",
   bg: "muted",
   boxShadow: "0 2px 6px rgba(0,0,0,0.10)",
+  padding: "sm",
 });
 
 const sectionBlock = css({
@@ -101,7 +101,6 @@ const sectionBlock = css({
 });
 
 const sectionHeading = css({
-  fontFamily: "joscelyn",
   fontSize: "xl",
   fontWeight: "bold",
 });
@@ -217,7 +216,7 @@ export default function AboutScreen({
         </>
       )}
 
-      <h2 className={pageHeading}>About</h2>
+      <h2 className={pageHeading}>Help</h2>
       <div className={body}>
         <p>
           Summa is a simple spreadsheet for historians working with Early Modern
@@ -277,6 +276,32 @@ export default function AboutScreen({
           </p>
         </Section>
 
+        <Section heading="How to use: Show Working">
+          <p>
+            The <em>Show working</em> switch toggles display of the intermediate
+            calculations, which can be useful for tracking down clerical errors
+            in the source material.
+          </p>
+          <div className={exampleFrame}>
+            <Toggle
+              id="about-show-working"
+              label="Show working"
+              checked={demoShowWorking}
+              onChange={setDemoShowWorking}
+            />
+            <LineItem
+              view={toLineView(demo) as LineItemView}
+              canRemove={false}
+              showWorking={demoShowWorking}
+              onChangeField={(f, v) =>
+                setDemo((prev) => processFieldUpdate([prev], prev.id, f, v)[0] as LineState)
+              }
+              onRemove={noop}
+              onChangeTitle={noop}
+            />
+          </div>
+        </Section>
+
         <Section heading="Advanced options">
           <p>
             Enabling <em>Advanced options</em> via the toggle on the main screen
@@ -318,32 +343,6 @@ export default function AboutScreen({
               showWorking={false}
               onEdit={() => window.alert("In the real calculator, this opens the sub-calculation for editing.")}
               onRemove={noop}
-            />
-          </div>
-        </Section>
-
-        <Section heading="How to use: Show Working">
-          <p>
-            The <em>Show working</em> switch toggles display of the intermediate
-            calculations, which can be useful for tracking down clerical errors
-            in the source material.
-          </p>
-          <div className={exampleFrame}>
-            <Toggle
-              id="about-show-working"
-              label="Show working"
-              checked={demoShowWorking}
-              onChange={setDemoShowWorking}
-            />
-            <LineItem
-              view={toLineView(demo) as LineItemView}
-              canRemove={false}
-              showWorking={demoShowWorking}
-              onChangeField={(f, v) =>
-                setDemo((prev) => processFieldUpdate([prev], prev.id, f, v)[0] as LineState)
-              }
-              onRemove={noop}
-              onChangeTitle={noop}
             />
           </div>
         </Section>

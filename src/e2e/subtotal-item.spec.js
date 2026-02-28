@@ -65,7 +65,7 @@ test.describe('subtotal items', () => {
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
-		await expect(page.getByRole('button', { name: 'Done' })).toBeVisible();
+		await expect(page.getByRole('button', { name: '← Done' })).toBeVisible();
 	});
 
 	test('Done button returns to parent calculation', async ({ page }) => {
@@ -73,7 +73,7 @@ test.describe('subtotal items', () => {
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
-		await page.getByRole('button', { name: 'Done' }).click();
+		await page.getByRole('button', { name: '← Done' }).click();
 		await expect(page.getByRole('navigation', { name: /breadcrumb/i })).not.toBeVisible();
 	});
 
@@ -103,7 +103,7 @@ test.describe('subtotal items', () => {
 			await dialog.dismiss();
 		});
 		await page.getByRole('button', { name: 'Clear page' }).click();
-		await expect(dialogMessage).toMatch(/^Erase \d+ items\?$/);
+		expect(dialogMessage).toMatch(/^Erase \d+ items\?$/);
 	});
 
 	test('root Clear confirm says "Clear all?"', async ({ page }) => {
