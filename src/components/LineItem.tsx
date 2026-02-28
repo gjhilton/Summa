@@ -19,15 +19,6 @@ const opCol = css({
 	gap: 'xs',
 });
 
-const opMain = css({
-	flex: 1,
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'flex-end',
-	fontSize: '6xl',
-	fontWeight: '100',
-});
-
 export default function LineItem({
 	view,
 	canRemove,
@@ -54,7 +45,6 @@ export default function LineItem({
 						onChange={onChangeTitle}
 						ariaLabel="Line title"
 					/>
-					<div className={opMain} />
 					<PenceWorkingRow
 						showWorking={showWorking}
 						pence={totalPence}
