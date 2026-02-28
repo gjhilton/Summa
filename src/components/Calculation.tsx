@@ -34,6 +34,7 @@ interface CalculationProps {
   onRemoveLine: (id: string) => void;
   onReorderLines: (oldIndex: number, newIndex: number) => void;
   onReset: () => void;
+  onDone?: () => void;
   onEditSubtotalItem: (id: string) => void;
   useExtendedItem: boolean;
   onUseExtendedItemChange: (v: boolean) => void;
@@ -52,6 +53,7 @@ const bottomBar = css({
 });
 
 const toggleStack = css({ display: "flex", flexDirection: "column", gap: "xs" });
+const fullWidthBtn = css({ width: "100%" });
 
 export default function Calculation({
   lines,
@@ -68,6 +70,7 @@ export default function Calculation({
   onRemoveLine,
   onReorderLines,
   onReset,
+  onDone,
   onEditSubtotalItem,
   useExtendedItem,
   onUseExtendedItemChange,
@@ -171,9 +174,14 @@ export default function Calculation({
             disabled={advancedOptionsDisabled}
           />
         </div>
-        <Button onClick={() => window.confirm("Reset all lines?") && onReset()}>
-          Clear
-        </Button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          {isSubLevel && onDone && (
+            <Button onClick={onDone} className={fullWidthBtn}>Done</Button>
+          )}
+          <Button onClick={() => window.confirm(isSubLevel ? `Erase ${lines.length} items?` : "Clear all?") && onReset()} className={isSubLevel ? fullWidthBtn : undefined}>
+            {isSubLevel ? "Clear page" : "Clear"}
+          </Button>
+        </div>
       </div>
     </div>
   );

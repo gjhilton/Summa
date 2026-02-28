@@ -210,6 +210,7 @@ export default function CalculationData({
         useExtendedItem={useExtendedItem}
         onUseExtendedItemChange={onUseExtendedItemChange}
         onEditSubtotalItem={navigateInto}
+        onDone={isSubLevel ? () => navigateTo(navigationPath.slice(0, -1)) : undefined}
         advancedOptionsDisabled={isSubLevel}
         isSubLevel={isSubLevel}
       />

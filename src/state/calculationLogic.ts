@@ -122,7 +122,7 @@ export function getBreadcrumbs(
   path: IdPath,
 ): Array<{ id: string; title: string; path: IdPath }> {
   const crumbs: Array<{ id: string; title: string; path: IdPath }> = [
-    { id: "", title: "Summa", path: [] },
+    { id: "", title: "Summa totalis", path: [] },
   ];
   let currentLines = rootLines;
   for (let i = 0; i < path.length; i++) {
