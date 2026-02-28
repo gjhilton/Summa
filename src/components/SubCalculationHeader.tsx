@@ -50,13 +50,6 @@ const breadcrumbCurrent = css({
   opacity: "0.8",
 });
 
-const heading = css({
-  fontSize: "m",
-  fontStyle: "italic",
-  opacity: "0.5",
-  userSelect: "none",
-});
-
 const titleInput = css({
   width: "100%",
   background: "transparent",
@@ -95,7 +88,6 @@ export default function SubCalculationHeader({
           </span>
         )}
       </nav>
-      <div className={heading}>Summa paginae</div>
       <input
         className={titleInput}
         value={title}

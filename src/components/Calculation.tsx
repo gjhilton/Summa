@@ -38,6 +38,7 @@ interface CalculationProps {
   useExtendedItem: boolean;
   onUseExtendedItemChange: (v: boolean) => void;
   advancedOptionsDisabled?: boolean;
+  isSubLevel?: boolean;
 }
 
 const layout = css({ display: "flex", flexDirection: "column", gap: "xs" });
@@ -71,6 +72,7 @@ export default function Calculation({
   useExtendedItem,
   onUseExtendedItemChange,
   advancedOptionsDisabled = false,
+  isSubLevel = false,
 }: CalculationProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -103,7 +105,6 @@ export default function Calculation({
                     showWorking={showWorking}
                     onEdit={() => onEditSubtotalItem(view.id)}
                     onRemove={() => onRemoveLine(view.id)}
-                    onChangeTitle={(v) => onUpdateTitle(view.id, v)}
                   />
                 </SortableItem>
               );
@@ -151,8 +152,9 @@ export default function Calculation({
         display={totalDisplay}
         totalPence={totalPence}
         showWorking={showWorking}
+        isSubLevel={isSubLevel}
+        itemCount={lines.length}
       />
-      <div className={rowCountBar}>Total items: {lines.length}</div>
       <div className={bottomBar}>
         <div className={toggleStack}>
           <Toggle

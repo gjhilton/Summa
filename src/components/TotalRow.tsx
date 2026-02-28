@@ -1,5 +1,6 @@
 import { css } from "../generated/css";
 import { LsdStrings } from "../types/calculation";
+import { workingRowNowrap } from "../styles/shared";
 import PenceWorkingRow from "./PenceWorkingRow";
 import Logo from "./Logo";
 import CurrencyFields from "./CurrencyFields";
@@ -9,6 +10,8 @@ interface TotalRowProps {
   display: LsdStrings;
   totalPence: number;
   showWorking: boolean;
+  isSubLevel?: boolean;
+  itemCount?: number;
 }
 
 const totalRow = css({
@@ -36,16 +39,42 @@ const summaMain = css({
   justifyContent: "flex-end",
 });
 
-export default function TotalRow({ display, totalPence, showWorking }: TotalRowProps) {
+const workingAnnotationRow = css({
+  display: "flex",
+  alignItems: "baseline",
+  justifyContent: "space-between",
+  width: "100%",
+});
+
+const summaPageText = css({
+  fontFamily: "joscelyn",
+  fontSize: "m",
+  textAlign: "right",
+});
+
+export default function TotalRow({
+  display,
+  totalPence,
+  showWorking,
+  isSubLevel = false,
+  itemCount,
+}: TotalRowProps) {
   return (
     <ItemRow
       className={totalRow}
       title={
         <div className={summaCol}>
           <div className={summaMain}>
-            <Logo size="S" />
+            {isSubLevel
+              ? <span className={summaPageText}>Summa paginae</span>
+              : <Logo size="S" />}
           </div>
-          <PenceWorkingRow showWorking={showWorking} pence={totalPence} />
+          {showWorking && (
+            <div className={workingAnnotationRow}>
+              <span className={workingRowNowrap}>Items: {itemCount}</span>
+              <PenceWorkingRow showWorking={showWorking} pence={totalPence} />
+            </div>
+          )}
         </div>
       }
       currency={

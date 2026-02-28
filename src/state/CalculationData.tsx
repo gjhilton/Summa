@@ -211,6 +211,7 @@ export default function CalculationData({
         onUseExtendedItemChange={onUseExtendedItemChange}
         onEditSubtotalItem={navigateInto}
         advancedOptionsDisabled={isSubLevel}
+        isSubLevel={isSubLevel}
       />
     </>
   );

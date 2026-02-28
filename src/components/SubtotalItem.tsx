@@ -1,11 +1,8 @@
 import { css, cx } from "../generated/css";
 import { SubtotalItemView } from "../types/lineView";
 import { lineError, lineHoverVars } from "../styles/shared";
-import TitleInput from "./TitleInput";
 import RemoveButton from "./RemoveButton";
 import CurrencyFields from "./CurrencyFields";
-import Button from "./Button";
-import Icon from "./Icon";
 import ItemRow from "./ItemRow";
 
 interface SubtotalItemProps {
@@ -14,26 +11,32 @@ interface SubtotalItemProps {
   showWorking: boolean;
   onEdit: () => void;
   onRemove: () => void;
-  onChangeTitle: (v: string) => void;
 }
 
 const subtotalRow = css({
-  borderTopWidth: "medium",
-  borderTopStyle: "solid",
-  borderTopColor: "ink",
   marginTop: "0.5rem",
-  paddingTop: "2rem",
+  fontWeight: "normal",
 });
 
-const titleCol = css({
-  display: "flex",
-  alignItems: "center",
-  gap: "xs",
+const titleLink = css({
+  display: "block",
+  width: "100%",
+  textAlign: "left",
+  padding: "xs",
+  fontSize: "xl",
+  fontFamily: "inherit",
+  fontWeight: "inherit",
+  color: "blue",
+  textDecoration: "underline",
+  cursor: "pointer",
+  bg: "transparent",
+  borderWidth: "0",
   paddingLeft: "sm",
   paddingRight: "sm",
+  _hover: { opacity: "0.7" },
 });
 
-const titleFlex = css({ flex: "1" });
+const placeholder = css({ opacity: "0.4" });
 
 export default function SubtotalItem({
   view,
@@ -41,7 +44,6 @@ export default function SubtotalItem({
   showWorking,
   onEdit,
   onRemove,
-  onChangeTitle,
 }: SubtotalItemProps) {
   const { title, totalDisplay, error } = view;
   return (
@@ -49,12 +51,9 @@ export default function SubtotalItem({
       className={cx(subtotalRow, lineHoverVars, error ? lineError : undefined)}
       remove={<RemoveButton canRemove={canRemove} label="Remove subtotal" onClick={onRemove} />}
       title={
-        <div className={titleCol}>
-          <TitleInput value={title} onChange={onChangeTitle} className={titleFlex} />
-          <Button variant="icon" aria-label="Edit subtotal" onClick={onEdit}>
-            <Icon icon="pencil" size={16} />
-          </Button>
-        </div>
+        <button className={titleLink} onClick={onEdit}>
+          {title ? title : <span className={placeholder}>Untitled</span>}
+        </button>
       }
       currency={
         <CurrencyFields
@@ -64,7 +63,6 @@ export default function SubtotalItem({
           noBorder
           fmtZero
           dimZero
-          weightByZero
         />
       }
     />
