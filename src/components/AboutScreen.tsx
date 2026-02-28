@@ -8,7 +8,7 @@ import LineItem from './LineItem';
 import ExtendedItem from './ExtendedItem';
 import SubtotalItem from './SubtotalItem';
 import Toggle from './Toggle';
-import noWorkingImg from '../assets/no-working.png';
+import noWorkingImg from '../assets/screenshot.jpg';
 import {
 	emptyLine,
 	emptyExtendedItem,
