@@ -271,19 +271,25 @@ export default function AboutScreen({
             />
           </div>
           <p>
-            To add another line item, click the <em>Add item</em> button.
+            To add another line item, click the <em>New line item</em> button.
+            Items can be deleted by clicking the trash icon, and re-ordered by
+            drag and drop.
           </p>
         </Section>
 
-        <Section heading="Advanced option: Extended Items">
+        <Section heading="Advanced options">
           <p>
-            If you choose to enable this advanced feature (via the{" "}
-            <em>Advanced options</em> toggle on the main screen), you can add{" "}
-            <em>Extended Items</em> to your calculation. Extended Items
-            comprise a quantity field and a unit cost in pounds shillings and
-            pence bracketed together. From this the system computes the
-            extended cost by multiplication — which is shown on the following
-            line (and then summed with any other items you have added).
+            Enabling <em>Advanced options</em> via the toggle on the main screen
+            unlocks two additional item types and allows the creation of nested
+            calculations.
+          </p>
+
+          <h3 className={sectionHeading} style={{ fontSize: "inherit" }}>Extended Items</h3>
+          <p>
+            Extended Items comprise a quantity field and a unit cost in pounds,
+            shillings and pence bracketed together. The system computes the
+            extended cost by multiplication, which is carried forward into the
+            total alongside any other items.
           </p>
           <div className={exampleFrame}>
             <ExtendedItem
@@ -296,14 +302,14 @@ export default function AboutScreen({
               onChangeTitle={noop}
             />
           </div>
-        </Section>
 
-        <Section heading="Advanced option: Subtotal Items">
+          <h3 className={sectionHeading} style={{ fontSize: "inherit" }}>Subtotal Items</h3>
           <p>
             Subtotal Items group a set of lines into a nested sub-calculation.
             The subtotal of that group is then carried forward into the parent
-            calculation. Click the pencil icon to edit the lines inside a
-            Subtotal Item.
+            calculation as a single line. Click the underlined title to open the
+            sub-calculation and edit its lines; use the <em>Done</em> button or
+            breadcrumb trail to return to the parent.
           </p>
           <div className={exampleFrame}>
             <SubtotalItem
@@ -312,7 +318,6 @@ export default function AboutScreen({
               showWorking={false}
               onEdit={() => window.alert("In the real calculator, this opens the sub-calculation for editing.")}
               onRemove={noop}
-              onChangeTitle={(v) => setSubtotalItem((prev) => ({ ...prev, title: v }))}
             />
           </div>
         </Section>
