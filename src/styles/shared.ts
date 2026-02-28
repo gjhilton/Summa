@@ -52,6 +52,19 @@ export const titleInput = css({
   _placeholder: { opacity: "0.4" },
 });
 
+/**
+ * Universal ledger column grid shared by all row types.
+ * col 1 auto  = remove button
+ * col 2 1em   = ( bracket (ExtendedItem) or spacer
+ * col 3 1fr   = title / qty  (all titles and ExtendedItem qty align here)
+ * col 4 auto  = × / = operator (ExtendedItem) or spacer
+ * col 5 20%   = l (pounds)
+ * col 6 20%   = s (shillings)
+ * col 7 20%   = d (pence)
+ * col 8 1em   = ) bracket (ExtendedItem) or trailing spacer
+ */
+export const LEDGER_COLUMNS = "1.5rem 1em 1fr auto 20% 20% 20% 1em";
+
 export const lineHoverVars = css({
   "--rm-color": "currentColor",
   "--rm-fill": "transparent",

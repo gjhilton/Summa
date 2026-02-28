@@ -1,9 +1,9 @@
 import { css } from "../generated/css";
 import { LsdStrings } from "../types/calculation";
 import PenceWorkingRow from "./PenceWorkingRow";
-import LedgerRow from "./LedgerRow";
 import Logo from "./Logo";
 import CurrencyFields from "./CurrencyFields";
+import ItemRow from "./ItemRow";
 
 interface TotalRowProps {
   display: LsdStrings;
@@ -38,24 +38,26 @@ const summaMain = css({
 
 export default function TotalRow({ display, totalPence, showWorking }: TotalRowProps) {
   return (
-    <LedgerRow className={totalRow}>
-      <span />
-      <span />
-      <div className={summaCol}>
-        <div className={summaMain}>
-          <Logo size="S" />
+    <ItemRow
+      className={totalRow}
+      title={
+        <div className={summaCol}>
+          <div className={summaMain}>
+            <Logo size="S" />
+          </div>
+          <PenceWorkingRow showWorking={showWorking} pence={totalPence} />
         </div>
-        <PenceWorkingRow showWorking={showWorking} pence={totalPence} />
-      </div>
-      <CurrencyFields
-        values={display}
-        showWorking={showWorking}
-        noBorder
-        fmtZero
-        dimZero
-        weightByZero
-      />
-      <span />
-    </LedgerRow>
+      }
+      currency={
+        <CurrencyFields
+          values={display}
+          showWorking={showWorking}
+          noBorder
+          fmtZero
+          dimZero
+          weightByZero
+        />
+      }
+    />
   );
 }

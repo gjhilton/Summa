@@ -3,10 +3,10 @@ import { SubtotalItemView } from "../types/lineView";
 import { lineError, lineHoverVars } from "../styles/shared";
 import TitleInput from "./TitleInput";
 import RemoveButton from "./RemoveButton";
-import LedgerRow from "./LedgerRow";
 import CurrencyFields from "./CurrencyFields";
 import Button from "./Button";
 import Icon from "./Icon";
+import ItemRow from "./ItemRow";
 
 interface SubtotalItemProps {
   view: SubtotalItemView;
@@ -45,31 +45,28 @@ export default function SubtotalItem({
 }: SubtotalItemProps) {
   const { title, totalDisplay, error } = view;
   return (
-    <LedgerRow
-      className={cx(
-        subtotalRow,
-        lineHoverVars,
-        error ? lineError : undefined,
-      )}
-    >
-      <RemoveButton canRemove={canRemove} label="Remove subtotal" onClick={onRemove} />
-      <span />
-      <div className={titleCol}>
-        <TitleInput value={title} onChange={onChangeTitle} className={titleFlex} />
-        <Button variant="icon" aria-label="Edit subtotal" onClick={onEdit}>
-          <Icon icon="pencil" size={16} />
-        </Button>
-      </div>
-      <CurrencyFields
-        values={totalDisplay}
-        showWorking={showWorking}
-        hasError={error}
-        noBorder
-        fmtZero
-        dimZero
-        weightByZero
-      />
-      <span />
-    </LedgerRow>
+    <ItemRow
+      className={cx(subtotalRow, lineHoverVars, error ? lineError : undefined)}
+      remove={<RemoveButton canRemove={canRemove} label="Remove subtotal" onClick={onRemove} />}
+      title={
+        <div className={titleCol}>
+          <TitleInput value={title} onChange={onChangeTitle} className={titleFlex} />
+          <Button variant="icon" aria-label="Edit subtotal" onClick={onEdit}>
+            <Icon icon="pencil" size={16} />
+          </Button>
+        </div>
+      }
+      currency={
+        <CurrencyFields
+          values={totalDisplay}
+          showWorking={showWorking}
+          hasError={error}
+          noBorder
+          fmtZero
+          dimZero
+          weightByZero
+        />
+      }
+    />
   );
 }

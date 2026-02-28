@@ -1,31 +1,20 @@
 import { css, cx } from "../generated/css";
 import { ExtendedItemView, BaseLineItemProps } from "../types/lineView";
 import Field from "./Field";
-import LedgerRow from "./LedgerRow";
 import CurrencyFields from "./CurrencyFields";
-import { supD as supDClass, lineError, lineHoverVars } from "../styles/shared";
+import { supD as supDClass, lineError, lineHoverVars, LEDGER_COLUMNS, workingRowNowrap } from "../styles/shared";
 import TitleInput from "./TitleInput";
 import RemoveButton from "./RemoveButton";
 import MultiplySymbol from "./MultiplySymbol";
 import EqualsSymbol from "./EqualsSymbol";
+import ItemRow from "./ItemRow";
 
 interface ExtendedItemProps extends BaseLineItemProps {
   view: ExtendedItemView;
   onChangeQuantity: (v: string) => void;
 }
 
-// auto(remove) | 1fr(op) | 1em(() | 20%(qty) | auto(@) | 20%(l) | 20%(s) | 20%(d) | 1em())
-// The 1em bracket cols align with the new bracket cols in Item/Total rows.
-const COLUMNS = "auto 1fr 1em 20% auto 20% 20% 20% 1em";
-
 const inputRow = css({ fontStyle: "ritalic", fontWeight: "100" });
-
-const opMain = css({
-  flex: 1,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-});
 
 const atSign = css({
   display: "flex",
@@ -38,6 +27,12 @@ const atSign = css({
   userSelect: "none",
 });
 
+const subtotalTitleCol = css({
+  display: "flex",
+  flexDirection: "column",
+  paddingLeft: "sm",
+  paddingRight: "sm",
+});
 
 const subtotalOpCol = css({
   display: "flex",
@@ -104,8 +99,6 @@ const closeParenCol = css({
     borderBottomRightRadius: BRACKET_RADIUS,
   },
 });
-
-const multiplyCol = css({ gridColumn: "span 2" });
 
 const labelRow = css({
   display: "grid",
@@ -178,69 +171,79 @@ export default function ExtendedItem({
       {/* Annotation row above input fields */}
       <div
         className={cx(labelRow, errorClass)}
-        style={{ gridTemplateColumns: COLUMNS }}
+        style={{ gridTemplateColumns: LEDGER_COLUMNS }}
       >
-        <span style={{ gridColumn: "4" }} className={fieldLabel}>quantity</span>
-        <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>unit cost</span>
+        <span style={{ gridColumn: "3" }} className={fieldLabel}>quantity</span>
+        <span style={{ gridColumn: "5 / span 3" }} className={fieldLabel}>unit cost</span>
       </div>
 
-      {/* Input row: remove | op | ( | qty | × | l | s | d | ) */}
-      <LedgerRow columns={COLUMNS} className={cx(inputRow, errorClass)}>
-        <RemoveButton canRemove={canRemove} label="Remove item" onClick={onRemove} />
-        <div className={opMain} />
-        <span className={openParenCol} aria-hidden="true" />
-        <Field
-          value={quantity}
-          label="q"
-          error={quantityError}
-          onChange={onChangeQuantity}
-          showWorking={showWorking}
-          working={quantityWorking}
-        />
-        <span className={atSign} aria-hidden="true">
-          <MultiplySymbol />
-        </span>
-        <CurrencyFields
-          values={literals}
-          fieldErrors={fieldErrors}
-          showWorking={showWorking}
-          hasError={error}
-          onChange={onChangeField}
-        />
-        <span className={closeParenCol} aria-hidden="true" />
-      </LedgerRow>
+      {/* Input row: remove | ( | qty | empty | × | l | s | d | ) */}
+      <ItemRow
+        className={cx(inputRow, errorClass)}
+        remove={<RemoveButton canRemove={canRemove} label="Remove item" onClick={onRemove} />}
+        leftBracket={<span className={openParenCol} aria-hidden="true" />}
+        title={
+          <div className={subtotalTitleCol}>
+            <Field
+              value={quantity}
+              label="q"
+              error={quantityError}
+              onChange={onChangeQuantity}
+              showWorking={showWorking}
+              working={quantityWorking}
+            />
+          </div>
+        }
+        operator={
+          <span className={atSign} aria-hidden="true">
+            <MultiplySymbol />
+          </span>
+        }
+        currency={
+          <CurrencyFields
+            values={literals}
+            fieldErrors={fieldErrors}
+            showWorking={showWorking}
+            hasError={error}
+            onChange={onChangeField}
+          />
+        }
+        rightBracket={<span className={closeParenCol} aria-hidden="true" />}
+      />
 
       {/* Annotation row above subtotal fields */}
       <div
         className={cx(labelRow, errorClass)}
-        style={{ gridTemplateColumns: COLUMNS }}
+        style={{ gridTemplateColumns: LEDGER_COLUMNS }}
       >
-        <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>extended cost</span>
+        <span style={{ gridColumn: "5 / span 3" }} className={fieldLabel}>extended cost</span>
       </div>
 
-      {/* Subtotal row: empty | working(span 2) | title(inside brackets) | = | l | s | d | ) */}
-      <LedgerRow columns={COLUMNS} className={errorClass}>
-        <span />
-        <Field
-          value={"\u00A0"}
-          label="q"
-          noBorder
-          showWorking={showWorking}
-          working={multiplicationWorking}
-          className={multiplyCol}
-        />
-        <TitleInput value={title} onChange={onChangeTitle} />
-        <div className={subtotalOpCol}>
-          <EqualsSymbol />
-        </div>
-        <CurrencyFields
-          values={subtotalDisplay}
-          showWorking={showWorking}
-          hasError={error}
-          noBorder
-        />
-        <span />
-      </LedgerRow>
+      {/* Subtotal row: empty | spacer | title+working | empty | = | l | s | d | trailing */}
+      <ItemRow
+        className={errorClass}
+        title={
+          <div className={subtotalTitleCol}>
+            <TitleInput value={title} onChange={onChangeTitle} />
+            {showWorking && (
+              <span className={workingRowNowrap}>{multiplicationWorking}</span>
+            )}
+          </div>
+        }
+        operator={
+          <div className={subtotalOpCol}>
+            <EqualsSymbol />
+          </div>
+        }
+        currency={
+          <CurrencyFields
+            values={subtotalDisplay}
+            showWorking={showWorking}
+            hasError={error}
+            noBorder
+          />
+        }
+      />
     </div>
   );
 }

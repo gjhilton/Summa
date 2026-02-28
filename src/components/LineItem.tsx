@@ -4,8 +4,8 @@ import { lineError, lineHoverVars } from "../styles/shared";
 import TitleInput from "./TitleInput";
 import RemoveButton from "./RemoveButton";
 import PenceWorkingRow from "./PenceWorkingRow";
-import LedgerRow from "./LedgerRow";
 import CurrencyFields from "./CurrencyFields";
+import ItemRow from "./ItemRow";
 
 interface LineItemProps extends BaseLineItemProps {
   view: LineItemView;
@@ -14,10 +14,8 @@ interface LineItemProps extends BaseLineItemProps {
 const opCol = css({
   display: "flex",
   flexDirection: "column",
-  alignItems: "flex-end",
   paddingLeft: "sm",
   paddingRight: "sm",
-  userSelect: "none",
   gap: "xs",
 });
 
@@ -40,22 +38,25 @@ export default function LineItem({
 }: LineItemProps) {
   const { literals, error, fieldErrors, totalPence, title } = view;
   return (
-    <LedgerRow className={cx(lineHoverVars, error ? lineError : undefined)}>
-      <RemoveButton canRemove={canRemove} label="Remove line" onClick={onRemove} />
-      <span />
-      <div className={opCol}>
-        <TitleInput value={title} onChange={onChangeTitle} />
-        <div className={opMain} />
-        <PenceWorkingRow showWorking={showWorking} pence={totalPence} error={error} />
-      </div>
-      <CurrencyFields
-        values={literals}
-        fieldErrors={fieldErrors}
-        showWorking={showWorking}
-        hasError={error}
-        onChange={onChangeField}
-      />
-      <span />
-    </LedgerRow>
+    <ItemRow
+      className={cx(lineHoverVars, error ? lineError : undefined)}
+      remove={<RemoveButton canRemove={canRemove} label="Remove line" onClick={onRemove} />}
+      title={
+        <div className={opCol}>
+          <TitleInput value={title} onChange={onChangeTitle} />
+          <div className={opMain} />
+          <PenceWorkingRow showWorking={showWorking} pence={totalPence} error={error} />
+        </div>
+      }
+      currency={
+        <CurrencyFields
+          values={literals}
+          fieldErrors={fieldErrors}
+          showWorking={showWorking}
+          hasError={error}
+          onChange={onChangeField}
+        />
+      }
+    />
   );
 }
