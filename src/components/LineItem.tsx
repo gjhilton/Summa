@@ -43,7 +43,7 @@ export default function LineItem({
       remove={<RemoveButton canRemove={canRemove} label="Remove line" onClick={onRemove} />}
       title={
         <div className={opCol}>
-          <TitleInput value={title} onChange={onChangeTitle} />
+          <TitleInput value={title} onChange={onChangeTitle} ariaLabel="Line title" />
           <div className={opMain} />
           <PenceWorkingRow showWorking={showWorking} pence={totalPence} error={error} />
         </div>

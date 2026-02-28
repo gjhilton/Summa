@@ -269,7 +269,7 @@ describe("ExtendedItem logic", () => {
   });
 
   it("quantity=i (1) with valid l/s/d → totalPence = basePence", () => {
-    const item = emptyExtendedItem(); // quantity defaults to 'i'
+    const item = emptyExtendedItem(); // quantity defaults to 'j' (normalises to 1)
     let lines: AnyLineState[] = [item, emptyLine()];
     // Set 1s 6d → basePence = 18
     lines = processFieldUpdate(lines, item.id, "s", "i");

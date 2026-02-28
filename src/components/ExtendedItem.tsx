@@ -225,7 +225,7 @@ export default function ExtendedItem({
         noDragHandle
         title={
           <div className={subtotalTitleCol}>
-            <TitleInput value={title} onChange={onChangeTitle} />
+            <TitleInput value={title} onChange={onChangeTitle} ariaLabel="Item title" />
             {showWorking && (
               <span className={workingRowNowrap}>{multiplicationWorking}</span>
             )}

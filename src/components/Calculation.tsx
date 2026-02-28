@@ -44,7 +44,6 @@ interface CalculationProps {
 
 const layout = css({ display: "flex", flexDirection: "column", gap: "xs" });
 const addBar = css({ marginTop: "lg", display: "flex", gap: "sm", justifyContent: "flex-end" });
-const rowCountBar = css({ textAlign: "right", marginTop: "lg", fontSize: "m" });
 const bottomBar = css({
   display: "flex",
   alignItems: "center",
@@ -54,6 +53,7 @@ const bottomBar = css({
 
 const toggleStack = css({ display: "flex", flexDirection: "column", gap: "xs" });
 const fullWidthBtn = css({ width: "100%" });
+const actionStack = css({ display: "flex", flexDirection: "column", gap: "xs" });
 
 export default function Calculation({
   lines,
@@ -89,6 +89,11 @@ export default function Calculation({
       const newIndex = lines.findIndex((l) => l.id === over.id);
       onReorderLines(oldIndex, newIndex);
     }
+  }
+
+  function handleClear() {
+    const msg = isSubLevel ? `Erase ${lines.length} items?` : "Clear all?";
+    if (window.confirm(msg)) onReset();
   }
 
   const views = lines.map((line) => toLineView(line));
@@ -145,10 +150,10 @@ export default function Calculation({
       <div className={addBar}>
         <Button onClick={onAddLine}>New line item</Button>
         {useExtendedItem && (
-          <Button onClick={onAddExtendedItem}>New extended item</Button>
-        )}
-        {useExtendedItem && (
-          <Button onClick={onAddSubtotalItem}>New subtotal item</Button>
+          <>
+            <Button onClick={onAddExtendedItem}>New extended item</Button>
+            <Button onClick={onAddSubtotalItem}>New subtotal item</Button>
+          </>
         )}
       </div>
       <TotalRow
@@ -174,11 +179,11 @@ export default function Calculation({
             disabled={advancedOptionsDisabled}
           />
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+        <div className={actionStack}>
           {isSubLevel && onDone && (
             <Button onClick={onDone} className={fullWidthBtn}>Done</Button>
           )}
-          <Button onClick={() => window.confirm(isSubLevel ? `Erase ${lines.length} items?` : "Clear all?") && onReset()} className={isSubLevel ? fullWidthBtn : undefined}>
+          <Button onClick={handleClear} className={isSubLevel ? fullWidthBtn : undefined}>
             {isSubLevel ? "Clear page" : "Clear"}
           </Button>
         </div>

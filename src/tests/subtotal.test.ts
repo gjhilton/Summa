@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   emptyLine,
+  emptyExtendedItem,
   emptySubtotalItem,
   recomputeSubtotal,
   getLinesAtPath,
@@ -9,6 +10,9 @@ import {
   updateTitle,
   processFieldUpdate,
   computeGrandTotal,
+  formatComponent,
+  formatLsdDisplay,
+  computeFieldWorking,
 } from "../state/calculationLogic";
 import {
   AnyLineState,
@@ -153,7 +157,7 @@ describe("getBreadcrumbs", () => {
     const lines: AnyLineState[] = [emptyLine()];
     const crumbs = getBreadcrumbs(lines, []);
     expect(crumbs).toHaveLength(1);
-    expect(crumbs[0].title).toBe("Summa");
+    expect(crumbs[0].title).toBe("Summa totalis");
     expect(crumbs[0].path).toEqual([]);
   });
 
@@ -162,7 +166,7 @@ describe("getBreadcrumbs", () => {
     const root: AnyLineState[] = [sub, emptyLine()];
     const crumbs = getBreadcrumbs(root, [sub.id]);
     expect(crumbs).toHaveLength(2);
-    expect(crumbs[0].title).toBe("Summa");
+    expect(crumbs[0].title).toBe("Summa totalis");
     expect(crumbs[1].title).toBe("Quarter");
     expect(crumbs[1].path).toEqual([sub.id]);
   });
@@ -184,7 +188,7 @@ describe("getBreadcrumbs", () => {
     const root: AnyLineState[] = [outerSub, emptyLine()];
     const crumbs = getBreadcrumbs(root, [outerSub.id, innerSub.id]);
     expect(crumbs).toHaveLength(3);
-    expect(crumbs[0].title).toBe("Summa");
+    expect(crumbs[0].title).toBe("Summa totalis");
     expect(crumbs[1].title).toBe("Outer");
     expect(crumbs[2].title).toBe("Inner");
   });
@@ -206,6 +210,13 @@ describe("updateTitle", () => {
     expect(result[0].title).toBe("Quarter total");
   });
 
+  it("updates title of a matching ExtendedItemState", () => {
+    const ext = emptyExtendedItem();
+    const lines: AnyLineState[] = [ext, emptyLine()];
+    const result = updateTitle(lines, ext.id, "Cloth goods");
+    expect(result[0].title).toBe("Cloth goods");
+  });
+
   it("leaves non-matching lines unchanged", () => {
     const line0 = emptyLine();
     const line1 = emptyLine();
@@ -213,6 +224,111 @@ describe("updateTitle", () => {
     const result = updateTitle(lines, line0.id, "Changed");
     expect(result[0].title).toBe("Changed");
     expect(result[1]).toBe(line1);
+  });
+});
+
+describe("processFieldUpdate skips subtotal items", () => {
+  it("returns SubtotalItemState unchanged when it is the target lineId", () => {
+    const sub = emptySubtotalItem();
+    const line = emptyLine();
+    const lines: AnyLineState[] = [sub, line];
+    const result = processFieldUpdate(lines, sub.id, "d", "v");
+    expect(result[0]).toBe(sub);
+  });
+});
+
+describe("getBreadcrumbs edge case", () => {
+  it("returns partial crumb trail when mid-path id is not a subtotal", () => {
+    const line = emptyLine(); // not a subtotal — path traversal breaks here
+    const root: AnyLineState[] = [line, emptyLine()];
+    const crumbs = getBreadcrumbs(root, [line.id, "nonexistent"]);
+    // Root crumb only — line.id is not a SubtotalItemState so loop breaks immediately
+    expect(crumbs).toHaveLength(1);
+    expect(crumbs[0].title).toBe("Summa totalis");
+  });
+});
+
+describe("formatComponent", () => {
+  it("returns '0' for zero", () => {
+    expect(formatComponent(0)).toBe("0");
+  });
+
+  it("formats a small pence value", () => {
+    expect(formatComponent(4)).toBe("iiij");
+  });
+
+  it("formats a shilling value (12)", () => {
+    expect(formatComponent(12)).toBe("xij");
+  });
+
+  it("formats a pound value (20 shillings)", () => {
+    expect(formatComponent(20)).toBe("xx");
+  });
+});
+
+describe("formatLsdDisplay", () => {
+  it("returns all zeros for 0 pence", () => {
+    const result = formatLsdDisplay(0);
+    expect(result).toEqual({ l: "0", s: "0", d: "0" });
+  });
+
+  it("converts 12 pence to 1 shilling", () => {
+    const result = formatLsdDisplay(12);
+    expect(result.l).toBe("0");
+    expect(result.s).toBe("j");
+    expect(result.d).toBe("0");
+  });
+
+  it("converts 240 pence to 1 pound", () => {
+    const result = formatLsdDisplay(240);
+    expect(result.l).toBe("j");
+    expect(result.s).toBe("0");
+    expect(result.d).toBe("0");
+  });
+
+  it("handles mixed l/s/d values", () => {
+    // £1 2s 4d = 240 + 24 + 4 = 268d
+    const result = formatLsdDisplay(268);
+    expect(result.l).toBe("j");
+    expect(result.s).toBe("ij");
+    expect(result.d).toBe("iiij");
+  });
+});
+
+describe("computeFieldWorking", () => {
+  it("returns null for empty input", () => {
+    expect(computeFieldWorking("", "d")).toBeNull();
+  });
+
+  it("returns null for invalid roman numeral", () => {
+    expect(computeFieldWorking("dog", "d")).toBeNull();
+  });
+
+  it("d field: no prefix (multiplier 1)", () => {
+    const result = computeFieldWorking("v", "d");
+    expect(result).not.toBeNull();
+    expect(result!.prefix).toBe("");
+    expect(result!.pence).toBe(5);
+  });
+
+  it("s field: prefix shows × 12", () => {
+    const result = computeFieldWorking("v", "s");
+    expect(result).not.toBeNull();
+    expect(result!.prefix).toBe("5 × 12 = ");
+    expect(result!.pence).toBe(60);
+  });
+
+  it("l field: prefix shows × 240", () => {
+    const result = computeFieldWorking("ij", "l");
+    expect(result).not.toBeNull();
+    expect(result!.prefix).toBe("2 × 240 = ");
+    expect(result!.pence).toBe(480);
+  });
+
+  it("normalises early modern input (j → i)", () => {
+    const result = computeFieldWorking("ij", "d");
+    expect(result).not.toBeNull();
+    expect(result!.pence).toBe(2);
   });
 });
 

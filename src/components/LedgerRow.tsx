@@ -3,7 +3,6 @@ import { css, cx } from "../generated/css";
 interface LedgerRowProps {
   children: React.ReactNode;
   className?: string;
-  columns?: string;
 }
 
 const ledgerRow = css({
@@ -14,16 +13,9 @@ const ledgerRow = css({
   padding: "sm",
 });
 
-export default function LedgerRow({
-  children,
-  className,
-  columns,
-}: LedgerRowProps) {
+export default function LedgerRow({ children, className }: LedgerRowProps) {
   return (
-    <div
-      className={cx(ledgerRow, className)}
-      style={columns ? { gridTemplateColumns: columns } : undefined}
-    >
+    <div className={cx(ledgerRow, className)}>
       {children}
     </div>
   );

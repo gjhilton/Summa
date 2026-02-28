@@ -18,7 +18,7 @@ const subtotalRow = css({
   fontWeight: "normal",
 });
 
-const titleLink = css({
+const titleButton = css({
   display: "block",
   width: "100%",
   textAlign: "left",
@@ -51,7 +51,7 @@ export default function SubtotalItem({
       className={cx(subtotalRow, lineHoverVars, error ? lineError : undefined)}
       remove={<RemoveButton canRemove={canRemove} label="Remove subtotal" onClick={onRemove} />}
       title={
-        <button className={titleLink} onClick={onEdit}>
+        <button className={titleButton} onClick={onEdit} aria-label={title || "Untitled"}>
           {title ? title : <span className={placeholder}>Untitled</span>}
         </button>
       }

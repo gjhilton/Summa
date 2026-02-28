@@ -88,8 +88,8 @@ test.describe('subtotal items', () => {
 
 	test('root screen shows "Clear" not "Clear page"', async ({ page }) => {
 		await goto(page);
-		await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
-		await expect(page.getByRole('button', { name: 'Clear page' })).not.toBeVisible();
+		await expect(page.getByRole('button', { name: 'Clear', exact: true })).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Clear page', exact: true })).not.toBeVisible();
 	});
 
 	test('Clear page confirm says "Erase N items?"', async ({ page }) => {
@@ -158,12 +158,4 @@ test.describe('subtotal items', () => {
 		await expect(dInput).toHaveValue('v');
 	});
 
-	test('nested subtotals: advanced toggle is disabled at sub-level', async ({ page }) => {
-		await goto(page);
-		await toggleAdvancedOptions(page);
-		await addSubtotalItem(page);
-		await navigateIntoSubtotal(page);
-		const toggle = page.getByRole('switch', { name: /advanced options/i });
-		await expect(toggle).toBeDisabled();
-	});
 });

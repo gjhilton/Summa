@@ -32,7 +32,9 @@ test.describe('advanced mode', () => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await page.getByRole('button', { name: /new extended item/i }).click();
-		await expect(page.getByText('Total items: 3')).toBeVisible();
+		const toggle = page.getByRole('switch', { name: /show working/i });
+		await toggle.click();
+		await expect(page.getByText('Items: 3')).toBeVisible();
 	});
 
 	test('disabling advanced mode hides advanced buttons', async ({ page }) => {
