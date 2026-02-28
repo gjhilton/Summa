@@ -1,11 +1,10 @@
-import { css } from '../generated/css';
-import LedgerRow from './LedgerRow';
+import { css, cx } from '../generated/css';
 import Icon from './Icon';
 import { useDragHandle } from './DragHandleContext';
 
 /**
  * Slot-based row for all ledger item types.
- * Provides named slots that correspond to the 9 universal grid columns:
+ * 9-column grid:
  *   col 1 1.5rem = drag handle (built-in, from SortableItem context)
  *   col 2 1.5rem = remove button
  *   col 3 1em   = left bracket / spacer
@@ -24,6 +23,14 @@ interface ItemRowProps {
 	currency: React.ReactNode;
 	rightBracket?: React.ReactNode;
 }
+
+const row = css({
+	display: 'grid',
+	gridTemplateColumns: '1.5rem 1.5rem 1em 1fr auto 20% 20% 20% 1em',
+	alignItems: 'stretch',
+	width: '100%',
+	padding: 'sm',
+});
 
 const dragHandle = css({
 	display: 'flex',
@@ -50,7 +57,7 @@ export default function ItemRow({
 }: ItemRowProps) {
 	const drag = useDragHandle();
 	return (
-		<LedgerRow className={className}>
+		<div className={cx(row, className)}>
 			{!noDragHandle && drag ? (
 				<button
 					className={dragHandle}
@@ -69,6 +76,6 @@ export default function ItemRow({
 			{operator ?? <span />}
 			{currency}
 			{rightBracket ?? <span />}
-		</LedgerRow>
+		</div>
 	);
 }

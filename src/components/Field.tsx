@@ -1,5 +1,5 @@
 import { css, cx } from '../generated/css';
-import { focusRing, workingRowStyles } from '../styles/shared';
+import { focusRing } from './Button.styles';
 
 interface FieldProps {
 	value: string;
@@ -84,7 +84,12 @@ const labelBox = css({
 
 // Working text sits inside fieldInner, naturally aligned with the value above it
 const workingText = css({
-	...workingRowStyles,
+	display: 'block',
+	width: '100%',
+	minHeight: '1.5em',
+	fontSize: 's',
+	color: 'ink',
+	textAlign: 'right',
 	paddingRight: 'xs',
 });
 

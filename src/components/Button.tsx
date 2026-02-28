@@ -1,5 +1,5 @@
 import { cva, cx } from '../generated/css';
-import { focusRing } from '../styles/shared';
+import { focusRing } from './Button.styles';
 
 interface ButtonProps {
 	onClick: () => void;

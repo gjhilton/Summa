@@ -1,6 +1,12 @@
-import { cx } from '../generated/css';
-import { removeIcon, hidden } from '../styles/shared';
+import { css, cx } from '../generated/css';
 import Button from './Button';
+
+const hidden = css({ visibility: 'hidden' });
+
+const removeIcon = css({
+	color: 'var(--rm-color)',
+	opacity: 'var(--rm-opacity)',
+});
 import Icon from './Icon';
 
 interface RemoveButtonProps {

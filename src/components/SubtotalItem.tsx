@@ -1,7 +1,7 @@
 import { css, cx } from '../generated/css';
 import { SubtotalItemView } from '../types/lineView';
-import { lineError, lineHoverVars } from '../styles/shared';
 import RemoveButton from './RemoveButton';
+import { lineError, lineHoverVars } from './LineItem.styles';
 import CurrencyFields from './CurrencyFields';
 import ItemRow from './ItemRow';
 

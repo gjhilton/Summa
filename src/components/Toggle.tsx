@@ -1,5 +1,5 @@
 import { css, cx } from '../generated/css';
-import { focusRing } from '../styles/shared';
+import { focusRing } from './Button.styles';
 
 interface ToggleProps {
 	id: string;

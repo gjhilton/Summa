@@ -1,6 +1,6 @@
 import { css } from '../generated/css';
 import { LsdStrings } from '../types/calculation';
-import { workingRowNowrap } from '../styles/shared';
+import { workingRowNowrap } from './PenceWorkingRow.styles';
 import PenceWorkingRow from './PenceWorkingRow';
 import Logo from './Logo';
 import CurrencyFields from './CurrencyFields';

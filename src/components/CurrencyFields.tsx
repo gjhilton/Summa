@@ -1,7 +1,7 @@
 import { css } from '../generated/css';
 import { LsdStrings, LsdBooleans } from '../types/calculation';
 import { computeFieldWorking } from '../state/calculationLogic';
-import { supD } from '../styles/shared';
+import { supD } from './CurrencyFields.styles';
 import Field from './Field';
 
 interface CurrencyFieldsProps {

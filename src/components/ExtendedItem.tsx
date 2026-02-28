@@ -2,17 +2,14 @@ import { css, cx } from '../generated/css';
 import { ExtendedItemView, BaseLineItemProps } from '../types/lineView';
 import Field from './Field';
 import CurrencyFields from './CurrencyFields';
-import {
-	supD as supDClass,
-	lineError,
-	lineHoverVars,
-	LEDGER_COLUMNS,
-	workingRowNowrap,
-} from '../styles/shared';
+import { supD as supDClass } from './CurrencyFields.styles';
+import { workingRowNowrap } from './PenceWorkingRow.styles';
+import { lineError, lineHoverVars } from './LineItem.styles';
+
+const LEDGER_COLUMNS = '1.5rem 1.5rem 1em 1fr auto 20% 20% 20% 1em';
 import TitleInput from './TitleInput';
 import RemoveButton from './RemoveButton';
-import MultiplySymbol from './MultiplySymbol';
-import EqualsSymbol from './EqualsSymbol';
+import OperatorSymbol from './OperatorSymbol';
 import ItemRow from './ItemRow';
 
 interface ExtendedItemProps extends BaseLineItemProps {
@@ -53,10 +50,10 @@ const subtotalOpCol = css({
 
 const BRACKET_WIDTH = '1em';
 const BRACKET_INSET = '-4px';
-// LedgerRow padding is "sm" (0.5rem); two adjacent rows have a 1rem gap between content areas.
+// ItemRow padding is "sm" (0.5rem); two adjacent rows have a 1rem gap between content areas.
 // 100% = height of the bracket cell = height of the subtotal row (both rows are equal height).
-// LABEL_ROW_HEIGHT accounts for the "extended cost" annotation row that sits between the two LedgerRows.
-// Label rows have zero height; labels are visually offset into the next LedgerRow's padding area.
+// LABEL_ROW_HEIGHT accounts for the "extended cost" annotation row that sits between the two ItemRows.
+// Label rows have zero height; labels are visually offset into the next ItemRow's padding area.
 const BRACKET_BOTTOM = 'calc(-1rem - 100% - 4px)';
 const BRACKET_LINE_WEIGHT = '2px';
 const BRACKET_LINE_STYLE = 'solid';
@@ -128,7 +125,7 @@ const fieldLabel = css({
 	userSelect: 'none',
 	textAlign: 'left',
 	letterSpacing: '0.06em',
-	// push down past LedgerRow padding-top (0.5rem) and bracket top inset (-4px)
+	// push down past ItemRow padding-top (0.5rem) and bracket top inset (-4px)
 	transform: 'translateY(0.6rem)',
 	pointerEvents: 'none',
 	opacity: 'var(--lbl-opacity)',
@@ -216,7 +213,7 @@ export default function ExtendedItem({
 				}
 				operator={
 					<span className={atSign} aria-hidden="true">
-						<MultiplySymbol />
+						<OperatorSymbol type="multiply" />
 					</span>
 				}
 				currency={
@@ -266,7 +263,7 @@ export default function ExtendedItem({
 				}
 				operator={
 					<div className={subtotalOpCol}>
-						<EqualsSymbol />
+						<OperatorSymbol type="equals" />
 					</div>
 				}
 				currency={

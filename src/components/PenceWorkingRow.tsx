@@ -1,4 +1,5 @@
-import { supD, workingRowNowrap } from '../styles/shared';
+import { supD } from './CurrencyFields.styles';
+import { workingRowNowrap } from './PenceWorkingRow.styles';
 
 interface PenceWorkingRowProps {
 	showWorking: boolean;
