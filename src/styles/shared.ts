@@ -22,9 +22,35 @@ export const workingRowStyles = {
 
 export const hidden = css({ visibility: "hidden" });
 
+export const supD = css({ marginLeft: "2px" });
+
+export const workingRowNowrap = css({ ...workingRowStyles, whiteSpace: "nowrap" });
+
 export const lineError = css({ bg: "errorLineBg" });
 
 export const removeIcon = css({ color: "var(--rm-color)", opacity: "var(--rm-opacity)" });
+
+/**
+ * Shared title input style — matches Field's editable input appearance.
+ */
+export const titleInput = css({
+  width: "100%",
+  padding: "xs",
+  fontSize: "xl",
+  borderBottomWidth: "1px",
+  borderBottomStyle: "solid",
+  borderBottomColor: "rgba(0,0,0,0.1)",
+  bg: "transparent",
+  fontFamily: "inherit",
+  textAlign: "left",
+  outlineWidth: "0",
+  outlineStyle: "none",
+  transition: "all 200ms ease-in-out",
+  _hover: { borderBottomColor: "ink" },
+  _focus: { borderBottomColor: "ink" },
+  _focusVisible: focusRing,
+  _placeholder: { opacity: "0.4" },
+});
 
 export const lineHoverVars = css({
   "--rm-color": "currentColor",

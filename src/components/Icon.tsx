@@ -5,6 +5,8 @@ const PATHS = {
   trash: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6",
   reset:
     "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15",
+  pencil:
+    "M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z",
 } as const;
 
 type PathIcon = keyof typeof PATHS;

@@ -1,6 +1,6 @@
 import { css } from "../generated/css";
 import { LsdStrings } from "../types/calculation";
-import { workingRowStyles } from "../styles/shared";
+import PenceWorkingRow from "./PenceWorkingRow";
 import LedgerRow from "./LedgerRow";
 import Logo from "./Logo";
 import LsdFieldGroup from "./LsdFieldGroup";
@@ -36,13 +36,6 @@ const summaMain = css({
   justifyContent: "flex-end",
 });
 
-const summaWorkingRow = css({
-  ...workingRowStyles,
-  whiteSpace: "nowrap",
-});
-
-const supD = css({ marginLeft: "2px" });
-
 export default function Total({
   display,
   totalPence,
@@ -56,16 +49,7 @@ export default function Total({
         <div className={summaMain}>
           <Logo size="S" />
         </div>
-        {showWorking && (
-          <span className={summaWorkingRow}>
-            {totalPence > 0 && (
-              <>
-                {totalPence}
-                <sup className={supD}>d</sup> =
-              </>
-            )}
-          </span>
-        )}
+        <PenceWorkingRow showWorking={showWorking} pence={totalPence} />
       </div>
       <LsdFieldGroup
         values={display}

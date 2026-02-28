@@ -3,10 +3,12 @@ import {
   LsdBooleans,
   LineState,
   ExtendedItemState,
+  SubtotalItemState,
   AnyLineState,
   CalculationState,
   ItemType,
   isExtendedItem,
+  isSubtotalItem,
 } from "../types/calculation";
 import {
   normalizeEarlyModernInput,
@@ -32,6 +34,7 @@ export function emptyLine(): LineState {
   return {
     id: generateId(),
     itemType: ItemType.LINE_ITEM,
+    title: "",
     error: false,
     fieldErrors: { l: false, s: false, d: false },
     literals: { l: "", s: "", d: "" },
@@ -43,6 +46,7 @@ export function emptyExtendedItem(): ExtendedItemState {
   return {
     id: generateId(),
     itemType: ItemType.EXTENDED_ITEM,
+    title: "",
     error: false,
     fieldErrors: { l: false, s: false, d: false },
     quantityError: false,
@@ -51,6 +55,100 @@ export function emptyExtendedItem(): ExtendedItemState {
     basePence: 0,
     totalPence: 0,
   };
+}
+
+export function emptySubtotalItem(): SubtotalItemState {
+  const lines: AnyLineState[] = [emptyLine(), emptyLine()];
+  const { totalPence, totalDisplay } = computeGrandTotal(lines);
+  return {
+    id: generateId(),
+    itemType: ItemType.SUBTOTAL_ITEM,
+    title: "",
+    lines,
+    totalPence,
+    totalDisplay,
+    error: false,
+  };
+}
+
+export function recomputeSubtotal(item: SubtotalItemState): SubtotalItemState {
+  const error = item.lines.some((l) => l.error);
+  const { totalPence, totalDisplay } = computeGrandTotal(item.lines);
+  return { ...item, error, totalPence, totalDisplay };
+}
+
+export type IdPath = string[];
+
+/**
+ * Return the lines array at the given path depth.
+ */
+export function getLinesAtPath(
+  rootLines: AnyLineState[],
+  path: IdPath,
+): AnyLineState[] {
+  let current = rootLines;
+  for (const id of path) {
+    const item = current.find((l) => l.id === id);
+    if (!item || !isSubtotalItem(item)) return current;
+    current = item.lines;
+  }
+  return current;
+}
+
+/**
+ * Immutably apply updater at path depth, recomputing each SubtotalItemState
+ * on the way back up.
+ */
+export function updateLinesAtPath(
+  rootLines: AnyLineState[],
+  path: IdPath,
+  updater: (lines: AnyLineState[]) => AnyLineState[],
+): AnyLineState[] {
+  if (path.length === 0) return updater(rootLines);
+  const [head, ...rest] = path;
+  return rootLines.map((line) => {
+    if (line.id !== head || !isSubtotalItem(line)) return line;
+    const newLines = updateLinesAtPath(line.lines, rest, updater);
+    return recomputeSubtotal({ ...line, lines: newLines });
+  });
+}
+
+/**
+ * Breadcrumb data for each path level.
+ * crumbs[0] = { id: "", title: "Summa", path: [] } (root)
+ */
+export function getBreadcrumbs(
+  rootLines: AnyLineState[],
+  path: IdPath,
+): Array<{ id: string; title: string; path: IdPath }> {
+  const crumbs: Array<{ id: string; title: string; path: IdPath }> = [
+    { id: "", title: "Summa", path: [] },
+  ];
+  let currentLines = rootLines;
+  for (let i = 0; i < path.length; i++) {
+    const id = path[i];
+    const item = currentLines.find((l) => l.id === id);
+    if (!item || !isSubtotalItem(item)) break;
+    crumbs.push({
+      id,
+      title: item.title || "Untitled",
+      path: path.slice(0, i + 1),
+    });
+    currentLines = item.lines;
+  }
+  return crumbs;
+}
+
+/** Immutably update the title of the matching line (works for all 3 item types) */
+export function updateTitle(
+  lines: AnyLineState[],
+  lineId: string,
+  value: string,
+): AnyLineState[] {
+  return lines.map((line) => {
+    if (line.id !== lineId) return line;
+    return { ...line, title: value };
+  });
 }
 
 /**
@@ -187,6 +285,7 @@ export function processFieldUpdate(
 ): AnyLineState[] {
   return lines.map((line) => {
     if (line.id !== lineId) return line;
+    if (isSubtotalItem(line)) return line;
     return isExtendedItem(line)
       ? updateExtendedItemField(line, field, value)
       : updateLine(line, field, value);

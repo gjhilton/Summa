@@ -1,11 +1,11 @@
 import { css, cx } from "../generated/css";
 import { ExtendedItemView, BaseLineItemProps } from "../types/lineView";
 import Field from "./Field";
-import Button from "./Button";
-import Icon from "./Icon";
 import LedgerRow from "./LedgerRow";
 import LsdFieldGroup from "./LsdFieldGroup";
-import { hidden, lineError, removeIcon, lineHoverVars } from "../styles/shared";
+import { supD as supDClass, lineError, lineHoverVars } from "../styles/shared";
+import TitleInput from "./TitleInput";
+import RemoveButton from "./RemoveButton";
 
 interface ExtendedItemProps extends BaseLineItemProps {
   view: ExtendedItemView;
@@ -158,7 +158,7 @@ const closeParenCol = css({
   },
 });
 
-const multiplyCol = css({ gridColumn: "span 3" });
+const multiplyCol = css({ gridColumn: "span 2" });
 
 const labelRow = css({
   display: "grid",
@@ -189,7 +189,12 @@ const fieldLabel = css({
   transition: "opacity 0.15s",
 });
 
-const supD = css({ marginLeft: "2px" });
+
+const opColWithTitle = css({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "stretch",
+});
 
 export default function ExtendedItem({
   view,
@@ -197,6 +202,7 @@ export default function ExtendedItem({
   showWorking,
   onChangeField,
   onChangeQuantity,
+  onChangeTitle,
   onRemove,
 }: ExtendedItemProps) {
   const {
@@ -209,6 +215,7 @@ export default function ExtendedItem({
     totalPence,
     quantityInt,
     subtotalDisplay,
+    title,
   } = view;
 
   const quantityWorking =
@@ -218,8 +225,8 @@ export default function ExtendedItem({
     showWorking && !error && quantityInt !== null && basePence > 0 ? (
       <>
         {quantityInt} × {basePence}
-        <sup className={supD}>d</sup> = {totalPence}
-        <sup className={supD}>d</sup>
+        <sup className={supDClass}>d</sup> = {totalPence}
+        <sup className={supDClass}>d</sup>
       </>
     ) : undefined;
 
@@ -238,15 +245,11 @@ export default function ExtendedItem({
 
       {/* Input row: remove | ( | op | qty | × | l | s | d | ) */}
       <LedgerRow columns={COLUMNS} className={cx(inputRow, errorClass)}>
-        <Button
-          variant="icon"
-          aria-label="Remove item"
-          className={cx(removeIcon, canRemove ? undefined : hidden)}
-          onClick={onRemove}
-        >
-          <Icon icon="trash" size={16} />
-        </Button>
-        <div className={opMain} />
+        <RemoveButton canRemove={canRemove} label="Remove item" onClick={onRemove} />
+        <div className={opColWithTitle}>
+          <TitleInput value={title} onChange={onChangeTitle} />
+          <div className={opMain} />
+        </div>
         <span className={openParenCol} aria-hidden="true" />
         <Field
           value={quantity}
@@ -277,9 +280,13 @@ export default function ExtendedItem({
         <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>extended cost</span>
       </div>
 
-      {/* Subtotal row: empty | working(span 3) | = | l | s | d | empty */}
+      {/* Subtotal row: title | working(span 2) | = | l | s | d | empty */}
       <LedgerRow columns={COLUMNS} className={errorClass}>
-        <span />
+        <TitleInput
+          value={title}
+          onChange={onChangeTitle}
+          style={{ minWidth: "8em", fontStyle: "normal" }}
+        />
         <Field
           value={"\u00A0"}
           label="q"

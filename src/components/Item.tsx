@@ -1,8 +1,9 @@
 import { css, cx } from "../generated/css";
 import { LineItemView, BaseLineItemProps } from "../types/lineView";
-import { workingRowStyles, hidden, lineError, removeIcon, lineHoverVars } from "../styles/shared";
-import Button from "./Button";
-import Icon from "./Icon";
+import { lineError, lineHoverVars } from "../styles/shared";
+import TitleInput from "./TitleInput";
+import RemoveButton from "./RemoveButton";
+import PenceWorkingRow from "./PenceWorkingRow";
 import LedgerRow from "./LedgerRow";
 import LsdFieldGroup from "./LsdFieldGroup";
 
@@ -29,10 +30,7 @@ const opMain = css({
   fontWeight: "100",
 });
 
-const opWorkingRow = css({
-  ...workingRowStyles,
-  whiteSpace: "nowrap",
-});
+
 
 const opCross = css({
   display: "inline-block",
@@ -61,43 +59,29 @@ const opCross = css({
   },
 });
 
-const supD = css({ marginLeft: "2px" }); // pence superscript in op working row
+
 
 export default function Item({
   view,
   canRemove,
   showWorking,
   onChangeField,
+  onChangeTitle,
   onRemove,
 }: ItemProps) {
-  const { literals, error, fieldErrors, totalPence, showOp } = view;
+  const { literals, error, fieldErrors, totalPence, showOp, title } = view;
   return (
     <LedgerRow className={cx(lineHoverVars, error ? lineError : undefined)}>
-      <Button
-        variant="icon"
-        aria-label="Remove line"
-        className={cx(removeIcon, canRemove ? undefined : hidden)}
-        onClick={onRemove}
-      >
-        <Icon icon="trash" size={16} />
-      </Button>
+      <RemoveButton canRemove={canRemove} label="Remove line" onClick={onRemove} />
       <span />
       <div className={opCol}>
+        <TitleInput value={title} onChange={onChangeTitle} />
         <div className={opMain}>
           {!showWorking && showOp && (
             <span className={opCross} aria-hidden="true" />
           )}
         </div>
-        {showWorking && (
-          <span className={opWorkingRow}>
-            {!error && totalPence > 0 && (
-              <>
-                {totalPence}
-                <sup className={supD}>d</sup> =
-              </>
-            )}
-          </span>
-        )}
+        <PenceWorkingRow showWorking={showWorking} pence={totalPence} error={error} />
       </div>
       <LsdFieldGroup
         values={literals}
