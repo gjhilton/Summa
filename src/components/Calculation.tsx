@@ -1,10 +1,10 @@
 import { css } from "../generated/css";
 import { AnyLineState, ItemType, LsdStrings } from "../types/calculation";
 import { toLineView } from "../state/displayLogic";
-import Item from "./Item";
+import LineItem from "./LineItem";
 import ExtendedItem from "./ExtendedItem";
 import SubtotalItem from "./SubtotalItem";
-import Total from "./Total";
+import TotalRow from "./TotalRow";
 import Button from "./Button";
 import Toggle from "./Toggle";
 
@@ -59,7 +59,7 @@ export default function Calculation({
   onUseExtendedItemChange,
   advancedOptionsDisabled = false,
 }: CalculationProps) {
-  const views = lines.map((line, i) => toLineView(line, i > 0));
+  const views = lines.map((line) => toLineView(line));
   return (
     <div className={layout}>
       {views.map((view) => {
@@ -91,7 +91,7 @@ export default function Calculation({
           );
         }
         return (
-          <Item
+          <LineItem
             key={view.id}
             view={view}
             canRemove={lines.length > 2}
@@ -115,7 +115,7 @@ export default function Calculation({
           </Button>
         )}
       </div>
-      <Total
+      <TotalRow
         display={totalDisplay}
         totalPence={totalPence}
         showWorking={showWorking}

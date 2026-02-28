@@ -12,7 +12,6 @@ interface BaseLineView {
 
 export interface LineItemView extends BaseLineView {
   itemType: ItemType.LINE_ITEM;
-  showOp: boolean;
 }
 
 export interface ExtendedItemView extends BaseLineView {

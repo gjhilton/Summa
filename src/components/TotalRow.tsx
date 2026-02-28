@@ -3,9 +3,9 @@ import { LsdStrings } from "../types/calculation";
 import PenceWorkingRow from "./PenceWorkingRow";
 import LedgerRow from "./LedgerRow";
 import Logo from "./Logo";
-import LsdFieldGroup from "./LsdFieldGroup";
+import CurrencyFields from "./CurrencyFields";
 
-interface TotalProps {
+interface TotalRowProps {
   display: LsdStrings;
   totalPence: number;
   showWorking: boolean;
@@ -36,11 +36,7 @@ const summaMain = css({
   justifyContent: "flex-end",
 });
 
-export default function Total({
-  display,
-  totalPence,
-  showWorking,
-}: TotalProps) {
+export default function TotalRow({ display, totalPence, showWorking }: TotalRowProps) {
   return (
     <LedgerRow className={totalRow}>
       <span />
@@ -51,7 +47,7 @@ export default function Total({
         </div>
         <PenceWorkingRow showWorking={showWorking} pence={totalPence} />
       </div>
-      <LsdFieldGroup
+      <CurrencyFields
         values={display}
         showWorking={showWorking}
         noBorder

@@ -4,7 +4,7 @@ import { computeFieldWorking } from "../state/calculationLogic";
 import { supD } from "../styles/shared";
 import Field from "./Field";
 
-interface LsdFieldGroupProps {
+interface CurrencyFieldsProps {
   values: LsdStrings;
   showWorking: boolean;
   hasError?: boolean;
@@ -15,7 +15,6 @@ interface LsdFieldGroupProps {
   dimZero?: boolean;
   weightByZero?: boolean;
 }
-
 
 const dimmedClass = css({ opacity: "0.3" });
 
@@ -47,7 +46,7 @@ function buildLsdWorking(
   };
 }
 
-export default function LsdFieldGroup({
+export default function CurrencyFields({
   values,
   showWorking,
   hasError = false,
@@ -57,7 +56,7 @@ export default function LsdFieldGroup({
   fmtZero,
   dimZero,
   weightByZero,
-}: LsdFieldGroupProps) {
+}: CurrencyFieldsProps) {
   const working = buildLsdWorking(values, showWorking, hasError);
   return (
     <>

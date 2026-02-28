@@ -4,7 +4,7 @@ import { formatLsdDisplay } from "./calculationLogic";
 import { normalizeEarlyModernInput } from "../utils/earlyModern";
 import { isValidRoman, romanToInteger } from "../utils/roman";
 
-export function toLineView(line: AnyLineState, showOp: boolean): AnyLineView {
+export function toLineView(line: AnyLineState): AnyLineView {
   if (line.itemType === ItemType.SUBTOTAL_ITEM) {
     const view: SubtotalItemView = {
       id: line.id,
@@ -26,7 +26,6 @@ export function toLineView(line: AnyLineState, showOp: boolean): AnyLineView {
       fieldErrors: line.fieldErrors,
       literals: line.literals,
       totalPence: line.totalPence,
-      showOp,
     };
     return view;
   }

@@ -2,10 +2,12 @@ import { css, cx } from "../generated/css";
 import { ExtendedItemView, BaseLineItemProps } from "../types/lineView";
 import Field from "./Field";
 import LedgerRow from "./LedgerRow";
-import LsdFieldGroup from "./LsdFieldGroup";
+import CurrencyFields from "./CurrencyFields";
 import { supD as supDClass, lineError, lineHoverVars } from "../styles/shared";
 import TitleInput from "./TitleInput";
 import RemoveButton from "./RemoveButton";
+import MultiplySymbol from "./MultiplySymbol";
+import EqualsSymbol from "./EqualsSymbol";
 
 interface ExtendedItemProps extends BaseLineItemProps {
   view: ExtendedItemView;
@@ -36,61 +38,6 @@ const atSign = css({
   userSelect: "none",
 });
 
-const SYMBOL_LINE_WEIGHT = "2px"; // renders at 1px after scale(0.5)
-
-const mulSymbol = css({
-  display: "inline-block",
-  position: "relative",
-  width: "0.5em",
-  height: "0.5em",
-  transform: "rotate(45deg) scale(0.5)",
-  _before: {
-    content: '""',
-    position: "absolute",
-    width: SYMBOL_LINE_WEIGHT,
-    height: "100%",
-    left: "50%",
-    top: "0",
-    transform: "translateX(-50%)",
-    bg: "currentColor",
-  },
-  _after: {
-    content: '""',
-    position: "absolute",
-    height: SYMBOL_LINE_WEIGHT,
-    width: "100%",
-    top: "50%",
-    left: "0",
-    transform: "translateY(-50%)",
-    bg: "currentColor",
-  },
-});
-
-const eqSymbol = css({
-  display: "inline-block",
-  position: "relative",
-  width: "0.5em",
-  height: "0.5em",
-  transform: "scale(0.5)",
-  _before: {
-    content: '""',
-    position: "absolute",
-    height: SYMBOL_LINE_WEIGHT,
-    width: "100%",
-    top: "33%",
-    left: "0",
-    bg: "currentColor",
-  },
-  _after: {
-    content: '""',
-    position: "absolute",
-    height: SYMBOL_LINE_WEIGHT,
-    width: "100%",
-    top: "67%",
-    left: "0",
-    bg: "currentColor",
-  },
-});
 
 const subtotalOpCol = css({
   display: "flex",
@@ -190,12 +137,6 @@ const fieldLabel = css({
 });
 
 
-const opColWithTitle = css({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "stretch",
-});
-
 export default function ExtendedItem({
   view,
   canRemove,
@@ -243,13 +184,10 @@ export default function ExtendedItem({
         <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>unit cost</span>
       </div>
 
-      {/* Input row: remove | ( | op | qty | × | l | s | d | ) */}
+      {/* Input row: remove | op | ( | qty | × | l | s | d | ) */}
       <LedgerRow columns={COLUMNS} className={cx(inputRow, errorClass)}>
         <RemoveButton canRemove={canRemove} label="Remove item" onClick={onRemove} />
-        <div className={opColWithTitle}>
-          <TitleInput value={title} onChange={onChangeTitle} />
-          <div className={opMain} />
-        </div>
+        <div className={opMain} />
         <span className={openParenCol} aria-hidden="true" />
         <Field
           value={quantity}
@@ -260,9 +198,9 @@ export default function ExtendedItem({
           working={quantityWorking}
         />
         <span className={atSign} aria-hidden="true">
-          <span className={mulSymbol} />
+          <MultiplySymbol />
         </span>
-        <LsdFieldGroup
+        <CurrencyFields
           values={literals}
           fieldErrors={fieldErrors}
           showWorking={showWorking}
@@ -280,13 +218,9 @@ export default function ExtendedItem({
         <span style={{ gridColumn: "6 / span 3" }} className={fieldLabel}>extended cost</span>
       </div>
 
-      {/* Subtotal row: title | working(span 2) | = | l | s | d | empty */}
+      {/* Subtotal row: empty | working(span 2) | title(inside brackets) | = | l | s | d | ) */}
       <LedgerRow columns={COLUMNS} className={errorClass}>
-        <TitleInput
-          value={title}
-          onChange={onChangeTitle}
-          style={{ minWidth: "8em", fontStyle: "normal" }}
-        />
+        <span />
         <Field
           value={"\u00A0"}
           label="q"
@@ -295,10 +229,11 @@ export default function ExtendedItem({
           working={multiplicationWorking}
           className={multiplyCol}
         />
+        <TitleInput value={title} onChange={onChangeTitle} />
         <div className={subtotalOpCol}>
-          <span className={eqSymbol} aria-hidden="true" />
+          <EqualsSymbol />
         </div>
-        <LsdFieldGroup
+        <CurrencyFields
           values={subtotalDisplay}
           showWorking={showWorking}
           hasError={error}

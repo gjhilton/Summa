@@ -4,7 +4,7 @@ import { lineError, lineHoverVars } from "../styles/shared";
 import TitleInput from "./TitleInput";
 import RemoveButton from "./RemoveButton";
 import LedgerRow from "./LedgerRow";
-import LsdFieldGroup from "./LsdFieldGroup";
+import CurrencyFields from "./CurrencyFields";
 import Button from "./Button";
 import Icon from "./Icon";
 
@@ -60,7 +60,7 @@ export default function SubtotalItem({
           <Icon icon="pencil" size={16} />
         </Button>
       </div>
-      <LsdFieldGroup
+      <CurrencyFields
         values={totalDisplay}
         showWorking={showWorking}
         hasError={error}

@@ -4,19 +4,23 @@ import Button from "./Button";
 import Footer from "./Footer";
 import PageLayout from "./PageLayout";
 import Logo from "./Logo";
-import Item from "./Item";
+import LineItem from "./LineItem";
 import ExtendedItem from "./ExtendedItem";
+import SubtotalItem from "./SubtotalItem";
 import Toggle from "./Toggle";
 import noWorkingImg from "../assets/no-working.png";
 import {
-  computeLinePence,
+  emptyLine,
   emptyExtendedItem,
+  emptySubtotalItem,
+  processFieldUpdate,
+  recomputeSubtotal,
   updateExtendedItemField,
   updateExtendedItemQuantity,
 } from "../state/calculationLogic";
 import { toLineView } from "../state/displayLogic";
-import { ExtendedItemState, ItemType } from "../types/calculation";
-import { ExtendedItemView } from "../types/lineView";
+import { LineState, ExtendedItemState, SubtotalItemState } from "../types/calculation";
+import { LineItemView, ExtendedItemView, SubtotalItemView } from "../types/lineView";
 
 interface AboutScreenProps {
   onClose: () => void;
@@ -124,28 +128,38 @@ export default function AboutScreen({
   isFirstVisit = false,
   onGetStarted,
 }: AboutScreenProps) {
-  const [example1Literals, setExample1Literals] = useState({
-    l: "xx",
-    s: "v",
-    d: "iiij",
+  const [example1, setExample1] = useState<LineState>(() => {
+    let lines = [emptyLine()];
+    const id = lines[0].id;
+    lines = processFieldUpdate(lines, id, "l", "xx");
+    lines = processFieldUpdate(lines, id, "s", "v");
+    lines = processFieldUpdate(lines, id, "d", "iiij");
+    return lines[0] as LineState;
   });
-  const {
-    totalPence: example1Pence,
-    error: example1Error,
-    fieldErrors: example1FieldErrors,
-  } = computeLinePence(example1Literals);
 
   const [demoShowWorking, setDemoShowWorking] = useState(true);
-  const [demoLiterals, setDemoLiterals] = useState({
-    l: "xx",
-    s: "v",
-    d: "iiij",
+  const [demo, setDemo] = useState<LineState>(() => {
+    let lines = [emptyLine()];
+    const id = lines[0].id;
+    lines = processFieldUpdate(lines, id, "l", "xx");
+    lines = processFieldUpdate(lines, id, "s", "v");
+    lines = processFieldUpdate(lines, id, "d", "iiij");
+    return lines[0] as LineState;
   });
-  const {
-    totalPence: demoTotalPence,
-    error: demoError,
-    fieldErrors: demoFieldErrors,
-  } = computeLinePence(demoLiterals);
+
+  const [subtotalItem, setSubtotalItem] = useState<SubtotalItemState>(() => {
+    const item = emptySubtotalItem();
+    let lines = item.lines;
+    const id0 = lines[0].id;
+    const id1 = lines[1].id;
+    lines = processFieldUpdate(lines, id0, "l", "i");
+    lines = processFieldUpdate(lines, id0, "s", "ii");
+    lines = processFieldUpdate(lines, id0, "d", "iii");
+    lines = processFieldUpdate(lines, id1, "l", "ii");
+    lines = processFieldUpdate(lines, id1, "s", "iii");
+    lines = processFieldUpdate(lines, id1, "d", "iv");
+    return recomputeSubtotal({ ...item, lines });
+  });
 
   const [extendedItem, setExtendedItem] = useState<ExtendedItemState>(() => {
     let item = emptyExtendedItem();
@@ -245,22 +259,15 @@ export default function AboutScreen({
             value like 'dog' and see what happens.
           </p>
           <div className={exampleFrame}>
-            <Item
-              view={{
-                id: "example1",
-                itemType: ItemType.LINE_ITEM,
-                literals: example1Literals,
-                error: example1Error,
-                fieldErrors: example1FieldErrors,
-                totalPence: example1Pence,
-                showOp: false,
-              }}
+            <LineItem
+              view={toLineView(example1) as LineItemView}
               canRemove={false}
               showWorking={false}
               onChangeField={(f, v) =>
-                setExample1Literals((prev) => ({ ...prev, [f]: v }))
+                setExample1((prev) => processFieldUpdate([prev], prev.id, f, v)[0] as LineState)
               }
               onRemove={noop}
+              onChangeTitle={noop}
             />
           </div>
           <p>
@@ -280,12 +287,32 @@ export default function AboutScreen({
           </p>
           <div className={exampleFrame}>
             <ExtendedItem
-              view={toLineView(extendedItem, false) as ExtendedItemView}
+              view={toLineView(extendedItem) as ExtendedItemView}
               canRemove={false}
               showWorking={false}
               onChangeField={handleExtendedItemField}
               onChangeQuantity={handleExtendedItemQuantity}
               onRemove={noop}
+              onChangeTitle={noop}
+            />
+          </div>
+        </Section>
+
+        <Section heading="Advanced option: Subtotal Items">
+          <p>
+            Subtotal Items group a set of lines into a nested sub-calculation.
+            The subtotal of that group is then carried forward into the parent
+            calculation. Click the pencil icon to edit the lines inside a
+            Subtotal Item.
+          </p>
+          <div className={exampleFrame}>
+            <SubtotalItem
+              view={toLineView(subtotalItem) as SubtotalItemView}
+              canRemove={false}
+              showWorking={false}
+              onEdit={() => window.alert("In the real calculator, this opens the sub-calculation for editing.")}
+              onRemove={noop}
+              onChangeTitle={(v) => setSubtotalItem((prev) => ({ ...prev, title: v }))}
             />
           </div>
         </Section>
@@ -303,22 +330,15 @@ export default function AboutScreen({
               checked={demoShowWorking}
               onChange={setDemoShowWorking}
             />
-            <Item
-              view={{
-                id: "demo",
-                itemType: ItemType.LINE_ITEM,
-                literals: demoLiterals,
-                error: demoError,
-                fieldErrors: demoFieldErrors,
-                totalPence: demoTotalPence,
-                showOp: false,
-              }}
+            <LineItem
+              view={toLineView(demo) as LineItemView}
               canRemove={false}
               showWorking={demoShowWorking}
               onChangeField={(f, v) =>
-                setDemoLiterals((prev) => ({ ...prev, [f]: v }))
+                setDemo((prev) => processFieldUpdate([prev], prev.id, f, v)[0] as LineState)
               }
               onRemove={noop}
+              onChangeTitle={noop}
             />
           </div>
         </Section>
