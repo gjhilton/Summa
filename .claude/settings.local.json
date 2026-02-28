@@ -13,7 +13,8 @@
       "mcp__plugin_playwright_playwright__browser_navigate",
       "Bash(npm install:*)",
       "Bash(sed:*)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "Bash(npx playwright:*)"
     ]
   }
 }

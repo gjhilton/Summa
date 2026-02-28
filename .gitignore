@@ -3,3 +3,5 @@
 /src/generated
 .DS_Store
 .DS_Store
+/src/config/playwright/playwright-report
+/src/config/playwright/test-results

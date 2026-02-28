@@ -4,6 +4,7 @@ import {
 	toggleAdvancedOptions,
 	addSubtotalItem,
 	navigateIntoSubtotal,
+	getField,
 } from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('item titles', () => {
@@ -24,7 +25,7 @@ test.describe('item titles', () => {
 		await goto(page);
 		const titleInput = page.getByLabel('Line title').first();
 		await titleInput.fill('Rent');
-		const dInput = page.getByLabel('d').first();
+		const dInput = await getField(page, 'd', 0);
 		await dInput.fill('v');
 		await expect(titleInput).toHaveValue('Rent');
 	});
@@ -47,10 +48,12 @@ test.describe('item titles', () => {
 	});
 
 	test('subtotal items have a title input', async ({ page }) => {
+		// Title for a subtotal is edited inside its sub-calculation via the header
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		const titleInput = page.getByLabel('Subtotal title');
+		await navigateIntoSubtotal(page);
+		const titleInput = page.getByLabel('Sub-calculation title');
 		await expect(titleInput).toBeVisible();
 	});
 
@@ -58,7 +61,8 @@ test.describe('item titles', () => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		const titleInput = page.getByLabel('Subtotal title');
+		await navigateIntoSubtotal(page);
+		const titleInput = page.getByLabel('Sub-calculation title');
 		await titleInput.fill('Quarter total');
 		await expect(titleInput).toHaveValue('Quarter total');
 	});
@@ -67,9 +71,10 @@ test.describe('item titles', () => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		const titleInput = page.getByLabel('Subtotal title');
-		await titleInput.fill('Quarter total');
 		await navigateIntoSubtotal(page);
+		const titleInput = page.getByLabel('Sub-calculation title');
+		await titleInput.fill('Quarter total');
+		// The current breadcrumb entry should reflect the title
 		await expect(page.getByText('Quarter total')).toBeVisible();
 	});
 

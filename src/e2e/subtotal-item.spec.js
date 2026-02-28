@@ -8,6 +8,8 @@ import {
 	enterValue,
 	enableShowWorking,
 	getItemsCount,
+	getTotalField,
+	getField,
 } from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('subtotal items', () => {
@@ -82,8 +84,8 @@ test.describe('subtotal items', () => {
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
-		await expect(page.getByRole('button', { name: 'Clear page' })).toBeVisible();
-		await expect(page.getByRole('button', { name: 'Clear' })).not.toBeVisible();
+		await expect(page.getByRole('button', { name: 'Clear page', exact: true })).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Clear', exact: true })).not.toBeVisible();
 	});
 
 	test('root screen shows "Clear" not "Clear page"', async ({ page }) => {
@@ -125,8 +127,7 @@ test.describe('subtotal items', () => {
 		await enterValue(page, 0, 'd', 'v');   // 5d
 		await enterValue(page, 1, 'd', 'iii'); // 3d
 		// Sub-total should show viii = 8d
-		const dTotal = page.getByLabel('d').last();
-		await expect(dTotal).toHaveText('viij');
+		await expect(getTotalField(page, 'd')).toHaveText('viij');
 	});
 
 	test('navigating back via breadcrumb shows parent total includes subtotal', async ({ page }) => {
@@ -138,8 +139,7 @@ test.describe('subtotal items', () => {
 		await enterValue(page, 1, 'd', 'iii'); // 3d = 8d subtotal
 		await navigateViaBreadcrumb(page, 'Summa totalis');
 		await expect(page.getByText('Summa paginae')).not.toBeVisible();
-		const dTotal = page.getByLabel('d').last();
-		await expect(dTotal).toHaveText('viij');
+		await expect(getTotalField(page, 'd')).toHaveText('viij');
 	});
 
 	test('Clear page at sub-level only resets sub-calc', async ({ page }) => {
@@ -154,7 +154,7 @@ test.describe('subtotal items', () => {
 		await enableShowWorking(page);
 		await expect(getItemsCount(page)).toHaveText('Items: 2');
 		await navigateViaBreadcrumb(page, 'Summa totalis');
-		const dInput = page.getByLabel('d').first();
+		const dInput = await getField(page, 'd', 0);
 		await expect(dInput).toHaveValue('v');
 	});
 

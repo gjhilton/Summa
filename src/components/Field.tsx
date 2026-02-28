@@ -118,6 +118,7 @@ export default function Field({
           />
         ) : (
           <span
+            aria-label={ARIA_LABELS[label]}
             className={cx(
               fieldBase,
               readonlyStyle,

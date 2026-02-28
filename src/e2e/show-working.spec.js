@@ -12,7 +12,7 @@ test.describe('show working', () => {
 		await goto(page);
 		await enterValue(page, 0, 's', 'v'); // 5s = 60d
 		await enableShowWorking(page);
-		await expect(page.getByText(/60/)).toBeVisible();
+		await expect(page.getByText(/60/).first()).toBeVisible();
 	});
 
 	test('disabling show working hides working annotations', async ({ page }) => {

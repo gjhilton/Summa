@@ -7,8 +7,20 @@
  * @param {import('@playwright/test').Page} page
  */
 export async function goto(page) {
+	// Load the page, clear all storage, reload to dismiss the first-visit
+	// help screen, then click Clear to reset the default demo state so every
+	// test starts with two empty lines.
 	await page.goto('/');
+	await page.evaluate(() => {
+		localStorage.clear();
+		localStorage.setItem('summa_visited', '1');
+	});
+	await page.reload();
+	page.once('dialog', (dialog) => dialog.accept());
+	await page.getByRole('button', { name: 'Clear', exact: true }).click();
 }
+
+const FIELD_LABELS = { l: 'pounds', s: 'shillings', d: 'pence' };
 
 /**
  * Get an l/s/d input field by label for a given line index.
@@ -17,8 +29,18 @@ export async function goto(page) {
  * @param {number} [lineIndex=0] - 0-based index among line items
  */
 export async function getField(page, field, lineIndex = 0) {
-	const inputs = page.getByLabel(field, { exact: true });
-	return inputs.nth(lineIndex);
+	const label = FIELD_LABELS[field] ?? field;
+	return page.getByLabel(label, { exact: true }).nth(lineIndex);
+}
+
+/**
+ * Get the total row display span for a given l/s/d field (the last labelled element).
+ * @param {import('@playwright/test').Page} page
+ * @param {'l' | 's' | 'd'} field
+ */
+export function getTotalField(page, field) {
+	const label = FIELD_LABELS[field] ?? field;
+	return page.getByLabel(label, { exact: true }).last();
 }
 
 /**
@@ -77,10 +99,9 @@ export async function navigateViaBreadcrumb(page, crumbText) {
 }
 
 /**
- * Get the Items count shown in the total row (only visible when show working is on).
- * Returns the text content of the annotation.
+ * Get the Items count locator shown in the total row (only visible when show working is on).
  * @param {import('@playwright/test').Page} page
  */
-export async function getItemsCount(page) {
+export function getItemsCount(page) {
 	return page.getByText(/^Items: \d+$/);
 }
