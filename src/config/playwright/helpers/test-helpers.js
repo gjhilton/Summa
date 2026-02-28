@@ -34,6 +34,14 @@ export async function enterValue(page, lineIndex, field, value) {
 }
 
 /**
+ * Enable show working toggle.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function enableShowWorking(page) {
+	await page.getByRole('switch', { name: /show working/i }).click();
+}
+
+/**
  * Click the Advanced options toggle to enable it.
  * @param {import('@playwright/test').Page} page
  */
@@ -50,12 +58,13 @@ export async function addSubtotalItem(page) {
 }
 
 /**
- * Click the pencil (edit) button on a subtotal row identified by its title input value.
+ * Click the subtotal title link to navigate into it.
+ * The title defaults to "Untitled" for a freshly added subtotal.
  * @param {import('@playwright/test').Page} page
- * @param {string} title - current title text (or empty string for untitled)
+ * @param {string} [title='Untitled']
  */
-export async function navigateIntoSubtotal(page, title) {
-	await page.getByRole('button', { name: /edit subtotal/i }).first().click();
+export async function navigateIntoSubtotal(page, title = 'Untitled') {
+	await page.getByRole('button', { name: title }).first().click();
 }
 
 /**
@@ -65,4 +74,13 @@ export async function navigateIntoSubtotal(page, title) {
  */
 export async function navigateViaBreadcrumb(page, crumbText) {
 	await page.getByRole('button', { name: crumbText }).click();
+}
+
+/**
+ * Get the Items count shown in the total row (only visible when show working is on).
+ * Returns the text content of the annotation.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function getItemsCount(page) {
+	return page.getByText(/^Items: \d+$/);
 }

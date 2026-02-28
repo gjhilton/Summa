@@ -6,6 +6,8 @@ import {
 	navigateIntoSubtotal,
 	navigateViaBreadcrumb,
 	enterValue,
+	enableShowWorking,
+	getItemsCount,
 } from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('subtotal items', () => {
@@ -13,25 +15,39 @@ test.describe('subtotal items', () => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		await expect(page.getByText('Total items: 3')).toBeVisible();
+		await enableShowWorking(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 3');
 	});
 
-	test('subtotal shows a pencil edit button', async ({ page }) => {
+	test('subtotal title is a clickable link', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		const editBtn = page.getByRole('button', { name: /edit subtotal/i });
-		await expect(editBtn).toBeVisible();
+		const titleBtn = page.getByRole('button', { name: 'Untitled' });
+		await expect(titleBtn).toBeVisible();
 	});
 
-	test('clicking pencil navigates into the subtotal', async ({ page }) => {
+	test('clicking subtotal title navigates into the sub-calculation', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
-		// Should now show the breadcrumb nav
 		await expect(page.getByRole('navigation', { name: /breadcrumb/i })).toBeVisible();
-		// Should show "Summa paginae" heading
+	});
+
+	test('breadcrumb root shows "Summa totalis"', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await expect(page.getByRole('button', { name: 'Summa totalis' })).toBeVisible();
+	});
+
+	test('sub-level total row shows "Summa paginae" instead of logo', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
 		await expect(page.getByText('Summa paginae')).toBeVisible();
 	});
 
@@ -44,17 +60,73 @@ test.describe('subtotal items', () => {
 		await expect(toggle).toBeDisabled();
 	});
 
+	test('sub-level has a Done button', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await expect(page.getByRole('button', { name: 'Done' })).toBeVisible();
+	});
+
+	test('Done button returns to parent calculation', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await page.getByRole('button', { name: 'Done' }).click();
+		await expect(page.getByRole('navigation', { name: /breadcrumb/i })).not.toBeVisible();
+	});
+
+	test('sub-level shows "Clear page" instead of "Clear"', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await expect(page.getByRole('button', { name: 'Clear page' })).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Clear' })).not.toBeVisible();
+	});
+
+	test('root screen shows "Clear" not "Clear page"', async ({ page }) => {
+		await goto(page);
+		await expect(page.getByRole('button', { name: 'Clear' })).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Clear page' })).not.toBeVisible();
+	});
+
+	test('Clear page confirm says "Erase N items?"', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		let dialogMessage = '';
+		page.once('dialog', async (dialog) => {
+			dialogMessage = dialog.message();
+			await dialog.dismiss();
+		});
+		await page.getByRole('button', { name: 'Clear page' }).click();
+		await expect(dialogMessage).toMatch(/^Erase \d+ items\?$/);
+	});
+
+	test('root Clear confirm says "Clear all?"', async ({ page }) => {
+		await goto(page);
+		let dialogMessage = '';
+		page.once('dialog', async (dialog) => {
+			dialogMessage = dialog.message();
+			await dialog.dismiss();
+		});
+		await page.getByRole('button', { name: 'Clear' }).click();
+		expect(dialogMessage).toBe('Clear all?');
+	});
+
 	test('adding lines inside subtotal updates sub-total display', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
-		// Enter values inside the sub-calculation
 		await enterValue(page, 0, 'd', 'v');   // 5d
 		await enterValue(page, 1, 'd', 'iii'); // 3d
 		// Sub-total should show viii = 8d
 		const dTotal = page.getByLabel('d').last();
-		await expect(dTotal).toHaveValue('viij');
+		await expect(dTotal).toHaveText('viij');
 	});
 
 	test('navigating back via breadcrumb shows parent total includes subtotal', async ({ page }) => {
@@ -64,42 +136,33 @@ test.describe('subtotal items', () => {
 		await navigateIntoSubtotal(page);
 		await enterValue(page, 0, 'd', 'v');   // 5d
 		await enterValue(page, 1, 'd', 'iii'); // 3d = 8d subtotal
-		// Navigate back to root
-		await navigateViaBreadcrumb(page, 'Summa');
-		// Breadcrumb should be gone
+		await navigateViaBreadcrumb(page, 'Summa totalis');
 		await expect(page.getByText('Summa paginae')).not.toBeVisible();
-		// The root total should include the 8d from the subtotal
 		const dTotal = page.getByLabel('d').last();
-		await expect(dTotal).toHaveValue('viij');
+		await expect(dTotal).toHaveText('viij');
 	});
 
-	test('Clear at sub-level only resets sub-calc', async ({ page }) => {
+	test('Clear page at sub-level only resets sub-calc', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
-		// Set a value at root level
 		await enterValue(page, 0, 'd', 'v');
-		// Add subtotal, navigate in, set values
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
 		await enterValue(page, 0, 'd', 'iii');
-		// Clear at sub-level
 		page.on('dialog', (dialog) => dialog.accept());
-		await page.getByRole('button', { name: /clear/i }).click();
-		// Sub-calc should be reset (2 empty lines)
-		await expect(page.getByText('Total items: 2')).toBeVisible();
-		// Navigate back — root line 0 should still have its value
-		await navigateViaBreadcrumb(page, 'Summa');
+		await page.getByRole('button', { name: 'Clear page' }).click();
+		await enableShowWorking(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 2');
+		await navigateViaBreadcrumb(page, 'Summa totalis');
 		const dInput = page.getByLabel('d').first();
 		await expect(dInput).toHaveValue('v');
 	});
 
-	test('nested subtotals: can add subtotal inside subtotal', async ({ page }) => {
+	test('nested subtotals: advanced toggle is disabled at sub-level', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
-		// Advanced options should be disabled at depth 1 — cannot add sub-subtotal via toggle
-		// So this test verifies the disabled state
 		const toggle = page.getByRole('switch', { name: /advanced options/i });
 		await expect(toggle).toBeDisabled();
 	});
