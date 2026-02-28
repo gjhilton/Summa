@@ -35,8 +35,11 @@ export const removeIcon = css({ color: "var(--rm-color)", opacity: "var(--rm-opa
  */
 export const titleInput = css({
   width: "100%",
-  padding: "xs",
-  fontSize: "xl",
+  paddingLeft: "xs",
+  paddingRight: "xs",
+  paddingTop: "md",
+  paddingBottom: "md",
+  fontSize: "m",
   borderBottomWidth: "1px",
   borderBottomStyle: "solid",
   borderBottomColor: "rgba(0,0,0,0.1)",

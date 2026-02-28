@@ -26,7 +26,7 @@ import {
 } from "./calculationLogic";
 import { arrayMove } from "@dnd-kit/sortable";
 import Calculation from "../components/Calculation";
-import SubCalculationHeader from "../components/SubCalculationHeader";
+import CalculationHeader from "../components/CalculationHeader";
 import { FEATURES } from "../features";
 
 const STORAGE_KEY = "summa_calculation";
@@ -184,14 +184,17 @@ export default function CalculationData({
 
   return (
     <>
-      {isSubLevel && (
-        <SubCalculationHeader
-          breadcrumbs={breadcrumbs}
-          title={breadcrumbs[breadcrumbs.length - 1]?.title ?? ""}
-          onTitleChange={updateCurrentSubtotalTitle}
-          onNavigate={navigateTo}
-        />
-      )}
+      <CalculationHeader
+        breadcrumbs={breadcrumbs}
+        onNavigate={navigateTo}
+        onClear={isSubLevel
+          ? () => window.confirm(`Erase ${currentLines.length} items?`) && resetCalculation()
+          : () => window.confirm("Clear all?") && resetCalculation()
+        }
+        onDone={isSubLevel ? () => navigateTo(navigationPath.slice(0, -1)) : undefined}
+        title={isSubLevel ? (breadcrumbs[breadcrumbs.length - 1]?.title ?? "") : undefined}
+        onTitleChange={isSubLevel ? updateCurrentSubtotalTitle : undefined}
+      />
       <Calculation
         lines={currentLines}
         totalDisplay={totalDisplay}
@@ -206,11 +209,9 @@ export default function CalculationData({
         onAddSubtotalItem={addSubtotalItem}
         onRemoveLine={removeLine}
         onReorderLines={reorderLines}
-        onReset={resetCalculation}
         useExtendedItem={useExtendedItem}
         onUseExtendedItemChange={onUseExtendedItemChange}
         onEditSubtotalItem={navigateInto}
-        onDone={isSubLevel ? () => navigateTo(navigationPath.slice(0, -1)) : undefined}
         advancedOptionsDisabled={isSubLevel}
         isSubLevel={isSubLevel}
       />

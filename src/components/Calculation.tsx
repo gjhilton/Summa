@@ -33,8 +33,6 @@ interface CalculationProps {
   onAddSubtotalItem: () => void;
   onRemoveLine: (id: string) => void;
   onReorderLines: (oldIndex: number, newIndex: number) => void;
-  onReset: () => void;
-  onDone?: () => void;
   onEditSubtotalItem: (id: string) => void;
   useExtendedItem: boolean;
   onUseExtendedItemChange: (v: boolean) => void;
@@ -52,8 +50,6 @@ const bottomBar = css({
 });
 
 const toggleStack = css({ display: "flex", flexDirection: "column", gap: "xs" });
-const fullWidthBtn = css({ width: "100%" });
-const actionStack = css({ display: "flex", flexDirection: "column", gap: "xs" });
 
 export default function Calculation({
   lines,
@@ -69,8 +65,6 @@ export default function Calculation({
   onAddSubtotalItem,
   onRemoveLine,
   onReorderLines,
-  onReset,
-  onDone,
   onEditSubtotalItem,
   useExtendedItem,
   onUseExtendedItemChange,
@@ -91,12 +85,7 @@ export default function Calculation({
     }
   }
 
-  function handleClear() {
-    const msg = isSubLevel ? `Erase ${lines.length} items?` : "Clear all?";
-    if (window.confirm(msg)) onReset();
-  }
-
-  const views = lines.map((line) => toLineView(line));
+const views = lines.map((line) => toLineView(line));
   const ids = lines.map((l) => l.id);
 
   return (
@@ -178,14 +167,6 @@ export default function Calculation({
             onChange={onUseExtendedItemChange}
             disabled={advancedOptionsDisabled}
           />
-        </div>
-        <div className={actionStack}>
-          {isSubLevel && onDone && (
-            <Button onClick={onDone} className={fullWidthBtn}>Done</Button>
-          )}
-          <Button onClick={handleClear} className={isSubLevel ? fullWidthBtn : undefined}>
-            {isSubLevel ? "Clear page" : "Clear"}
-          </Button>
         </div>
       </div>
     </div>

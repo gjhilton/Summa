@@ -22,8 +22,7 @@ const titleButton = css({
   display: "block",
   width: "100%",
   textAlign: "left",
-  padding: "xs",
-  fontSize: "xl",
+  fontSize: "m",
   fontFamily: "inherit",
   fontWeight: "inherit",
   color: "blue",
@@ -33,6 +32,8 @@ const titleButton = css({
   borderWidth: "0",
   paddingLeft: "sm",
   paddingRight: "sm",
+  paddingTop: "md",
+  paddingBottom: "md",
   _hover: { opacity: "0.7" },
 });
 

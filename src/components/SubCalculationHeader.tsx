@@ -1,11 +1,14 @@
 import { css } from "../generated/css";
 import { IdPath } from "../state/calculationLogic";
+import Button from "./Button";
 
 interface SubCalculationHeaderProps {
   breadcrumbs: Array<{ id: string; title: string; path: IdPath }>;
   title: string;
   onTitleChange: (v: string) => void;
   onNavigate: (path: IdPath) => void;
+  onDone: () => void;
+  onClear: () => void;
 }
 
 const header = css({
@@ -50,8 +53,14 @@ const breadcrumbCurrent = css({
   opacity: "0.8",
 });
 
+const titleRow = css({
+  display: "flex",
+  alignItems: "center",
+  gap: "sm",
+});
+
 const titleInput = css({
-  width: "100%",
+  flex: "1",
   background: "transparent",
   borderWidth: "0",
   outlineWidth: "0",
@@ -61,11 +70,19 @@ const titleInput = css({
   _placeholder: { opacity: "0.3" },
 });
 
+const buttonGroup = css({
+  display: "flex",
+  gap: "xs",
+  flexShrink: "0",
+});
+
 export default function SubCalculationHeader({
   breadcrumbs,
   title,
   onTitleChange,
   onNavigate,
+  onDone,
+  onClear,
 }: SubCalculationHeaderProps) {
   return (
     <div className={header}>
@@ -88,13 +105,19 @@ export default function SubCalculationHeader({
           </span>
         )}
       </nav>
-      <input
-        className={titleInput}
-        value={title}
-        placeholder="Untitled sub-calculation"
-        onChange={(e) => onTitleChange(e.target.value)}
-        aria-label="Sub-calculation title"
-      />
+      <div className={titleRow}>
+        <input
+          className={titleInput}
+          value={title}
+          placeholder="Untitled sub-calculation"
+          onChange={(e) => onTitleChange(e.target.value)}
+          aria-label="Sub-calculation title"
+        />
+        <div className={buttonGroup}>
+          <Button onClick={onClear}>Clear page</Button>
+          <Button onClick={onDone}>Done</Button>
+        </div>
+      </div>
     </div>
   );
 }
