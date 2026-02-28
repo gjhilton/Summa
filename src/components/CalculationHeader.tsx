@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { css } from '../generated/css';
 import { IdPath } from '../state/calculationLogic';
 import Button from './Button';
@@ -88,6 +89,24 @@ export default function CalculationHeader({
 	const showBreadcrumbs = breadcrumbs.length > 0;
 	const showTitle = title !== undefined && onTitleChange !== undefined;
 
+	// Local draft so typing (including deleting to empty) doesn't round-trip
+	// through global state and trigger an immediate restore.
+	const [draft, setDraft] = useState(title ?? '');
+
+	// Sync draft when navigating to a different sub-calculation.
+	useEffect(() => {
+		setDraft(title ?? '');
+	}, [title]);
+
+	function handleBlur() {
+		if (draft === '') {
+			// Restore the last saved title; leave state unchanged.
+			setDraft(title ?? '');
+		} else {
+			onTitleChange?.(draft);
+		}
+	}
+
 	return (
 		<div className={header}>
 			{showBreadcrumbs && (
@@ -120,9 +139,10 @@ export default function CalculationHeader({
 				{showTitle && (
 					<input
 						className={titleInput}
-						value={title}
+						value={draft}
 						placeholder="Untitled sub-calculation"
-						onChange={e => onTitleChange(e.target.value)}
+						onChange={e => setDraft(e.target.value)}
+						onBlur={handleBlur}
 						aria-label="Sub-calculation title"
 					/>
 				)}
