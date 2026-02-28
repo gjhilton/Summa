@@ -144,6 +144,10 @@ export default function CalculationHeader({
 						onChange={e => setDraft(e.target.value)}
 						onBlur={handleBlur}
 						aria-label="Sub-calculation title"
+						autoCapitalize="off"
+						autoCorrect="off"
+						autoComplete="off"
+						spellCheck={false}
 					/>
 				)}
 				<div className={buttonGroup}>

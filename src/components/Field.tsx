@@ -114,6 +114,9 @@ export default function Field({
 						value={value}
 						onChange={e => onChange(e.target.value)}
 						spellCheck={false}
+						autoCapitalize="off"
+						autoCorrect="off"
+						autoComplete="off"
 						aria-label={ARIA_LABELS[label]}
 						className={cx(
 							fieldBase,

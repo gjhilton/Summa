@@ -46,6 +46,10 @@ export default function TitleInput({
 			placeholder="Item"
 			aria-label={ariaLabel}
 			onChange={e => onChange(e.target.value)}
+			autoCapitalize="off"
+			autoCorrect="off"
+			autoComplete="off"
+			spellCheck={false}
 		/>
 	);
 }
