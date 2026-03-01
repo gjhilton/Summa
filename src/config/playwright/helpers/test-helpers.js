@@ -105,3 +105,67 @@ export async function navigateViaBreadcrumb(page, crumbText) {
 export function getItemsCount(page) {
 	return page.getByText(/^Items: \d+$/);
 }
+
+/**
+ * Click the Save button to open the save modal.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function openSaveModal(page) {
+	await page.getByRole('button', { name: 'Save', exact: true }).click();
+}
+
+/**
+ * Click the Load button to open the load modal.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function openLoadModal(page) {
+	await page.getByRole('button', { name: 'Load', exact: true }).click();
+}
+
+/**
+ * Close the save modal by pressing Escape.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function closeSaveModal(page) {
+	await page.keyboard.press('Escape');
+}
+
+/**
+ * Close the load modal by pressing Escape.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function closeLoadModal(page) {
+	await page.keyboard.press('Escape');
+}
+
+/**
+ * Type a filename and click Save, intercepting the download.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filename - without extension
+ * @returns {Promise<import('@playwright/test').Download>}
+ */
+export async function saveAs(page, filename) {
+	await page.getByLabel('Filename').fill(filename);
+	const [download] = await Promise.all([
+		page.waitForEvent('download'),
+		// .last() because there are two "Save" buttons in the DOM: one in the
+		// header and one inside the modal. The modal's button comes last.
+		page.getByRole('button', { name: 'Save', exact: true }).last().click(),
+	]);
+	return download;
+}
+
+/**
+ * Set the file input in the load modal to the given absolute file path.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} filePath - absolute path to fixture file
+ */
+export async function loadFile(page, filePath) {
+	await page.getByLabel('Summa file').setInputFiles(filePath);
+	// .last() because there are two "Load" buttons in the DOM: one in the
+	// header and one inside the modal. The modal's button comes last.
+	await page
+		.getByRole('button', { name: 'Load', exact: true })
+		.last()
+		.click();
+}

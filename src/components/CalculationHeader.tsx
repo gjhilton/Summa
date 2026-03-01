@@ -10,6 +10,9 @@ interface CalculationHeaderProps {
 	onDone?: () => void;
 	title?: string;
 	onTitleChange?: (v: string) => void;
+	onLoad?: () => void;
+	onSave?: () => void;
+	canSave?: boolean;
 }
 
 const header = css({
@@ -78,6 +81,12 @@ const buttonGroup = css({
 	marginLeft: 'auto',
 });
 
+const fileButtonGroup = css({
+	display: 'flex',
+	gap: 'xs',
+	flexShrink: '0',
+});
+
 export default function CalculationHeader({
 	breadcrumbs,
 	onNavigate,
@@ -85,6 +94,9 @@ export default function CalculationHeader({
 	onDone,
 	title,
 	onTitleChange,
+	onLoad,
+	onSave,
+	canSave = true,
 }: CalculationHeaderProps) {
 	const showBreadcrumbs = breadcrumbs.length > 0;
 	const showTitle = title !== undefined && onTitleChange !== undefined;
@@ -149,6 +161,16 @@ export default function CalculationHeader({
 						autoComplete="off"
 						spellCheck={false}
 					/>
+				)}
+				{(onLoad || onSave) && (
+					<div className={fileButtonGroup}>
+						{onLoad && <Button onClick={onLoad}>Load</Button>}
+						{onSave && (
+							<Button onClick={onSave} disabled={!canSave}>
+								Save
+							</Button>
+						)}
+					</div>
 				)}
 				<div className={buttonGroup}>
 					<Button onClick={onClear}>

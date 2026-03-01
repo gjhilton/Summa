@@ -55,4 +55,5 @@ export interface CalculationState {
 	lines: AnyLineState[];
 	totalPence: number;
 	totalDisplay: LsdStrings;
+	hasError: boolean;
 }

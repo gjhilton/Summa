@@ -173,16 +173,18 @@ export function formatLsdDisplay(pence: number): LsdStrings {
 }
 
 /**
- * Compute grand total from all non-error lines, return updated totalPence and totalDisplay.
+ * Compute grand total from all non-error lines, return updated totalPence, totalDisplay, and hasError.
  */
 export function computeGrandTotal(lines: AnyLineState[]): {
 	totalPence: number;
 	totalDisplay: LsdStrings;
+	hasError: boolean;
 } {
+	const hasError = lines.some(l => l.error);
 	const totalPence = lines
 		.filter(line => !line.error)
 		.reduce((sum, line) => sum + line.totalPence, 0);
-	return { totalPence, totalDisplay: formatLsdDisplay(totalPence) };
+	return { totalPence, totalDisplay: formatLsdDisplay(totalPence), hasError };
 }
 
 export function computeLinePence(literals: LsdStrings): {
@@ -206,7 +208,7 @@ export function computeLinePence(literals: LsdStrings): {
 	return { totalPence: error ? 0 : totalPence, error, fieldErrors };
 }
 
-function computeExtendedItemPence(
+export function computeExtendedItemPence(
 	literals: LsdStrings,
 	quantity: string
 ): {
@@ -315,8 +317,8 @@ export function withNewLines(
 	prev: CalculationState,
 	lines: AnyLineState[]
 ): CalculationState {
-	const { totalPence, totalDisplay } = computeGrandTotal(lines);
-	return { ...prev, lines, totalPence, totalDisplay };
+	const { totalPence, totalDisplay, hasError } = computeGrandTotal(lines);
+	return { ...prev, lines, totalPence, totalDisplay, hasError };
 }
 
 /**
@@ -340,6 +342,6 @@ export function computeFieldWorking(
 
 export function initialState(): CalculationState {
 	const lines = [emptyLine(), emptyLine()];
-	const { totalPence, totalDisplay } = computeGrandTotal(lines);
-	return { lines, totalPence, totalDisplay };
+	const { totalPence, totalDisplay, hasError } = computeGrandTotal(lines);
+	return { lines, totalPence, totalDisplay, hasError };
 }

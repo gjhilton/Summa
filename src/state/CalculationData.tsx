@@ -1,12 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-	CalculationState,
-	AnyLineState,
-	ItemType,
-	LineState,
-	ExtendedItemState,
-	SubtotalItemState,
-} from '../types/calculation';
+import { CalculationState, AnyLineState } from '../types/calculation';
 import {
 	emptyLine,
 	emptyExtendedItem,
@@ -21,57 +14,38 @@ import {
 	updateLinesAtPath,
 	updateTitle,
 	getBreadcrumbs,
-	recomputeSubtotal,
 	IdPath,
 } from './calculationLogic';
+import {
+	serializeLines,
+	deserializeLines,
+	createSummaFile,
+	parseSummaFile,
+} from './serialization';
+import { SavedAnyLine } from '../types/savedCalculation';
 import { arrayMove } from '@dnd-kit/sortable';
 import Calculation from '../components/Calculation';
 import CalculationHeader from '../components/CalculationHeader';
+import SaveModal from '../components/SaveModal';
+import LoadModal from '../components/LoadModal';
 import { FEATURES } from '../features';
 
 const STORAGE_KEY = 'summa_calculation';
-
-function sanitizeLines(rawLines: unknown[]): AnyLineState[] {
-	return (rawLines ?? []).map(l => sanitizeLine(l as AnyLineState));
-}
-
-function sanitizeLine(line: AnyLineState): AnyLineState {
-	const fieldErrors = (line as LineState | ExtendedItemState).fieldErrors ?? {
-		l: false,
-		s: false,
-		d: false,
-	};
-	const title = (line as { title?: string }).title ?? '';
-
-	if ((line as { itemType?: string }).itemType === ItemType.SUBTOTAL_ITEM) {
-		const st = line as SubtotalItemState;
-		return recomputeSubtotal({
-			...st,
-			title,
-			lines: sanitizeLines((st.lines ?? []) as unknown[]),
-		});
-	}
-	if ((line as { itemType?: string }).itemType === ItemType.EXTENDED_ITEM) {
-		const ext = line as ExtendedItemState;
-		return {
-			fieldErrors,
-			title,
-			...ext,
-			quantityError: ext.quantityError ?? false,
-		};
-	}
-	return { fieldErrors, title, ...(line as LineState) };
-}
 
 function loadState(): CalculationState {
 	if (FEATURES.persistCalculation) {
 		try {
 			const saved = localStorage.getItem(STORAGE_KEY);
 			if (saved) {
-				const parsed = JSON.parse(saved) as CalculationState;
-				const lines = sanitizeLines(parsed.lines as unknown[]);
-				const { totalPence, totalDisplay } = computeGrandTotal(lines);
-				return { ...parsed, lines, totalPence, totalDisplay };
+				const parsed = JSON.parse(saved) as unknown;
+				// Handle both old format (full state object) and new format (lines array)
+				const rawLines: unknown[] = Array.isArray(parsed)
+					? parsed
+					: ((parsed as { lines?: unknown[] }).lines ?? []);
+				const lines = deserializeLines(rawLines as SavedAnyLine[]);
+				const { totalPence, totalDisplay, hasError } =
+					computeGrandTotal(lines);
+				return { lines, totalPence, totalDisplay, hasError };
 			}
 		} catch {
 			// ignore parse errors
@@ -96,6 +70,9 @@ export default function CalculationData({
 	const [state, setState] = useState<CalculationState>(loadState);
 	const [showWorking, setShowWorking] = useState(false);
 	const [navigationPath, setNavigationPath] = useState<IdPath>([]);
+	const [showSaveModal, setShowSaveModal] = useState(false);
+	const [showLoadModal, setShowLoadModal] = useState(false);
+	const [lastSaveFilename, setLastSaveFilename] = useState('');
 
 	const isSubLevel = navigationPath.length > 0;
 	const currentLines = getLinesAtPath(state.lines, navigationPath);
@@ -106,7 +83,10 @@ export default function CalculationData({
 
 	useEffect(() => {
 		if (FEATURES.persistCalculation) {
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+			localStorage.setItem(
+				STORAGE_KEY,
+				JSON.stringify(serializeLines(state.lines))
+			);
 		}
 	}, [state]);
 
@@ -161,6 +141,7 @@ export default function CalculationData({
 			if (FEATURES.persistCalculation)
 				localStorage.removeItem(STORAGE_KEY);
 			setState(initialState());
+			setLastSaveFilename('');
 		} else {
 			mutate(() => [emptyLine(), emptyLine()]);
 		}
@@ -186,6 +167,27 @@ export default function CalculationData({
 				)
 			)
 		);
+	}
+
+	function handleSave(filename: string): void {
+		const file = createSummaFile(state);
+		const json = JSON.stringify(file, null, 2);
+		const blob = new Blob([json], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${filename}.summa.json`;
+		a.click();
+		URL.revokeObjectURL(url);
+		setLastSaveFilename(filename);
+	}
+
+	async function handleLoad(file: File): Promise<void> {
+		const text = await file.text();
+		const newState = parseSummaFile(text);
+		setState(newState);
+		setNavigationPath([]);
+		setLastSaveFilename('');
 	}
 
 	return (
@@ -216,6 +218,9 @@ export default function CalculationData({
 				onTitleChange={
 					isSubLevel ? updateCurrentSubtotalTitle : undefined
 				}
+				onLoad={!isSubLevel ? () => setShowLoadModal(true) : undefined}
+				onSave={!isSubLevel ? () => setShowSaveModal(true) : undefined}
+				canSave={!state.hasError}
 			/>
 			<Calculation
 				lines={currentLines}
@@ -236,6 +241,17 @@ export default function CalculationData({
 				onEditSubtotalItem={navigateInto}
 				advancedOptionsDisabled={isSubLevel}
 				isSubLevel={isSubLevel}
+			/>
+			<SaveModal
+				isOpen={showSaveModal}
+				onClose={() => setShowSaveModal(false)}
+				defaultFilename={lastSaveFilename}
+				onSave={handleSave}
+			/>
+			<LoadModal
+				isOpen={showLoadModal}
+				onClose={() => setShowLoadModal(false)}
+				onLoad={handleLoad}
 			/>
 		</>
 	);

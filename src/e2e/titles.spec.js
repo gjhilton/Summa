@@ -78,7 +78,8 @@ test.describe('item titles', () => {
 		await navigateIntoSubtotal(page);
 		const titleInput = page.getByLabel('Sub-calculation title');
 		await titleInput.fill('Quarter total');
-		// The current breadcrumb entry should reflect the title
+		// Blur the input so the global state updates and the breadcrumb reflects the title
+		await titleInput.press('Tab');
 		await expect(page.getByText('Quarter total')).toBeVisible();
 	});
 
@@ -91,6 +92,8 @@ test.describe('item titles', () => {
 		await navigateIntoSubtotal(page);
 		const subTitleInput = page.getByLabel('Sub-calculation title');
 		await subTitleInput.fill('My sub-calc');
+		// Blur the input so the global state updates and the breadcrumb reflects the title
+		await subTitleInput.press('Tab');
 		await expect(page.getByText('My sub-calc')).toBeVisible();
 	});
 });
