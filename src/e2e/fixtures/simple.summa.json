@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "appName": "summa",
+    "version": "0.5.0",
+    "savedAt": "2024-01-01T00:00:00.000Z"
+  },
+  "lines": [
+    {
+      "id": "fixture-line-1",
+      "itemType": "LINE_ITEM",
+      "title": "First item",
+      "literals": { "l": "", "s": "v", "d": "" }
+    },
+    {
+      "id": "fixture-line-2",
+      "itemType": "LINE_ITEM",
+      "title": "Second item",
+      "literals": { "l": "", "s": "vij", "d": "" }
+    }
+  ]
+}
