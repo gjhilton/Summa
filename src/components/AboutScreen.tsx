@@ -406,7 +406,6 @@ export default function AboutScreen({
 					<ul className={listUnordered}>
 						<li>Mobile device compatibility.</li>
 						<li>Support for ½d (Obolus)</li>
-						<li>Improved printing.</li>
 					</ul>
 					<p>
 						Please suggest features which would make Summa more

@@ -66,6 +66,7 @@ export default function SubtotalItem({
 					className={titleButton}
 					onClick={onEdit}
 					aria-label={title || 'Untitled'}
+					data-subtotal-title
 				>
 					{title ? (
 						title

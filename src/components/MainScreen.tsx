@@ -1,6 +1,7 @@
 import CalculationData from '../state/CalculationData';
 import Footer from './Footer';
 import PageLayout from './PageLayout';
+import PrintColophon from './PrintColophon';
 
 interface MainScreenProps {
 	onAbout: () => void;
@@ -20,6 +21,7 @@ export default function MainScreen({
 				onUseExtendedItemChange={onUseExtendedItemChange}
 			/>
 			<Footer onHelp={onAbout} />
+			<PrintColophon />
 		</PageLayout>
 	);
 }

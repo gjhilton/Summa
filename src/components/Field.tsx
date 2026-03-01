@@ -123,6 +123,7 @@ export default function Field({
 							inputStyle,
 							error ? inputError : inputNormal
 						)}
+						data-field
 					/>
 				) : (
 					<span
@@ -134,11 +135,12 @@ export default function Field({
 							weight === 'bold' && readonlyBold,
 							weight === 'light' && readonlyLight
 						)}
+						data-field
 					>
 						{value}
 					</span>
 				)}
-				{showWorking && <span className={workingText}>{working}</span>}
+				{showWorking && <span className={workingText} data-working>{working}</span>}
 			</span>
 			{LABELS[label] && (
 				<span

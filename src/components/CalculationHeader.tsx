@@ -120,7 +120,7 @@ export default function CalculationHeader({
 	}
 
 	return (
-		<div className={header}>
+		<div className={header} data-no-print>
 			{showBreadcrumbs && (
 				<nav className={breadcrumbRow} aria-label="Breadcrumb">
 					{breadcrumbs.slice(0, -1).map(crumb => (
@@ -163,7 +163,7 @@ export default function CalculationHeader({
 					/>
 				)}
 				{(onLoad || onSave) && (
-					<div className={fileButtonGroup}>
+					<div className={fileButtonGroup} data-no-print>
 						{onLoad && <Button onClick={onLoad}>Load</Button>}
 						{onSave && (
 							<Button onClick={onSave} disabled={!canSave}>
@@ -172,7 +172,7 @@ export default function CalculationHeader({
 						)}
 					</div>
 				)}
-				<div className={buttonGroup}>
+				<div className={buttonGroup} data-no-print>
 					<Button onClick={onClear}>
 						{onDone ? 'Clear page' : 'Clear'}
 					</Button>

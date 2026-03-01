@@ -14,5 +14,5 @@ export default function PageLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	return <div className={page}>{children}</div>;
+	return <div className={page} data-page-layout>{children}</div>;
 }

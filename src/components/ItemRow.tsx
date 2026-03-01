@@ -57,7 +57,7 @@ export default function ItemRow({
 }: ItemRowProps) {
 	const drag = useDragHandle();
 	return (
-		<div className={cx(row, className)}>
+		<div className={cx(row, className)} data-item-row>
 			{!noDragHandle && drag ? (
 				<button
 					className={dragHandle}
