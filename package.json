@@ -1,7 +1,7 @@
 {
 	"name": "summa",
 	"private": true,
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"type": "module",
 	"scripts": {
 		"dev": "npx panda codegen --config src/config/panda.config.mjs && vite --config src/config/vite.config.ts --host",
