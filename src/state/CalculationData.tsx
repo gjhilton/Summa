@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { CalculationState, AnyLineState } from '../types/calculation';
 import {
 	emptyLine,
@@ -96,53 +96,47 @@ export default function CalculationData({
 	const useExtendedItemRef = useRef(useExtendedItem);
 	const showSaveModalRef = useRef(showSaveModal);
 	const showLoadModalRef = useRef(showLoadModal);
-	useEffect(() => {
+	useLayoutEffect(() => {
 		navigationPathRef.current = navigationPath;
 	});
-	useEffect(() => {
+	useLayoutEffect(() => {
 		useExtendedItemRef.current = useExtendedItem;
 	});
-	useEffect(() => {
+	useLayoutEffect(() => {
 		showSaveModalRef.current = showSaveModal;
 	});
-	useEffect(() => {
+	useLayoutEffect(() => {
 		showLoadModalRef.current = showLoadModal;
 	});
 
 	useEffect(() => {
 		function handleKeyDown(e: KeyboardEvent) {
-			if (!e.metaKey) return;
 			if (showSaveModalRef.current || showLoadModalRef.current) return;
-			if (e.key.toLowerCase() === 'n') {
+			if (e.metaKey || e.ctrlKey || e.altKey) return;
+			if (
+				e.target instanceof HTMLInputElement &&
+				e.target.type === 'text'
+			)
+				return;
+			if (e.key === '=' || e.key === '+') {
 				e.preventDefault();
-				if (e.shiftKey) {
-					// Cmd+Shift+N → add extended item (advanced mode), else line item
-					const newItem = useExtendedItemRef.current
+				// = → add line item; + (Shift+=) → add extended item in advanced mode
+				// Use e.shiftKey as fallback in case e.key is '=' even when shifted
+				const isPlus = e.key === '+' || (e.key === '=' && e.shiftKey);
+				const newItem =
+					isPlus && useExtendedItemRef.current
 						? emptyExtendedItem()
 						: emptyLine();
-					setState(prev =>
-						withNewLines(
-							prev,
-							updateLinesAtPath(
-								prev.lines,
-								navigationPathRef.current,
-								lines => [...lines, newItem]
-							)
+				setState(prev =>
+					withNewLines(
+						prev,
+						updateLinesAtPath(
+							prev.lines,
+							navigationPathRef.current,
+							lines => [...lines, newItem]
 						)
-					);
-				} else {
-					// Cmd+N → add line item
-					setState(prev =>
-						withNewLines(
-							prev,
-							updateLinesAtPath(
-								prev.lines,
-								navigationPathRef.current,
-								lines => [...lines, emptyLine()]
-							)
-						)
-					);
-				}
+					)
+				);
 			}
 		}
 		window.addEventListener('keydown', handleKeyDown);
