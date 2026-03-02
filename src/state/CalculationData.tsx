@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CalculationState, AnyLineState } from '../types/calculation';
 import {
 	emptyLine,
@@ -89,6 +89,65 @@ export default function CalculationData({
 			);
 		}
 	}, [state]);
+
+	// Refs so the keydown handler always reads current values without
+	// needing to re-register on every render.
+	const navigationPathRef = useRef(navigationPath);
+	const useExtendedItemRef = useRef(useExtendedItem);
+	const showSaveModalRef = useRef(showSaveModal);
+	const showLoadModalRef = useRef(showLoadModal);
+	useEffect(() => {
+		navigationPathRef.current = navigationPath;
+	});
+	useEffect(() => {
+		useExtendedItemRef.current = useExtendedItem;
+	});
+	useEffect(() => {
+		showSaveModalRef.current = showSaveModal;
+	});
+	useEffect(() => {
+		showLoadModalRef.current = showLoadModal;
+	});
+
+	useEffect(() => {
+		function handleKeyDown(e: KeyboardEvent) {
+			if (!e.metaKey) return;
+			if (showSaveModalRef.current || showLoadModalRef.current) return;
+			if (e.key.toLowerCase() === 'n') {
+				e.preventDefault();
+				if (e.shiftKey) {
+					// Cmd+Shift+N → add extended item (advanced mode), else line item
+					const newItem = useExtendedItemRef.current
+						? emptyExtendedItem()
+						: emptyLine();
+					setState(prev =>
+						withNewLines(
+							prev,
+							updateLinesAtPath(
+								prev.lines,
+								navigationPathRef.current,
+								lines => [...lines, newItem]
+							)
+						)
+					);
+				} else {
+					// Cmd+N → add line item
+					setState(prev =>
+						withNewLines(
+							prev,
+							updateLinesAtPath(
+								prev.lines,
+								navigationPathRef.current,
+								lines => [...lines, emptyLine()]
+							)
+						)
+					);
+				}
+			}
+		}
+		window.addEventListener('keydown', handleKeyDown);
+		return () => window.removeEventListener('keydown', handleKeyDown);
+	}, []);
 
 	function mutate(updater: (lines: AnyLineState[]) => AnyLineState[]): void {
 		setState(prev =>

@@ -1,7 +1,7 @@
 {
 	"name": "summa",
 	"private": true,
-	"version": "0.7.0",
+	"version": "0.8.0",
 	"type": "module",
 	"scripts": {
 		"dev": "npx panda codegen --config src/config/panda.config.mjs && vite --config src/config/vite.config.ts --host",
@@ -45,6 +45,7 @@
 		"eslint-plugin-react-refresh": "^0.4.18",
 		"globals": "^15.15.0",
 		"jsdom": "^26.0.0",
+		"marked": "^17.0.3",
 		"prettier": "^3.5.1",
 		"typescript": "^5.7.3",
 		"typescript-eslint": "^8.24.0",

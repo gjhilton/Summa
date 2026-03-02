@@ -140,7 +140,11 @@ export default function Field({
 						{value}
 					</span>
 				)}
-				{showWorking && <span className={workingText} data-working>{working}</span>}
+				{showWorking && (
+					<span className={workingText} data-working>
+						{working}
+					</span>
+				)}
 			</span>
 			{LABELS[label] && (
 				<span

@@ -20,6 +20,7 @@ import {
 } from '../state/calculationLogic';
 import { toLineView } from '../state/displayLogic';
 import {
+	AnyLineState,
 	LineState,
 	ExtendedItemState,
 	SubtotalItemState,
@@ -29,6 +30,17 @@ import {
 	ExtendedItemView,
 	SubtotalItemView,
 } from '../types/lineView';
+import cookiesHtml from '../content/about/01-cookies.md';
+import introBeforeHtml from '../content/about/02-intro-before.md';
+import introAfterHtml from '../content/about/03-intro-after.md';
+import calculationHtml from '../content/about/04-calculation.md';
+import itemsBeforeHtml from '../content/about/05-items-before.md';
+import itemsAfterHtml from '../content/about/06-items-after.md';
+import showWorkingHtml from '../content/about/07-show-working.md';
+import advancedIntroHtml from '../content/about/08-advanced-intro.md';
+import extendedItemsHtml from '../content/about/09-extended-items.md';
+import subtotalItemsHtml from '../content/about/10-subtotal-items.md';
+import comingSoonHtml from '../content/about/11-coming-soon.md';
 
 interface AboutScreenProps {
 	onClose: () => void;
@@ -59,18 +71,6 @@ const body = css({
 	flexDirection: 'column',
 	gap: '2xl',
 	marginBottom: '3xl',
-	lineHeight: '1.7',
-	fontSize: '18px',
-});
-
-const listOrdered = css({
-	listStyleType: 'decimal',
-	paddingLeft: '1.5em',
-});
-
-const listUnordered = css({
-	listStyleType: 'disc',
-	paddingLeft: '1.5em',
 });
 
 const backBar = css({ marginBottom: '3xl' });
@@ -108,24 +108,12 @@ const sectionBlock = css({
 	marginTop: '4rem',
 });
 
-const sectionHeading = css({
-	fontSize: 'xl',
-	fontWeight: 'bold',
-});
+function Section({ children }: { children: React.ReactNode }) {
+	return <section className={sectionBlock}>{children}</section>;
+}
 
-function Section({
-	heading,
-	children,
-}: {
-	heading: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<section className={sectionBlock}>
-			<h2 className={sectionHeading}>{heading}</h2>
-			{children}
-		</section>
-	);
+function Prose({ html }: { html: string }) {
+	return <div data-about-prose dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 const noop = () => {};
@@ -136,7 +124,7 @@ export default function AboutScreen({
 	onGetStarted,
 }: AboutScreenProps) {
 	const [example1, setExample1] = useState<LineState>(() => {
-		let lines = [emptyLine()];
+		let lines: AnyLineState[] = [emptyLine()];
 		const id = lines[0].id;
 		lines = processFieldUpdate(lines, id, 'l', 'xx');
 		lines = processFieldUpdate(lines, id, 's', 'v');
@@ -146,7 +134,7 @@ export default function AboutScreen({
 
 	const [demoShowWorking, setDemoShowWorking] = useState(true);
 	const [demo, setDemo] = useState<LineState>(() => {
-		let lines = [emptyLine()];
+		let lines: AnyLineState[] = [emptyLine()];
 		const id = lines[0].id;
 		lines = processFieldUpdate(lines, id, 'l', 'xx');
 		lines = processFieldUpdate(lines, id, 's', 'v');
@@ -196,23 +184,8 @@ export default function AboutScreen({
 
 			{isFirstVisit && onGetStarted && (
 				<>
-					<Section heading="No warranty / Cookies">
-						<p>
-							This software is provided free of charge and with{' '}
-							<strong>no warranty of correctness</strong>. It's
-							beta software written in a few hours and almost
-							certainly contains defects and errors. You are
-							strongly advised to check any results you obtain
-							from Summa.
-						</p>
-						<p>
-							We use cookies and local storage to persist your
-							preferences and work between sessions. We don't
-							collect user data or analytics of any kind to our
-							knowledge, but we DO use Google fonts and they
-							might.
-						</p>
-						<p>By continuing you agree to the above.</p>
+					<Section>
+						<Prose html={cookiesHtml} />
 					</Section>
 					<div className={getStartedBar}>
 						<Button
@@ -228,11 +201,7 @@ export default function AboutScreen({
 
 			<h2 className={pageHeading}>Help</h2>
 			<div className={body}>
-				<p>
-					Summa is a simple spreadsheet for historians working with
-					Early Modern British ledgers, accounts and similar
-					documents.
-				</p>
+				<Prose html={introBeforeHtml} />
 				<div className={cx(exampleFrame, snapshot)}>
 					<img
 						src={noWorkingImg}
@@ -244,40 +213,14 @@ export default function AboutScreen({
 						}}
 					/>
 				</div>
-				<p>
-					For clerks of the era, summing columns of figures expressed
-					as pounds, shillings and pence in Roman numerals was second
-					nature. For modern users the calculations can be
-					error-prone, and in large quantities quickly become tedious.
-					Summa automates the calculation.
-				</p>
+				<Prose html={introAfterHtml} />
 
-				<Section heading="The Calculation">
-					<p>Summa uses the following algorithm:</p>
-					<ol className={listOrdered}>
-						<li>
-							Convert Roman numerals to regular Arabic integers.
-						</li>
-						<li>
-							Canonicalise pounds and shillings to amounts of
-							pence (£1 = 240d; 1/&#x2212; = 12d).
-						</li>
-						<li>Sum the amounts denominated in pence.</li>
-						<li>
-							Convert the sum back into its £, s, d denominations.
-						</li>
-						<li>Convert each amount to Roman numerals.</li>
-					</ol>
+				<Section>
+					<Prose html={calculationHtml} />
 				</Section>
 
-				<Section heading="How to use: Items">
-					<p>
-						Input each line of your calculation as pounds, shillings
-						and pence in Roman numerals. The total updates
-						automatically. NB the example below is editable so you
-						can experiment — try inputting an invalid value like
-						'dog' and see what happens.
-					</p>
+				<Section>
+					<Prose html={itemsBeforeHtml} />
 					<div className={exampleFrame}>
 						<LineItem
 							view={toLineView(example1) as LineItemView}
@@ -298,20 +241,11 @@ export default function AboutScreen({
 							onChangeTitle={noop}
 						/>
 					</div>
-					<p>
-						To add another line item, click the{' '}
-						<em>New line item</em> button. Items can be deleted by
-						clicking the trash icon, and re-ordered by drag and
-						drop.
-					</p>
+					<Prose html={itemsAfterHtml} />
 				</Section>
 
-				<Section heading="How to use: Show Working">
-					<p>
-						The <em>Show working</em> switch toggles display of the
-						intermediate calculations, which can be useful for
-						tracking down clerical errors in the source material.
-					</p>
+				<Section>
+					<Prose html={showWorkingHtml} />
 					<div className={exampleFrame}>
 						<Toggle
 							id="about-show-working"
@@ -340,26 +274,9 @@ export default function AboutScreen({
 					</div>
 				</Section>
 
-				<Section heading="Advanced options">
-					<p>
-						Enabling <em>Advanced options</em> via the toggle on the
-						main screen unlocks two additional item types and allows
-						the creation of nested calculations.
-					</p>
-
-					<h3
-						className={sectionHeading}
-						style={{ fontSize: 'inherit' }}
-					>
-						Extended Items
-					</h3>
-					<p>
-						Extended Items comprise a quantity field and a unit cost
-						in pounds, shillings and pence bracketed together. The
-						system computes the extended cost by multiplication,
-						which is carried forward into the total alongside any
-						other items.
-					</p>
+				<Section>
+					<Prose html={advancedIntroHtml} />
+					<Prose html={extendedItemsHtml} />
 					<div className={exampleFrame}>
 						<ExtendedItem
 							view={toLineView(extendedItem) as ExtendedItemView}
@@ -371,22 +288,7 @@ export default function AboutScreen({
 							onChangeTitle={noop}
 						/>
 					</div>
-
-					<h3
-						className={sectionHeading}
-						style={{ fontSize: 'inherit' }}
-					>
-						Subtotal Items
-					</h3>
-					<p>
-						Subtotal Items group a set of lines into a nested
-						sub-calculation. The subtotal of that group is then
-						carried forward into the parent calculation as a single
-						line. Click the underlined title to open the
-						sub-calculation and edit its lines; use the{' '}
-						<em>Done</em> button or breadcrumb trail to return to
-						the parent.
-					</p>
+					<Prose html={subtotalItemsHtml} />
 					<div className={exampleFrame}>
 						<SubtotalItem
 							view={toLineView(subtotalItem) as SubtotalItemView}
@@ -402,19 +304,8 @@ export default function AboutScreen({
 					</div>
 				</Section>
 
-				<Section heading="Coming soon">
-					<ul className={listUnordered}>
-						<li>Mobile device compatibility.</li>
-						<li>Support for ½d (Obolus)</li>
-					</ul>
-					<p>
-						Please suggest features which would make Summa more
-						useful on the{' '}
-						<a href="https://github.com/gjhilton/Summa/issues">
-							GitHub issues page
-						</a>
-						.
-					</p>
+				<Section>
+					<Prose html={comingSoonHtml} />
 				</Section>
 			</div>
 

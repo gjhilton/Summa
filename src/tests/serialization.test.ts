@@ -23,6 +23,11 @@ import {
 	isExtendedItem,
 	isSubtotalItem,
 } from '../types/calculation';
+import {
+	SavedLine,
+	SavedExtendedItem,
+	SavedSubtotalItem,
+} from '../types/savedCalculation';
 
 // ─── serializeLine ────────────────────────────────────────────────────────────
 
@@ -114,7 +119,7 @@ describe('serializeLine — SUBTOTAL_ITEM', () => {
 
 describe('deserializeLine — LINE_ITEM', () => {
 	it('recomputes error/fieldErrors/totalPence', () => {
-		const saved = {
+		const saved: SavedLine = {
 			id: 'test-id',
 			itemType: ItemType.LINE_ITEM,
 			title: 'Test',
@@ -130,7 +135,7 @@ describe('deserializeLine — LINE_ITEM', () => {
 	});
 
 	it('marks error for invalid roman', () => {
-		const saved = {
+		const saved: SavedLine = {
 			id: 'test-id',
 			itemType: ItemType.LINE_ITEM,
 			title: '',
@@ -148,7 +153,7 @@ describe('deserializeLine — LINE_ITEM', () => {
 
 describe('deserializeLine — EXTENDED_ITEM', () => {
 	it('recomputes extended item fields', () => {
-		const saved = {
+		const saved: SavedExtendedItem = {
 			id: 'test-id',
 			itemType: ItemType.EXTENDED_ITEM,
 			title: 'Widget',
@@ -168,7 +173,7 @@ describe('deserializeLine — EXTENDED_ITEM', () => {
 
 describe('deserializeLine — SUBTOTAL_ITEM', () => {
 	it('recurses and recomputes subtotal', () => {
-		const saved = {
+		const saved: SavedSubtotalItem = {
 			id: 'sub-id',
 			itemType: ItemType.SUBTOTAL_ITEM,
 			title: 'Sub',

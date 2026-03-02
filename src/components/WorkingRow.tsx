@@ -15,5 +15,9 @@ export default function WorkingRow({
 }: {
 	children: React.ReactNode;
 }) {
-	return <span className={workingRowNowrap} data-working>{children}</span>;
+	return (
+		<span className={workingRowNowrap} data-working>
+			{children}
+		</span>
+	);
 }

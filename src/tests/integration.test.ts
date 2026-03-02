@@ -7,7 +7,7 @@ import {
 	computeGrandTotal,
 	initialState,
 } from '../state/calculationLogic';
-import { AnyLineState, isExtendedItem } from '../types/calculation';
+import { AnyLineState, LineState, isExtendedItem } from '../types/calculation';
 
 function applyUpdates(
 	lines: AnyLineState[],
@@ -118,8 +118,16 @@ describe('reset behaviour', () => {
 	it('reset returns exactly 2 empty lines', () => {
 		const reset = initialState();
 		expect(reset.lines).toHaveLength(2);
-		expect(reset.lines[0].literals).toEqual({ l: '', s: '', d: '' });
-		expect(reset.lines[1].literals).toEqual({ l: '', s: '', d: '' });
+		expect((reset.lines[0] as LineState).literals).toEqual({
+			l: '',
+			s: '',
+			d: '',
+		});
+		expect((reset.lines[1] as LineState).literals).toEqual({
+			l: '',
+			s: '',
+			d: '',
+		});
 	});
 
 	it('reset total is 0', () => {
