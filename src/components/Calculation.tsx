@@ -99,6 +99,7 @@ export default function Calculation({
 		}
 	}
 
+	const canRemove = lines.length > 2;
 	const views = lines.map(line => toLineView(line));
 	const ids = lines.map(l => l.id);
 
@@ -119,7 +120,7 @@ export default function Calculation({
 								<SortableItem key={view.id} id={view.id}>
 									<SubtotalItem
 										view={view}
-										canRemove={lines.length > 2}
+										canRemove={canRemove}
 										showWorking={showWorking}
 										onEdit={() =>
 											onEditSubtotalItem(view.id)
@@ -134,7 +135,7 @@ export default function Calculation({
 								<SortableItem key={view.id} id={view.id}>
 									<ExtendedItem
 										view={view}
-										canRemove={lines.length > 2}
+										canRemove={canRemove}
 										showWorking={showWorking}
 										onChangeField={(f, v) =>
 											onUpdateField(view.id, f, v)
@@ -154,7 +155,7 @@ export default function Calculation({
 							<SortableItem key={view.id} id={view.id}>
 								<LineItem
 									view={view}
-									canRemove={lines.length > 2}
+									canRemove={canRemove}
 									showWorking={showWorking}
 									onChangeField={(f, v) =>
 										onUpdateField(view.id, f, v)

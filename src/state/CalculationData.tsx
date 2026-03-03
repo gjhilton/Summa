@@ -98,14 +98,8 @@ export default function CalculationData({
 	const showLoadModalRef = useRef(showLoadModal);
 	useLayoutEffect(() => {
 		navigationPathRef.current = navigationPath;
-	});
-	useLayoutEffect(() => {
 		useExtendedItemRef.current = useExtendedItem;
-	});
-	useLayoutEffect(() => {
 		showSaveModalRef.current = showSaveModal;
-	});
-	useLayoutEffect(() => {
 		showLoadModalRef.current = showLoadModal;
 	});
 

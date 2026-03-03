@@ -60,6 +60,7 @@ export default function ItemRow({
 		<div className={cx(row, className)} data-item-row>
 			{!noDragHandle && drag ? (
 				<button
+					type="button"
 					className={dragHandle}
 					aria-label="Drag to reorder"
 					{...drag.listeners}

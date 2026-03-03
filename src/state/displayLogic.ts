@@ -7,7 +7,7 @@ import {
 } from '../types/lineView';
 import { formatLsdDisplay } from './calculationLogic';
 import { normalizeEarlyModernInput } from '../utils/earlyModern';
-import { isValidRoman, romanToInteger } from '../utils/roman';
+import { romanToInteger } from '../utils/roman';
 
 export function toLineView(line: AnyLineState): AnyLineView {
 	if (line.itemType === ItemType.SUBTOTAL_ITEM) {
@@ -36,11 +36,10 @@ export function toLineView(line: AnyLineState): AnyLineView {
 	}
 
 	// EXTENDED_ITEM
+	// quantityError is defined as !isValidRoman(qNorm) || empty, so when it's
+	// false we know the quantity is valid and romanToInteger is safe to call.
 	const qNorm = normalizeEarlyModernInput(line.quantity);
-	const quantityInt =
-		!line.quantityError && isValidRoman(qNorm)
-			? romanToInteger(qNorm)
-			: null;
+	const quantityInt = line.quantityError ? null : romanToInteger(qNorm);
 
 	const rawSubtotal = formatLsdDisplay(line.totalPence);
 	const subtotalDisplay = {

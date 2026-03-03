@@ -27,7 +27,6 @@ const buttonStyle = cva({
 			opacity: '0.4',
 			cursor: 'not-allowed',
 			transform: 'none',
-			pointerEvents: 'none',
 		},
 	},
 	variants: {

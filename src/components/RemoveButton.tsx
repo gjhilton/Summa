@@ -1,5 +1,6 @@
 import { css, cx } from '../generated/css';
 import Button from './Button';
+import Icon from './Icon';
 
 const hidden = css({ visibility: 'hidden' });
 
@@ -7,7 +8,6 @@ const removeIcon = css({
 	color: 'var(--rm-color)',
 	opacity: 'var(--rm-opacity)',
 });
-import Icon from './Icon';
 
 interface RemoveButtonProps {
 	canRemove: boolean;
@@ -24,6 +24,7 @@ export default function RemoveButton({
 		<Button
 			variant="icon"
 			aria-label={label}
+			disabled={!canRemove}
 			className={cx(removeIcon, canRemove ? undefined : hidden)}
 			onClick={onClick}
 		>

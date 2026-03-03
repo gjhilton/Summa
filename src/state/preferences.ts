@@ -31,13 +31,15 @@ export function usePreferences(): [
 	const [prefs, setPrefs] = useState<Preferences>(load);
 
 	function update(patch: Partial<Preferences>): void {
-		const next = { ...prefs, ...patch };
-		try {
-			localStorage.setItem(PREFERENCES_KEY, JSON.stringify(next));
-		} catch {
-			/* ignore */
-		}
-		setPrefs(next);
+		setPrefs(prev => {
+			const next = { ...prev, ...patch };
+			try {
+				localStorage.setItem(PREFERENCES_KEY, JSON.stringify(next));
+			} catch {
+				/* ignore */
+			}
+			return next;
+		});
 	}
 
 	return [prefs, update];

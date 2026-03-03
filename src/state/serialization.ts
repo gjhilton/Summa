@@ -64,6 +64,9 @@ export function createSummaFile(state: CalculationState): SummaFile {
 }
 
 export function deserializeLine(saved: SavedAnyLine): AnyLineState {
+	if (!saved || typeof saved !== 'object') {
+		throw new Error('Invalid file format: line item must be an object');
+	}
 	const type = (saved as { itemType?: string }).itemType;
 
 	if (type === ItemType.SUBTOTAL_ITEM) {

@@ -11,15 +11,15 @@ export function normalizeEarlyModernInput(input: string): string {
  * into early modern accounting style.
  *
  * Rules:
- * 1. Replace iv → iiij
+ * 1. Replace ix → viiii, iv → iiii (expand subtractive pairs)
  * 2. In every contiguous run of i/j chars, replace the last i with j
  * 3. Uppercase l/c/d/m only while no lowercase i/j/v/x has yet appeared;
  *    once a small numeral is seen, all subsequent l/c/d/m stay lowercase.
  *    e.g. ccvij → CCvij, xcvij → xcvij, mcmxciiij → MCMxciiij
  */
 export function formatEarlyModernOutput(roman: string): string {
-	// Step 1: expand iv to iiij
-	let result = roman.replace(/iv/g, 'iiij');
+	// Step 1: expand subtractive pairs to additive (ix → viiii, iv → iiii)
+	let result = roman.replace(/ix/g, 'viiii').replace(/iv/g, 'iiii');
 
 	// Step 2: for every contiguous run of i/j, replace last i with j
 	result = result.replace(/[ij]+/g, m => {
@@ -27,12 +27,8 @@ export function formatEarlyModernOutput(roman: string): string {
 		return allI.slice(0, -1) + 'j';
 	});
 
-	// Step 3: uppercase l/c/d/m only if no lowercase i/j/v/x has preceded them
-	// The rule: a single boolean seenLowercase flag scans left to right — flipped to true the
-	//  moment an i, j, v, or x appears. Any l/c/d/m encountered while the flag is still false gets
-	// uppercased; after the flag is set, they stay lowercase. Uppercase L/C/D/M don't set the
-	// flag, so MCCxvij works correctly — the two C's are uppercase, then x trips the flag and vij
-	// stays lower.
+	// Step 3: uppercase L/C/D/M only while no i/j/v/x has yet appeared (left-to-right).
+	// seenLowercase flips true on the first i/j/v/x; any l/c/d/m after that stays lowercase.
 	let seenLowercase = false;
 	result = result.replace(/[ijvxlcdm]/g, c => {
 		if ('ijvx'.includes(c)) {

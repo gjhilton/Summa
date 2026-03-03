@@ -52,8 +52,8 @@ describe('formatEarlyModernOutput', () => {
 		expect(formatEarlyModernOutput('iv')).toBe('iiij');
 	});
 
-	it('formats ix → jx', () => {
-		expect(formatEarlyModernOutput('ix')).toBe('jx');
+	it('formats ix → viiij (expand to viiii then j-rule)', () => {
+		expect(formatEarlyModernOutput('ix')).toBe('viiij');
 	});
 
 	it('formats xi → xj', () => {
@@ -155,12 +155,16 @@ describe('round-trip: integerToRoman + formatEarlyModernOutput', () => {
 		expect(formatEarlyModernOutput(integerToRoman(4))).toBe('iiij');
 	});
 
-	it('9 → jx', () => {
-		expect(formatEarlyModernOutput(integerToRoman(9))).toBe('jx');
+	it('9 → viiij (ix expands to viiii)', () => {
+		expect(formatEarlyModernOutput(integerToRoman(9))).toBe('viiij');
 	});
 
 	it('11 → xj', () => {
 		expect(formatEarlyModernOutput(integerToRoman(11))).toBe('xj');
+	});
+
+	it('19 → xviiij (xix: ix expands to viiii)', () => {
+		expect(formatEarlyModernOutput(integerToRoman(19))).toBe('xviiij');
 	});
 
 	it('13 → xiij', () => {

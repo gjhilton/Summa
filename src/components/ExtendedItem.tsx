@@ -17,7 +17,7 @@ interface ExtendedItemProps extends BaseLineItemProps {
 	onChangeQuantity: (v: string) => void;
 }
 
-const inputRow = css({ fontStyle: 'ritalic', fontWeight: '100' });
+const inputRow = css({ fontStyle: 'italic', fontWeight: '100' });
 
 const atSign = css({
 	display: 'flex',

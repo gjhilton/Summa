@@ -37,9 +37,6 @@ export default function Modal({
 	children,
 }: ModalProps) {
 	const ref = useRef<HTMLDialogElement>(null);
-	// Tracks closes we initiate programmatically so we can suppress the
-	// resulting native 'close' event — otherwise onClose fires twice.
-	const programmaticClose = useRef(false);
 
 	useEffect(() => {
 		const el = ref.current;
@@ -47,19 +44,15 @@ export default function Modal({
 		if (isOpen) {
 			if (!el.open) el.showModal();
 		} else {
-			if (el.open) {
-				programmaticClose.current = true;
-				el.close();
-			}
+			if (el.open) el.close();
 		}
 	}, [isOpen]);
 
+	// Called for both Escape key and programmatic close. When we call
+	// el.close() above, the browser fires this event, but isOpen is already
+	// false so calling onClose() is a React no-op. When Escape closes the
+	// dialog, onClose() propagates the state change to the parent.
 	function handleNativeClose() {
-		if (programmaticClose.current) {
-			programmaticClose.current = false;
-			return;
-		}
-		// Escape key: browser closed the dialog; propagate to parent.
 		onClose();
 	}
 
