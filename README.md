@@ -1,6 +1,7 @@
 <img src="public/summer.gif" width="100%" alt="Summa" />
 
 # Summa
+
 ## A simple spreadsheet for Early Modern British currency
 
 [**Use Summa**](https://gjhilton.github.io/Summa/)
