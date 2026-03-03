@@ -37,8 +37,6 @@ const titleButton = css({
 	_hover: { opacity: '0.7' },
 });
 
-const placeholder = css({ opacity: '0.4' });
-
 export default function SubtotalItem({
 	view,
 	canRemove,
@@ -68,11 +66,7 @@ export default function SubtotalItem({
 					aria-label={title || 'Untitled'}
 					data-subtotal-title
 				>
-					{title ? (
-						title
-					) : (
-						<span className={placeholder}>Untitled</span>
-					)}
+					{title || 'Untitled'}
 				</button>
 			}
 			currency={

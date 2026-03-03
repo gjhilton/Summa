@@ -144,4 +144,17 @@
 		list-style-type: disc;
 		padding-left: 1.5em;
 	}
+
+	& kbd {
+		font-family: monospace;
+		font-size: 0.875em;
+		display: inline-block;
+		margin-inline: 0.2em;
+		padding: 0.1em 0.4em;
+		background-color: #f0f0f0;
+		border: 1px solid #c8c8c8;
+		border-bottom-width: 2px;
+		border-radius: 4px;
+		line-height: 1;
+	}
 }

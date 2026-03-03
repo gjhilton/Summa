@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { createRequire } from 'module';
-import { marked } from 'marked';
+import { marked, Tokens } from 'marked';
 
 const require = createRequire(import.meta.url);
 const { version } = require('../../package.json') as { version: string };
@@ -13,10 +13,10 @@ const __dirname = dirname(__filename);
 
 marked.use({
 	renderer: {
-		// Strip raw HTML blocks rather than passing them through verbatim.
-		// Content files are trusted, but this prevents accidental or malicious
-		// HTML injection if a .md file is ever edited carelessly.
-		html: () => '',
+		// Allow <kbd> through; strip all other raw HTML.
+		html({ text }: Tokens.HTML | Tokens.Tag): string {
+			return /^<\/?kbd>$/i.test(text.trim()) ? text : '';
+		},
 	},
 });
 
