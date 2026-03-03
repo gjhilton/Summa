@@ -309,6 +309,12 @@ export default function AboutScreen({
 				</Section>
 			</div>
 
+			{!isFirstVisit && (
+				<div className={backBar}>
+					<Button onClick={onClose}>← Back</Button>
+				</div>
+			)}
+
 			<Footer />
 		</PageLayout>
 	);

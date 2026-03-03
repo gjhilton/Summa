@@ -28,6 +28,11 @@ export function formatEarlyModernOutput(roman: string): string {
 	});
 
 	// Step 3: uppercase l/c/d/m only if no lowercase i/j/v/x has preceded them
+	// The rule: a single boolean seenLowercase flag scans left to right — flipped to true the     
+ //  moment an i, j, v, or x appears. Any l/c/d/m encountered while the flag is still false gets
+  // uppercased; after the flag is set, they stay lowercase. Uppercase L/C/D/M don't set the     
+  // flag, so MCCxvij works correctly — the two C's are uppercase, then x trips the flag and vij
+  // stays lower.
 	let seenLowercase = false;
 	result = result.replace(/[ijvxlcdm]/g, c => {
 		if ('ijvx'.includes(c)) {
