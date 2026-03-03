@@ -93,6 +93,59 @@ describe('formatEarlyModernOutput', () => {
 	});
 });
 
+describe('formatEarlyModernOutput: conditional uppercase of l/c/d/m', () => {
+	// l/c/d/m at the start → uppercase (no lowercase precedes them)
+	it('c alone → C', () => {
+		expect(formatEarlyModernOutput('c')).toBe('C');
+	});
+	it('cc → CC (both uppercase, no lowercase before either)', () => {
+		expect(formatEarlyModernOutput('cc')).toBe('CC');
+	});
+	it('ccvij → CCvij (CC uppercase, v triggers lowercase flag, vij stay lowercase)', () => {
+		expect(formatEarlyModernOutput('ccvij')).toBe('CCvij');
+	});
+
+	// x (a small numeral) before l/c/d/m → those stay lowercase
+	it('xc → xc (x sets lowercase flag, c stays lowercase)', () => {
+		expect(formatEarlyModernOutput('xc')).toBe('xc');
+	});
+	it('xl → xl (x sets lowercase flag, l stays lowercase)', () => {
+		expect(formatEarlyModernOutput('xl')).toBe('xl');
+	});
+	it('xcvij → xcvij', () => {
+		expect(formatEarlyModernOutput('xcvij')).toBe('xcvij');
+	});
+
+	// uppercase l/c/d/m do NOT set the lowercase flag
+	it('mc → MC (m uppercase, flag not set, c also uppercase)', () => {
+		expect(formatEarlyModernOutput('mc')).toBe('MC');
+	});
+	it('mccxvij → MCCxvij (MC uppercase, C uppercase, then x sets flag, vij lowercase)', () => {
+		expect(formatEarlyModernOutput('mccxvij')).toBe('MCCxvij');
+	});
+
+	// l at start → uppercase; xl → lowercase l
+	it('lxvij → Lxvij (l uppercase at start, x then sets flag)', () => {
+		expect(formatEarlyModernOutput('lxvij')).toBe('Lxvij');
+	});
+	it('xlvij → xlvij (x sets flag before l)', () => {
+		expect(formatEarlyModernOutput('xlvij')).toBe('xlvij');
+	});
+
+	// cd and cm stay uppercase (no small numeral precedes them)
+	it('cd → CD', () => {
+		expect(formatEarlyModernOutput('cd')).toBe('CD');
+	});
+	it('cm → CM', () => {
+		expect(formatEarlyModernOutput('cm')).toBe('CM');
+	});
+
+	// mcm: all uppercase, x resets to lowercase for subsequent c
+	it('mcmxciiij → MCMxciiij', () => {
+		expect(formatEarlyModernOutput('mcmxciiij')).toBe('MCMxciiij');
+	});
+});
+
 describe('round-trip: integerToRoman + formatEarlyModernOutput', () => {
 	it('1 → j', () => {
 		expect(formatEarlyModernOutput(integerToRoman(1))).toBe('j');
@@ -122,20 +175,20 @@ describe('round-trip: integerToRoman + formatEarlyModernOutput', () => {
 		expect(formatEarlyModernOutput(integerToRoman(1000))).toBe('M');
 	});
 
-	it('1994 → MCMxCiiij', () => {
-		expect(formatEarlyModernOutput(integerToRoman(1994))).toBe('MCMxCiiij');
+	it('1994 → MCMxciiij', () => {
+		expect(formatEarlyModernOutput(integerToRoman(1994))).toBe('MCMxciiij');
 	});
 
-	it('40 → xL', () => {
-		expect(formatEarlyModernOutput(integerToRoman(40))).toBe('xL');
+	it('40 → xl (x precedes l so l stays lowercase)', () => {
+		expect(formatEarlyModernOutput(integerToRoman(40))).toBe('xl');
 	});
 
 	it('50 → L', () => {
 		expect(formatEarlyModernOutput(integerToRoman(50))).toBe('L');
 	});
 
-	it('90 → xC', () => {
-		expect(formatEarlyModernOutput(integerToRoman(90))).toBe('xC');
+	it('90 → xc (x precedes c so c stays lowercase)', () => {
+		expect(formatEarlyModernOutput(integerToRoman(90))).toBe('xc');
 	});
 
 	it('400 → CD', () => {

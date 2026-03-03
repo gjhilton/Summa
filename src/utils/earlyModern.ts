@@ -13,7 +13,9 @@ export function normalizeEarlyModernInput(input: string): string {
  * Rules:
  * 1. Replace iv → iiij
  * 2. In every contiguous run of i/j chars, replace the last i with j
- * 3. Apply casing: l→L, c→C, d→D, m→M; i, j, v, x stay lowercase
+ * 3. Uppercase l/c/d/m only while no lowercase i/j/v/x has yet appeared;
+ *    once a small numeral is seen, all subsequent l/c/d/m stay lowercase.
+ *    e.g. ccvij → CCvij, xcvij → xcvij, mcmxciiij → MCMxciiij
  */
 export function formatEarlyModernOutput(roman: string): string {
 	// Step 1: expand iv to iiij
@@ -25,8 +27,16 @@ export function formatEarlyModernOutput(roman: string): string {
 		return allI.slice(0, -1) + 'j';
 	});
 
-	// Step 3: apply uppercase to l, c, d, m
-	result = result.replace(/[lcdm]/g, c => c.toUpperCase());
+	// Step 3: uppercase l/c/d/m only if no lowercase i/j/v/x has preceded them
+	let seenLowercase = false;
+	result = result.replace(/[ijvxlcdm]/g, c => {
+		if ('ijvx'.includes(c)) {
+			seenLowercase = true;
+			return c;
+		}
+		if (!seenLowercase) return c.toUpperCase();
+		return c;
+	});
 
 	return result;
 }
