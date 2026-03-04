@@ -151,35 +151,37 @@
 
 	/* Inputs: always full-opacity black underline */
 	[data-item-row] input {
-		border-bottom-color: black;
+		border-bottom-color: rgba(0, 0, 0, 0.1);
 	}
 
 	/* Field font size and vertical padding */
 	[data-field] {
-		font-size: 1.2rem;
+		font-size: 1.25rem;
 		padding-top: 0.125rem;
 		padding-bottom: 0.125rem;
 	}
 
 	/* Title input: smaller font, bold, no vertical padding */
 	[data-item-row] > :nth-child(4) input {
-		font-size: 1rem;
+		font-size: 1.1rem;
 		font-weight: bold;
 		padding-top: 0;
 		padding-bottom: 0;
 	}
 
-	/* Field labels: smaller, pinned to top */
+	/* Field labels: smaller, italic, pinned to top */
 	[data-field-label] {
-		font-size: 0.6rem;
+		font-size: 0.8rem;
+		font-style: italic;
 		align-self: flex-start;
 		padding-top: 0.15rem;
 		padding-bottom: 0;
+		padding-left: 0.05rem;
 	}
 
 	/* Vertical space between rows */
 	[data-item-row] {
-		margin-bottom: 1.5rem;
+		margin-bottom: 2.5rem;
 	}
 
 	/* Remove border under header */
