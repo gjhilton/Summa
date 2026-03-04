@@ -39,7 +39,7 @@ export default function LineItem({
 				/>
 			}
 			title={
-				<div className={opCol}>
+				<div className={opCol} data-title-col>
 					<TitleInput
 						value={title}
 						onChange={onChangeTitle}

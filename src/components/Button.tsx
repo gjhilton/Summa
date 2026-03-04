@@ -8,6 +8,7 @@ interface ButtonProps {
 	'aria-label'?: string;
 	className?: string;
 	children: React.ReactNode;
+	'data-remove-button'?: boolean;
 }
 
 const buttonStyle = cva({
@@ -66,6 +67,7 @@ export default function Button({
 	'aria-label': ariaLabel,
 	className,
 	children,
+	'data-remove-button': dataRemoveButton,
 }: ButtonProps) {
 	return (
 		<button
@@ -74,6 +76,7 @@ export default function Button({
 			disabled={disabled}
 			aria-label={ariaLabel}
 			className={cx(buttonStyle({ variant }), className)}
+			data-remove-button={dataRemoveButton || undefined}
 		>
 			{children}
 		</button>

@@ -106,7 +106,7 @@ export default function Field({
 }: FieldProps) {
 	const FieldRow = onChange ? 'label' : 'span';
 	return (
-		<FieldRow className={cx(fieldRow, className)}>
+		<FieldRow className={cx(fieldRow, className)} data-field-key={label}>
 			<span className={fieldInner}>
 				{onChange ? (
 					<input

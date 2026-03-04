@@ -198,7 +198,7 @@ export default function ExtendedItem({
 					/>
 				}
 				leftBracket={
-					<span className={openParenCol} aria-hidden="true" />
+					<span className={openParenCol} aria-hidden="true" data-left-bracket />
 				}
 				title={
 					<div data-ext-qty className={subtotalTitleCol}>
@@ -213,7 +213,7 @@ export default function ExtendedItem({
 					</div>
 				}
 				operator={
-					<span className={atSign} aria-hidden="true">
+					<span className={atSign} aria-hidden="true" data-operator>
 						<OperatorSymbol type="multiply" />
 					</span>
 				}
@@ -227,7 +227,7 @@ export default function ExtendedItem({
 					/>
 				}
 				rightBracket={
-					<span className={closeParenCol} aria-hidden="true" />
+					<span className={closeParenCol} aria-hidden="true" data-right-bracket />
 				}
 			/>
 
@@ -262,7 +262,7 @@ export default function ExtendedItem({
 					</div>
 				}
 				operator={
-					<div className={subtotalOpCol}>
+					<div className={subtotalOpCol} data-operator>
 						<OperatorSymbol type="equals" />
 					</div>
 				}

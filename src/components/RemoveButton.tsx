@@ -27,6 +27,7 @@ export default function RemoveButton({
 			disabled={!canRemove}
 			className={cx(removeIcon, canRemove ? undefined : hidden)}
 			onClick={onClick}
+			data-remove-button
 		>
 			<Icon icon="trash" size={16} />
 		</Button>

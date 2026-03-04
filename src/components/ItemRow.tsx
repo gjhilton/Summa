@@ -63,20 +63,21 @@ export default function ItemRow({
 					type="button"
 					className={dragHandle}
 					aria-label="Drag to reorder"
+					data-drag-handle
 					{...drag.listeners}
 					{...drag.attributes}
 				>
 					<Icon icon="grip" size={14} />
 				</button>
 			) : (
-				<span />
+				<span data-drag-handle />
 			)}
-			{remove ?? <span />}
-			{leftBracket ?? <span />}
-			{title ?? <span />}
-			{operator ?? <span />}
+			{remove ?? <span data-remove-button />}
+			{leftBracket ?? <span data-left-bracket />}
+			{title ?? <span data-title-col />}
+			{operator ?? <span data-operator />}
 			{currency}
-			{rightBracket ?? <span />}
+			{rightBracket ?? <span data-right-bracket />}
 		</div>
 	);
 }
