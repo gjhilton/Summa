@@ -16,7 +16,7 @@ const svgClass = css({
 export default function Logo({ size = 'M' }: LogoProps) {
 	const maxWidth = (SIZE as Record<string, string>)[size] ?? size;
 	return (
-		<div className={wrapper}>
+		<div className={wrapper} data-logo>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 158.59 52.42"
