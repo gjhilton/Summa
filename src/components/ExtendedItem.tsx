@@ -169,9 +169,10 @@ export default function ExtendedItem({
 	const errorClass = error ? lineError : undefined;
 
 	return (
-		<div className={cx(itemGroup, lineHoverVars)}>
+		<div className={cx(itemGroup, lineHoverVars)} data-ext-item>
 			{/* Annotation row above input fields */}
 			<div
+				data-ext-ann
 				className={cx(labelRow, errorClass)}
 				style={{ gridTemplateColumns: LEDGER_COLUMNS }}
 			>
@@ -200,7 +201,7 @@ export default function ExtendedItem({
 					<span className={openParenCol} aria-hidden="true" />
 				}
 				title={
-					<div className={subtotalTitleCol}>
+					<div data-ext-qty className={subtotalTitleCol}>
 						<Field
 							value={quantity}
 							label="q"
@@ -232,6 +233,7 @@ export default function ExtendedItem({
 
 			{/* Annotation row above subtotal fields */}
 			<div
+				data-ext-ann
 				className={cx(labelRow, errorClass)}
 				style={{ gridTemplateColumns: LEDGER_COLUMNS }}
 			>
@@ -248,7 +250,7 @@ export default function ExtendedItem({
 				className={errorClass}
 				noDragHandle
 				title={
-					<div className={subtotalTitleCol}>
+					<div data-ext-title className={subtotalTitleCol}>
 						<TitleInput
 							value={title}
 							onChange={onChangeTitle}
