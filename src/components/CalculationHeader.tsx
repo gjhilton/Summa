@@ -120,7 +120,7 @@ export default function CalculationHeader({
 	}
 
 	return (
-		<div className={header} data-no-print>
+		<div className={header} data-no-print data-calc-header>
 			{showBreadcrumbs && (
 				<nav className={breadcrumbRow} aria-label="Breadcrumb">
 					{breadcrumbs.slice(0, -1).map(crumb => (

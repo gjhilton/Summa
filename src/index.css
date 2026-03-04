@@ -111,6 +111,108 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Mobile portrait ─────────────────────────────────────────────────────── */
+@media screen and (max-width: 859px) {
+	/* Page margin + full-height flex so footer stays at bottom */
+	[data-page-layout] {
+		padding-left: 1rem;
+		padding-right: 1rem;
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+	[data-page-layout] > footer {
+		margin-top: auto;
+	}
+
+	/* Reflow item rows: title full-width on row 1, l/s/d equal-width on row 2 */
+	[data-item-row] {
+		grid-template-columns: 1fr 1fr 1fr;
+		padding: 0;
+	}
+	/* Hide chrome: drag handle, remove button, brackets, operator */
+	[data-item-row] > :nth-child(1),
+	[data-item-row] > :nth-child(2),
+	[data-item-row] > :nth-child(3),
+	[data-item-row] > :nth-child(5),
+	[data-item-row] > :nth-child(9) {
+		display: none;
+	}
+	/* Title spans full width on row 1 */
+	[data-item-row] > :nth-child(4) {
+		grid-column: 1 / -1;
+		grid-row: 1;
+	}
+	/* l / s / d sit side by side on row 2 */
+	[data-item-row] > :nth-child(6) { grid-column: 1; grid-row: 2; }
+	[data-item-row] > :nth-child(7) { grid-column: 2; grid-row: 2; }
+	[data-item-row] > :nth-child(8) { grid-column: 3; grid-row: 2; }
+
+	/* Field font size and vertical padding */
+	[data-field] {
+		font-size: 1.2rem;
+		padding-top: 0.125rem;
+		padding-bottom: 0.125rem;
+	}
+
+	/* Title input: smaller font, bold, no vertical padding */
+	[data-item-row] > :nth-child(4) input {
+		font-size: 1rem;
+		font-weight: bold;
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	/* Field labels: smaller, pinned to top */
+	[data-field-label] {
+		font-size: 0.6rem;
+		align-self: flex-start;
+		padding-top: 0.15rem;
+		padding-bottom: 0;
+	}
+
+	/* Vertical space between rows */
+	[data-item-row] {
+		margin-bottom: 0.75rem;
+	}
+
+	/* Remove border under header */
+	[data-calc-header] {
+		border-bottom-width: 0;
+	}
+
+	/* Hide toggle switches */
+	[data-bottom-bar] {
+		display: none;
+	}
+
+	/* Full-width add buttons — same height and spacing as item rows */
+	[data-add-bar] {
+		flex-direction: column;
+		margin-top: 0;
+		gap: 0.75rem;
+	}
+	[data-add-bar] button {
+		width: 100%;
+		padding-top: 0.75rem;
+		padding-bottom: 0.75rem;
+		margin-bottom: 0;
+	}
+
+	/* Summa logo: left-aligned */
+	[data-summa-col] {
+		align-items: flex-start;
+	}
+
+	/* DEBUG */
+	[data-item-row] > :nth-child(4),
+	[data-item-row] > :nth-child(6),
+	[data-item-row] > :nth-child(7),
+	[data-item-row] > :nth-child(8) {
+		outline: 2px solid transparent;
+	}
+}
+
 /* ── About page prose blocks ─────────────────────────────────────────────── */
 [data-about-prose] {
 	font-size: 18px;

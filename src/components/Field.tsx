@@ -148,6 +148,7 @@ export default function Field({
 			</span>
 			{LABELS[label] && (
 				<span
+					data-field-label
 					className={cx(
 						labelBox,
 						error && labelError,

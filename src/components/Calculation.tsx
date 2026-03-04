@@ -170,7 +170,7 @@ export default function Calculation({
 					})}
 				</SortableContext>
 			</DndContext>
-			<div className={addBar} data-no-print>
+			<div className={addBar} data-no-print data-add-bar>
 				<Button onClick={onAddLine}>New line item</Button>
 				{useExtendedItem && (
 					<>
@@ -190,7 +190,7 @@ export default function Calculation({
 				isSubLevel={isSubLevel}
 				itemCount={lines.length}
 			/>
-			<div className={bottomBar} data-no-print>
+			<div className={bottomBar} data-no-print data-bottom-bar>
 				<div className={toggleStack}>
 					<Toggle
 						id="show-working"

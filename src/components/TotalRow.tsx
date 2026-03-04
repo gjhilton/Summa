@@ -63,7 +63,7 @@ export default function TotalRow({
 		<ItemRow
 			className={totalRow}
 			title={
-				<div className={summaCol}>
+				<div className={summaCol} data-summa-col>
 					<div className={summaMain}>
 						{isSubLevel ? (
 							<span className={summaPageText}>Summa paginae</span>
