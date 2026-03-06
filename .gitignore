@@ -6,3 +6,4 @@
 /src/config/playwright/test-results
 CLAUDE.md
 /.claude
+/.playwright-mcp

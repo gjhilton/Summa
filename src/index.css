@@ -113,8 +113,11 @@
 
 /* ── Mobile portrait ─────────────────────────────────────────────────────── */
 @media screen and (max-width: 859px) {
-	/* Page: pad sides, footer pinned to bottom */
+	/* Page: full viewport width, pad sides, footer pinned to bottom */
 	[data-page-layout] {
+		max-width: 100%;
+		margin-left: 0;
+		margin-right: 0;
 		padding-left: 1rem;
 		padding-right: 1rem;
 		min-height: 100vh;
@@ -146,7 +149,9 @@
 		justify-content: center;
 		grid-column: 1;
 		grid-row: 1;
-		background: black;
+		background: rgba(0, 0, 0, 0.08);
+		color: rgba(0, 0, 0, 0.85);
+		opacity: 1;
 	}
 
 	/* Title cells: grid placement + left indent */
