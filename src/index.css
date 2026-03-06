@@ -113,7 +113,7 @@
 
 /* ── Mobile portrait ─────────────────────────────────────────────────────── */
 @media screen and (max-width: 859px) {
-	/* Page margin + full-height flex so footer stays at bottom */
+	/* Page: pad sides, footer pinned to bottom */
 	[data-page-layout] {
 		padding-left: 1rem;
 		padding-right: 1rem;
@@ -121,26 +121,25 @@
 		display: flex;
 		flex-direction: column;
 	}
-	[data-page-layout] > footer {
-		margin-top: auto;
-	}
+	[data-page-layout] > footer { margin-top: auto; }
 
-	/* Reflow item rows: col 1 = drag handle in page margin, cols 2-4 = content */
+	/* Item rows: 4-column grid; col 1 extends into page-margin as drag handle */
 	[data-item-row] {
 		grid-template-columns: 1rem 1fr 1fr 1fr;
 		grid-auto-rows: 2.5rem;
 		margin-left: -1rem;
 		width: calc(100% + 1rem);
 		padding: 0;
+		margin-bottom: 2.5rem;
 	}
-	/* Hide chrome: remove button, brackets, operator */
-	[data-item-row] > [data-remove-button],
-	[data-item-row] > [data-left-bracket],
-	[data-item-row] > [data-operator],
-	[data-item-row] > [data-right-bracket] {
+
+	/* Hide desktop chrome */
+	[data-item-row] > :is([data-remove-button], [data-left-bracket], [data-operator], [data-right-bracket]),
+	[data-item-row] > span[data-drag-handle] {
 		display: none;
 	}
-	/* Drag handle: col 1 row 1 — same height as title row, fills page margin */
+
+	/* Drag handle: fills col 1, row 1 */
 	[data-item-row] > button[data-drag-handle] {
 		display: flex;
 		align-items: center;
@@ -149,19 +148,15 @@
 		grid-row: 1;
 		background: black;
 	}
-	/* Placeholder spans (no-drag-handle rows, TotalRow) stay hidden */
-	[data-item-row] > span[data-drag-handle] {
-		display: none;
-	}
-	/* Title spans cols 2–4 on row 1, vertically centered */
-	[data-item-row] > [data-title-col],
-	[data-item-row] > [data-subtotal-title],
-	[data-item-row] > [data-summa-col] {
+
+	/* Title cells: grid placement + left indent */
+	[data-item-row] > :is([data-title-col], [data-subtotal-title], [data-summa-col]) {
 		grid-column: 2 / -1;
 		grid-row: 1;
 		padding-left: 0.4rem;
 		justify-content: center;
 	}
+	/* Subtotal title is a button — needs flex-row centering, not flex-column */
 	[data-item-row] > [data-subtotal-title] {
 		display: flex;
 		align-items: center;
@@ -171,59 +166,39 @@
 		font-weight: bold;
 		text-decoration: none;
 	}
-	/* l / s / d sit side by side on row 2, cols 2–4, vertically centered */
-	[data-item-row] > [data-field-key="l"] { grid-column: 2; grid-row: 2; align-items: center; }
-	[data-item-row] > [data-field-key="s"] { grid-column: 3; grid-row: 2; align-items: center; }
-	[data-item-row] > [data-field-key="d"] { grid-column: 4; grid-row: 2; align-items: center; }
 
-	/* Inputs: always full-opacity black underline */
-	[data-item-row] input {
-		border-bottom-color: rgba(0, 0, 0, 0.1);
+	/* l / s / d: cols 2–4, row 2 */
+	[data-item-row] > [data-field-key="l"] { grid-column: 2; grid-row: 2; }
+	[data-item-row] > [data-field-key="s"] { grid-column: 3; grid-row: 2; }
+	[data-item-row] > [data-field-key="d"] { grid-column: 4; grid-row: 2; }
+
+	/* All field cells: vertically center their flex content */
+	[data-field-key] { align-items: center; }
+	[data-field-label] {
+		font-size: 0.8rem;
+		font-style: italic;
+		align-self: center;
+		padding: 0 0 0 0.05rem;
 	}
 
-	/* Field font size and vertical padding */
+	/* Field + input sizing */
 	[data-field] {
 		font-size: 1.25rem;
 		padding-top: 0.125rem;
 		padding-bottom: 0.125rem;
 	}
-
-	/* Title input: smaller font, bold, no padding */
-	[data-item-row] > [data-title-col] input,
-	[data-item-row] > [data-ext-title] input {
+	[data-item-row] input { border-bottom-color: rgba(0, 0, 0, 0.1); }
+	:is([data-title-col], [data-ext-title]) input {
 		font-size: 1.1rem;
 		font-weight: bold;
-		padding-top: 0;
-		padding-bottom: 0;
-		padding-left: 0;
+		padding: 0;
 	}
 
-	/* Field labels: smaller, italic, centered with input */
-	[data-field-label] {
-		font-size: 0.8rem;
-		font-style: italic;
-		align-self: center;
-		padding-top: 0;
-		padding-bottom: 0;
-		padding-left: 0.05rem;
-	}
+	/* Header + controls */
+	[data-calc-header] { border-bottom-width: 0; }
+	[data-bottom-bar] div:has(> #show-working) { display: none; }
 
-	/* Vertical space between rows */
-	[data-item-row] {
-		margin-bottom: 2.5rem;
-	}
-
-	/* Remove border under header */
-	[data-calc-header] {
-		border-bottom-width: 0;
-	}
-
-	/* Hide show-working toggle, keep advanced options */
-	[data-bottom-bar] div:has(> #show-working) {
-		display: none;
-	}
-
-	/* Full-width add buttons — same height and spacing as item rows */
+	/* Add buttons: full-width stacked column */
 	[data-add-bar] {
 		flex-direction: column;
 		margin-top: 0;
@@ -237,24 +212,12 @@
 		margin-bottom: 0;
 	}
 
-	/* Summa logo: left-aligned, same height as item rows */
-	[data-summa-col] {
-		align-items: flex-start;
-	}
-	[data-logo] {
-		padding-top: 0.25rem;
-		padding-bottom: 0.25rem;
-	}
-	[data-logo] svg {
-		height: 2rem !important;
-		width: auto !important;
-	}
+	/* Logo: left-aligned, contained within row height */
+	[data-summa-col] { align-items: flex-start; }
+	[data-logo] { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+	[data-logo] svg { height: 2rem !important; width: auto !important; }
 
-	/* ── Extended item: 3-row layout ─────────────────────────────────────── */
-	/* 6-column grid (lcm of 2 and 3):                                        */
-	/* Row 1: title (cols 1–3, 50%) | quantity cell (cols 4–6, 50%)           */
-	/* Row 2: l (1–2) | s (3–4) | d (5–6)  unit cost inputs                  */
-	/* Row 3: l (1–2) | s (3–4) | d (5–6)  extended cost read-only           */
+	/* ── Extended item: 3-row × 6-column grid ────────────────────────────── */
 	[data-ext-item] {
 		display: grid;
 		grid-template-columns: repeat(6, 1fr);
@@ -262,78 +225,33 @@
 		position: relative;
 		margin-bottom: 2.5rem;
 	}
-	/* Ext-item drag handle: absolutely positioned in page margin */
+	/* Drag handle: absolute in page margin; inherits flex/bg from base rule above */
 	[data-ext-item] > [data-item-row] > button[data-drag-handle] {
 		position: absolute;
 		left: -1rem;
 		top: 0;
 		width: 1rem;
 		height: 2.5rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: black;
 	}
-	/* Hide annotation label rows (they float above inputs on desktop) */
-	[data-ext-ann] {
-		display: none;
-	}
-	/* Dissolve both ItemRows into the parent grid */
-	[data-ext-item] > [data-item-row] {
-		display: contents;
-	}
-	/* Title cell → row 1, cols 1–3 (left half) */
-	[data-ext-item] [data-ext-title] {
-		grid-column: 1 / 4;
-		grid-row: 1;
-		padding-left: 0.4rem;
-		font-style: normal;
-		justify-content: center;
-	}
-	/* Quantity cell → row 1, cols 4–6 (right half) */
-	[data-ext-item] [data-ext-qty] {
-		grid-column: 4 / 7;
-		grid-row: 1;
-		padding-left: 0;
-		flex-direction: row;
-		align-items: center;
-		font-style: normal;
-		font-weight: normal;
-	}
-	/* "quantity:" prefix inline, "@" suffix inline — 25% grey */
-	[data-ext-item] [data-ext-qty]::before {
-		content: 'quantity:';
-		font-size: 0.65rem;
-		flex-shrink: 0;
-		padding-right: 0.2rem;
-		color: rgba(0, 0, 0, 0.25);
-	}
-	[data-ext-item] [data-ext-qty]::after {
-		content: '@';
-		flex-shrink: 0;
-		padding-left: 0.2rem;
-		font-size: 0.9rem;
-		color: rgba(0, 0, 0, 0.25);
-	}
-	/* Field fills remaining space between the two labels */
-	[data-ext-item] [data-ext-qty] > * {
-		flex: 1;
-		width: auto;
-		min-width: 0;
-	}
-	/* Quantity input: normal weight, currency field font size */
-	[data-ext-item] [data-ext-qty] input {
-		font-size: 1.25rem;
-		font-weight: normal;
-	}
-	/* Unit cost l/s/d → row 2, equal thirds, vertically centered */
-	[data-ext-item] > [data-item-row]:has([data-ext-qty]) > [data-field-key="l"] { grid-column: 1 / 3; grid-row: 2; align-items: center; }
-	[data-ext-item] > [data-item-row]:has([data-ext-qty]) > [data-field-key="s"] { grid-column: 3 / 5; grid-row: 2; align-items: center; }
-	[data-ext-item] > [data-item-row]:has([data-ext-qty]) > [data-field-key="d"] { grid-column: 5 / 7; grid-row: 2; align-items: center; }
-	/* Extended cost l/s/d → row 3, equal thirds, vertically centered */
-	[data-ext-item] > [data-item-row]:has([data-ext-title]) > [data-field-key="l"] { grid-column: 1 / 3; grid-row: 3; align-items: center; }
-	[data-ext-item] > [data-item-row]:has([data-ext-title]) > [data-field-key="s"] { grid-column: 3 / 5; grid-row: 3; align-items: center; }
-	[data-ext-item] > [data-item-row]:has([data-ext-title]) > [data-field-key="d"] { grid-column: 5 / 7; grid-row: 3; align-items: center; }
+	[data-ext-ann] { display: none; }
+	[data-ext-item] > [data-item-row] { display: contents; }
+
+	/* Row 1: title (left half) | quantity (right half) */
+	[data-ext-title] { grid-column: 1 / 4; grid-row: 1; padding-left: 0.4rem; font-style: normal; justify-content: center; }
+	[data-ext-qty]   { grid-column: 4 / 7; grid-row: 1; flex-direction: row; align-items: center; font-style: normal; font-weight: normal; }
+	[data-ext-qty]::before { content: 'quantity:'; font-size: 0.65rem; flex-shrink: 0; padding-right: 0.2rem; color: rgba(0,0,0,0.25); }
+	[data-ext-qty]::after  { content: '@'; flex-shrink: 0; padding-left: 0.2rem; font-size: 0.9rem; color: rgba(0,0,0,0.25); }
+	[data-ext-qty] > * { flex: 1; width: auto; min-width: 0; }
+	[data-ext-qty] input { font-size: 1.25rem; font-weight: normal; }
+
+	/* Row 2: unit cost l/s/d */
+	[data-item-row]:has([data-ext-qty]) > [data-field-key="l"] { grid-column: 1 / 3; grid-row: 2; }
+	[data-item-row]:has([data-ext-qty]) > [data-field-key="s"] { grid-column: 3 / 5; grid-row: 2; }
+	[data-item-row]:has([data-ext-qty]) > [data-field-key="d"] { grid-column: 5 / 7; grid-row: 2; }
+	/* Row 3: extended cost l/s/d */
+	[data-item-row]:has([data-ext-title]) > [data-field-key="l"] { grid-column: 1 / 3; grid-row: 3; }
+	[data-item-row]:has([data-ext-title]) > [data-field-key="s"] { grid-column: 3 / 5; grid-row: 3; }
+	[data-item-row]:has([data-ext-title]) > [data-field-key="d"] { grid-column: 5 / 7; grid-row: 3; }
 }
 
 /* ── About page prose blocks ─────────────────────────────────────────────── */
