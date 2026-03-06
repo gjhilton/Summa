@@ -159,12 +159,13 @@
 	[data-item-row] > [data-summa-col] {
 		grid-column: 2 / -1;
 		grid-row: 1;
-		padding-left: 0;
+		padding-left: 0.4rem;
 		justify-content: center;
 	}
 	[data-item-row] > [data-subtotal-title] {
 		display: flex;
 		align-items: center;
+		justify-content: flex-start;
 		padding-top: 0;
 		padding-bottom: 0;
 		font-weight: bold;
@@ -187,13 +188,14 @@
 		padding-bottom: 0.125rem;
 	}
 
-	/* Title input: smaller font, bold, no vertical padding */
+	/* Title input: smaller font, bold, no padding */
 	[data-item-row] > [data-title-col] input,
 	[data-item-row] > [data-ext-title] input {
 		font-size: 1.1rem;
 		font-weight: bold;
 		padding-top: 0;
 		padding-bottom: 0;
+		padding-left: 0;
 	}
 
 	/* Field labels: smaller, italic, centered with input */
@@ -284,7 +286,7 @@
 	[data-ext-item] [data-ext-title] {
 		grid-column: 1 / 4;
 		grid-row: 1;
-		padding-left: 0;
+		padding-left: 0.4rem;
 		font-style: normal;
 		justify-content: center;
 	}
