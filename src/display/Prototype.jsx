@@ -4,7 +4,7 @@ import { cva } from "../styled-system/css"
 
 // Map border variant to thickness and color
 const borderMap = {
-  subtotal: { thickness: "1px", color: "black" },
+  subtotal: { thickness: "1px", color: "transparent" },
   total: { thickness: "5px", color: "black" },
   default: { thickness: "1px", color: "transparent" },
 }
@@ -88,7 +88,7 @@ const Equally = styled("div", {
 
 const Box = styled("div", {
   base: {
-    bg: "gray.100"
+    // bg: "gray.100"
   },
 })
 
@@ -96,8 +96,10 @@ const Block = Box // later we may need rows to share something boxes dont
 
 const inputRecipe = cva({
   base: {
-    border: "1px solid",
-    borderColor: "transparent",
+    border: "0",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: "transparent",
     p: "2",
      w: "full",
     outline: "none",
@@ -108,16 +110,17 @@ const inputRecipe = cva({
       true: {
         bg: "white",
         color: "black",
-		borderColor: "black"
+        borderBottomColor: "black",
       },
       false: {
-        bg: "gray.100",
-        color: "gray.500",
+        fontStyle: "italic",
+        borderBottomColor: "transparent",
+       // color: "gray.500",
       },
     },
   },
   defaultVariants: {
-    editable: true,
+    editable: false,
   },
 })
 
@@ -127,7 +130,7 @@ const StyledInput = styled("input", inputRecipe)
 /* ----- exported components ---- */
 
 export function TextInput({ 
-	editable = true, 
+	editable, 
 	value, 
 	onChange, 
 	...props
@@ -162,7 +165,7 @@ export const CurrencyField = ({
 }) =>
 <Box>
 	<label>
-    	<TextField value={value}/>
+    	<TextField value={value} editable={editable}/>
     {label}
   </label>
 </Box>
@@ -171,9 +174,9 @@ export const Currency = ({
 	editable
 }) =>
 	<Equally>
-		<CurrencyField label="li" editable="editable"/>
-		<CurrencyField label="s" editable="editable"/>
-		<CurrencyField label="d" editable="editable"/>
+		<CurrencyField label="li" editable={editable}/>
+		<CurrencyField label="s" editable={editable}/>
+		<CurrencyField label="d" editable={editable}/>
 	</Equally>
 
 export const BlockTitle = ({
@@ -183,37 +186,41 @@ export const BlockTitle = ({
 }) =>
 	<Block>
 	<Equally>
-		<TextField value="Unit item" editable={editable}/>
+		<TextField value={title} editable={editable}/>
 		{children}
 		</Equally>
 	</Block>
 
-export const BlockCurrency = ({children}) =>
+export const BlockCurrency = ({
+children,
+editable
+}) =>
 	<Block>
-		<Currency />
+		<Currency editable={editable}/>
 	</Block>
 
 export const ItemUnit = () =>
 	<Item>
-		<BlockTitle title="unit item title" editable={true}/>
+		<BlockTitle title="unit item" editable={true}/>
+		<BlockCurrency editable={true}/>
 	</Item>
 
 export const ItemExtended = () =>
 	<Item>
-		<BlockTitle title="extended item title" editable={true}/>
-		<BlockCurrency />
+		<BlockTitle title="extended item" editable={true}/>
+		<BlockCurrency editable={true}/>
 		<BlockCurrency />
 	</Item>
 
 export const ItemSubTotal = () =>
 	<Item borders="subtotal">
-		<BlockTitle title="subtotal item title" editable={false}/>
+		<BlockTitle title="subtotal" editable={false}/>
 		<BlockCurrency />
 	</Item>
 
 export const ItemTotal = () =>
 	<Item borders="total">
-		<BlockTitle title="unit item title" editable={false}/>
+		<BlockTitle title="total" editable={false}/>
 		<BlockCurrency />
 	</Item>
 
