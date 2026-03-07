@@ -10,11 +10,98 @@ const borderMap = {
   default: { thickness: "1px", color: "transparent", style: "solid" },
 }
 
+// Swipe context — tracks which item's action strip is open
+const SwipeContext = React.createContext({ openId: null, setOpenId: () => {} })
+function useSwipeContext() { return React.useContext(SwipeContext) }
+
+function SwipeProvider({ children }) {
+  const [openId, setOpenId] = React.useState(null)
+  return (
+    <SwipeContext.Provider value={{ openId, setOpenId }}>
+      {children}
+    </SwipeContext.Provider>
+  )
+}
+
+// Action strip — revealed on swipe left
+const ActionStripWrapper = styled("div", {
+  base: {
+    position: "absolute",
+    right: "1.5rem",
+    top: 0,
+    bottom: 0,
+    width: "180px",
+    display: "flex",
+    flexDirection: "row",
+    zIndex: 1,
+    borderRadius: "0 0.75rem 0.75rem 0",
+    overflow: "hidden",
+  },
+})
+
+const actionButtonBase = {
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "2px",
+  border: "none",
+  cursor: "pointer",
+  fontSize: "0.65rem",
+  fontFamily: "inherit",
+  color: "white",
+  padding: "0 4px",
+  lineHeight: 1.2,
+}
+
+function ActionStrip({ onClose, desktopVisible }) {
+  // Touch devices: strip is always opaque — content slides away to reveal it
+  // Hover devices: strip fades in/out on row hover
+  const style = canHover
+    ? {
+        opacity: desktopVisible ? 1 : 0,
+        transform: desktopVisible ? "translateX(0)" : "translateX(12px)",
+        transition: "opacity 0.2s ease, transform 0.2s ease",
+        pointerEvents: desktopVisible ? "auto" : "none",
+      }
+    : {}
+  return (
+    <ActionStripWrapper style={style}>
+      <button
+        style={{ ...actionButtonBase, background: "#c0392b" }}
+        onClick={onClose}
+        aria-label="Delete row"
+      >
+        <span style={{ fontSize: "1rem" }}>🗑</span>
+        Delete
+      </button>
+      <button
+        style={{ ...actionButtonBase, background: "#444" }}
+        onClick={onClose}
+        aria-label="Duplicate row"
+      >
+        <span style={{ fontSize: "1rem" }}>⧉</span>
+        Duplicate
+      </button>
+      <button
+        style={{ ...actionButtonBase, background: "#888" }}
+        onClick={onClose}
+        aria-label="Clear item"
+      >
+        <span style={{ fontSize: "1rem" }}>✕</span>
+        Clear
+      </button>
+    </ActionStripWrapper>
+  )
+}
+
 // Base container: grid and button positioning
 const StyledItem = styled("div", {
   base: {
-    position: "relative", // for absolute button
+    position: "relative",
     marginBottom: "3rem",
+    overflow: "hidden",
   },
 })
 
@@ -37,6 +124,9 @@ const PageWidth = styled("div", {
 // Content wrapper: contains the borders and margins
 const ContentWrapper = styled("div", {
   base: {
+    position: "relative",
+    zIndex: 2,
+    borderRadius: "0.75rem",
     display: { base: "block", md: "flex" },
     "& > *": { flex: "1" },
     "& > *:last-child": { flex: "0 0 33.333%" },
@@ -73,12 +163,65 @@ const ContentWrapper = styled("div", {
   },
 })
 
+// Detect if device supports hover (non-touch pointer)
+const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches
+
 // Component
-export function Item({ borders, leftButton, children, ...props }) {
+export function Item({ borders, leftButton, noSwipe, children, ...props }) {
+  const id = React.useId()
+  const { openId, setOpenId } = useSwipeContext()
+  const isOpen = !noSwipe && openId === id
+  const [hovered, setHovered] = React.useState(false)
+  const startX = React.useRef(null)
+  const startY = React.useRef(null)
+  const isVertical = React.useRef(false)
+
+  function onTouchStart(e) {
+    startX.current = e.touches[0].clientX
+    startY.current = e.touches[0].clientY
+    isVertical.current = false
+  }
+
+  function onTouchMove(e) {
+    if (isVertical.current) return
+    const dx = e.touches[0].clientX - startX.current
+    const dy = e.touches[0].clientY - startY.current
+    if (Math.abs(dy) > Math.abs(dx)) isVertical.current = true
+  }
+
+  function onTouchEnd(e) {
+    if (isVertical.current) return
+    const dx = e.changedTouches[0].clientX - startX.current
+    if (dx < -40) setOpenId(id)
+    else if (dx > 20) setOpenId(null)
+  }
+
+  function onClose() {
+    setOpenId(null)
+    setHovered(false)
+  }
+
   return (
-    <StyledItem {...props}>
+    <StyledItem
+      {...props}
+      onMouseEnter={!noSwipe && canHover ? () => setHovered(true) : undefined}
+      onMouseLeave={!noSwipe && canHover ? () => setHovered(false) : undefined}
+    >
       {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
-      <ContentWrapper hasButton={!!leftButton} borders={borders}>
+      {!noSwipe && <ActionStrip onClose={onClose} desktopVisible={canHover && hovered} />}
+      <ContentWrapper
+        hasButton={!!leftButton}
+        borders={borders}
+        style={{
+          transform: isOpen ? "translateX(-180px)" : "translateX(0)",
+          transition: "transform 0.25s ease, background 0.25s ease",
+          touchAction: noSwipe ? undefined : "pan-y",
+          background: isOpen ? "#fef9e0" : "white",
+        }}
+        onTouchStart={noSwipe ? undefined : onTouchStart}
+        onTouchMove={noSwipe ? undefined : onTouchMove}
+        onTouchEnd={noSwipe ? undefined : onTouchEnd}
+      >
         {children}
       </ContentWrapper>
     </StyledItem>
@@ -156,7 +299,7 @@ const inputRecipe = cva({
 	},
     editable: {
       true: {
-        bg: "white",
+        bg: "transparent",
         color: "black",
         borderBottomColor: "rgba(0,0,0,0.1)",
         _focus: { borderBottomColor: "black" },
@@ -287,7 +430,7 @@ export const ItemSubTotal = () =>
 	</Item>
 
 export const ItemTotal = () =>
-	<Item borders="total">
+	<Item borders="total" noSwipe>
 		<BlockTitle title="total" editable={false}/>
 		<BlockCurrency />
 	</Item>
@@ -319,12 +462,14 @@ export const HeaderEdit = () =>
 	</Header>
 
 export const ListOfItems = () =>
-	<section>
-		<ItemUnit/>
-		<ItemExtended />
-		<ItemSubTotal />
-		<ItemTotal />
-	</section>
+	<SwipeProvider>
+		<section>
+			<ItemUnit/>
+			<ItemExtended />
+			<ItemSubTotal />
+			<ItemTotal />
+		</section>
+	</SwipeProvider>
 
 export const ScreenMain = () =>
 	<main>
