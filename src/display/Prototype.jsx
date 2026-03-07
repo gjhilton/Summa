@@ -9,64 +9,68 @@ const borderMap = {
   default: { thickness: "1px", color: "transparent" },
 }
 
-// Base container with borders
-const itemRecipe = cva({
+// Base container: grid and button positioning
+const StyledItem = styled("div", {
   base: {
-    position: "relative", // needed for absolute button
+    position: "relative", // for absolute button
     marginBottom: "1rem",
     display: "grid",
     gridTemplateColumns: { base: "1fr", md: "repeat(auto-fit, minmax(0, 1fr))" },
-    borderLeft: 0,
-    borderRight: 0,
-  },
-  variants: {
-    borders: Object.fromEntries(
-      Object.entries(borderMap).map(([key, { thickness, color }]) => [
-        key === "default" ? undefined : key,
-        {
-          borderTop: `${thickness} solid ${color}`,
-          borderBottom: `${thickness} solid ${color}`,
-        },
-      ])
-    ),
   },
 })
 
-const StyledItem = styled("div", itemRecipe)
-
-// Left button absolutely positioned
+// Button wrapper: absolutely positioned outside content
 const LeftButtonWrapper = styled("div", {
   base: {
     position: "absolute",
-    left: "0",
+    left: 0,
     top: "50%",
     transform: "translateY(-50%)",
   },
 })
 
-// Content wrapper uses margin-left instead of padding
+// Content wrapper: contains the borders and margins
 const ContentWrapper = styled("div", {
   base: {
     display: "block",
-	marginLeft: "1.5rem",
-	marginRight: "1.5rem"
+    borderTopWidth: "1px",
+    borderBottomWidth: "1px",
+    borderTopStyle: "solid",
+    borderBottomStyle: "solid",
+    borderTopColor: "transparent",
+    borderBottomColor: "transparent",
+	margin: "0 1.5rem"
   },
   variants: {
     hasButton: {
-      // true: { marginLeft: "3rem" }, // reserve space for button only if it exists
+    //  true: { marginLeft: "1.5rem" },
     },
+    borders: Object.fromEntries(
+      Object.entries(borderMap).map(([key, { thickness, color }]) => [
+        key === "default" ? undefined : key,
+        {
+          borderTopWidth: thickness,
+          borderBottomWidth: thickness,
+          borderTopColor: color,
+          borderBottomColor: color,
+        },
+      ])
+    ),
   },
   defaultVariants: {
     hasButton: false,
+    borders: undefined,
   },
 })
 
 // Component
 export function Item({ borders, leftButton, children, ...props }) {
   return (
-    <StyledItem borders={borders} {...props}>
+    <StyledItem {...props}>
       {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
-      <ContentWrapper hasButton={!!leftButton}>{children}</ContentWrapper>
+      <ContentWrapper hasButton={!!leftButton} borders={borders}>
+        {children}
+      </ContentWrapper>
     </StyledItem>
   )
 }
