@@ -1,13 +1,6 @@
+import React from "react"
 import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
-
-// container: always equal columns
-const Equally = styled("div", {
-  base: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(0, 1fr))", // all children equal width
-  },
-})
 
 // Map border variant to thickness and color
 const borderMap = {
@@ -16,9 +9,10 @@ const borderMap = {
   default: { thickness: "1px", color: "transparent" },
 }
 
-// Grid container: n rows on mobile / n columns on desktop
+// Base container with borders
 const itemRecipe = cva({
   base: {
+    position: "relative", // needed for absolute button
     marginBottom: "1rem",
     display: "grid",
     gridTemplateColumns: { base: "1fr", md: "repeat(auto-fit, minmax(0, 1fr))" },
@@ -28,7 +22,7 @@ const itemRecipe = cva({
   variants: {
     borders: Object.fromEntries(
       Object.entries(borderMap).map(([key, { thickness, color }]) => [
-        key === "default" ? undefined : key, // skip default as a variant
+        key === "default" ? undefined : key,
         {
           borderTop: `${thickness} solid ${color}`,
           borderBottom: `${thickness} solid ${color}`,
@@ -38,7 +32,55 @@ const itemRecipe = cva({
   },
 })
 
-export const Item = styled("div", itemRecipe)
+const StyledItem = styled("div", itemRecipe)
+
+// Left button absolutely positioned
+const LeftButtonWrapper = styled("div", {
+  base: {
+    position: "absolute",
+    left: "0",
+    top: "50%",
+    transform: "translateY(-50%)",
+  },
+})
+
+// Content wrapper uses margin-left instead of padding
+const ContentWrapper = styled("div", {
+  base: {
+    display: "block",
+	marginLeft: "1.5rem",
+	marginRight: "1.5rem"
+  },
+  variants: {
+    hasButton: {
+      // true: { marginLeft: "3rem" }, // reserve space for button only if it exists
+    },
+  },
+  defaultVariants: {
+    hasButton: false,
+  },
+})
+
+// Component
+export function Item({ borders, leftButton, children, ...props }) {
+  return (
+    <StyledItem borders={borders} {...props}>
+      {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
+      <ContentWrapper hasButton={!!leftButton}>{children}</ContentWrapper>
+    </StyledItem>
+  )
+}
+
+
+// -------- 
+
+// container: always equal columns
+const Equally = styled("div", {
+  base: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(0, 1fr))", // all children equal width
+  },
+})
 
 const Box = styled("div", {
   base: {
