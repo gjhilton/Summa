@@ -30,11 +30,13 @@ const ActionStripWrapper = styled("div", {
     right: 0,
     top: 0,
     bottom: 0,
-    width: "180px",
+    width: "240px",
     display: "flex",
     flexDirection: "row",
     zIndex: 1,
     overflow: "hidden",
+    background: "#e8e8e8",
+    boxShadow: "inset 8px 0 16px -4px rgba(0,0,0,0.25)",
   },
 })
 
@@ -68,7 +70,7 @@ function ActionStrip({ onClose, desktopVisible }) {
   return (
     <ActionStripWrapper style={style}>
       <button
-        style={{ ...actionButtonBase, background: "#c0392b" }}
+        style={{ ...actionButtonBase, background: "transparent", color: "#333" }}
         onClick={onClose}
         aria-label="Delete row"
       >
@@ -76,7 +78,7 @@ function ActionStrip({ onClose, desktopVisible }) {
         Delete
       </button>
       <button
-        style={{ ...actionButtonBase, background: "#444" }}
+        style={{ ...actionButtonBase, background: "transparent", color: "#333" }}
         onClick={onClose}
         aria-label="Duplicate row"
       >
@@ -84,7 +86,7 @@ function ActionStrip({ onClose, desktopVisible }) {
         Duplicate
       </button>
       <button
-        style={{ ...actionButtonBase, background: "#888" }}
+        style={{ ...actionButtonBase, background: "transparent", color: "#333" }}
         onClick={onClose}
         aria-label="Clear item"
       >
@@ -211,10 +213,11 @@ export function Item({ borders, leftButton, noSwipe, children, ...props }) {
         hasButton={!!leftButton}
         borders={borders}
         style={{
-          transform: isOpen ? "translateX(-180px)" : "translateX(0)",
-          transition: "transform 0.25s ease, background 0.25s ease",
+          transform: isOpen ? "translateX(-240px)" : "translateX(0)",
+          transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
           touchAction: noSwipe ? undefined : "pan-y",
           background: isOpen ? "#fef9e0" : "white",
+          boxShadow: isOpen ? "6px 0 16px rgba(0,0,0,0.3)" : "none",
         }}
         onTouchStart={noSwipe ? undefined : onTouchStart}
         onTouchMove={noSwipe ? undefined : onTouchMove}
