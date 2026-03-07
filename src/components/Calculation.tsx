@@ -103,6 +103,10 @@ export default function Calculation({
 	const views = lines.map(line => toLineView(line));
 	const ids = lines.map(l => l.id);
 
+	function handleRemove(id: string) {
+		if (window.confirm('Delete this item?')) onRemoveLine(id);
+	}
+
 	return (
 		<div className={layout}>
 			<DndContext
@@ -125,7 +129,7 @@ export default function Calculation({
 										onEdit={() =>
 											onEditSubtotalItem(view.id)
 										}
-										onRemove={() => onRemoveLine(view.id)}
+										onRemove={() => handleRemove(view.id)}
 									/>
 								</SortableItem>
 							);
@@ -143,7 +147,7 @@ export default function Calculation({
 										onChangeQuantity={v =>
 											onUpdateQuantity(view.id, v)
 										}
-										onRemove={() => onRemoveLine(view.id)}
+										onRemove={() => handleRemove(view.id)}
 										onChangeTitle={v =>
 											onUpdateTitle(view.id, v)
 										}
@@ -160,7 +164,7 @@ export default function Calculation({
 									onChangeField={(f, v) =>
 										onUpdateField(view.id, f, v)
 									}
-									onRemove={() => onRemoveLine(view.id)}
+									onRemove={() => handleRemove(view.id)}
 									onChangeTitle={v =>
 										onUpdateTitle(view.id, v)
 									}

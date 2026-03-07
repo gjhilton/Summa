@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import MainScreen from './components/MainScreen';
-import AboutScreen from './components/AboutScreen';
+import { ScreenMain } from './display/Prototype';
+//import AboutScreen from './components/AboutScreen';
 import { usePreferences } from './state/preferences';
 
 const VISITED_KEY = 'summa_visited';
@@ -27,7 +27,7 @@ export default function App() {
 		setIsFirstVisit(false);
 		setScreen('main');
 	}
-
+/*
 	if (screen === 'about') {
 		return (
 			<AboutScreen
@@ -36,10 +36,10 @@ export default function App() {
 				onGetStarted={handleGetStarted}
 			/>
 		);
-	}
+	}*/
 
 	return (
-		<MainScreen
+		<ScreenMain
 			onAbout={() => setScreen('about')}
 			useExtendedItem={prefs.useExtendedItem}
 			onUseExtendedItemChange={v => updatePrefs({ useExtendedItem: v })}
