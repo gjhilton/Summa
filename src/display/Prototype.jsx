@@ -27,14 +27,13 @@ function SwipeProvider({ children }) {
 const ActionStripWrapper = styled("div", {
   base: {
     position: "absolute",
-    right: "1.5rem",
+    right: 0,
     top: 0,
     bottom: 0,
     width: "180px",
     display: "flex",
     flexDirection: "row",
     zIndex: 1,
-    borderRadius: "0 0.75rem 0.75rem 0",
     overflow: "hidden",
   },
 })
@@ -126,7 +125,6 @@ const ContentWrapper = styled("div", {
   base: {
     position: "relative",
     zIndex: 2,
-    borderRadius: "0.75rem",
     display: { base: "block", md: "flex" },
     "& > *": { flex: "1" },
     "& > *:last-child": { flex: "0 0 33.333%" },
@@ -136,7 +134,7 @@ const ContentWrapper = styled("div", {
     borderBottomStyle: "solid",
     borderTopColor: "transparent",
     borderBottomColor: "transparent",
-	margin: "0 1.5rem"
+    padding: "0 1.5rem",
   },
   variants: {
     hasButton: {
