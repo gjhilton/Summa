@@ -92,7 +92,11 @@ const Box = styled("div", {
   },
 })
 
-const Block = Box // later we may need rows to share something boxes dont
+const Block = styled("div", {
+  base: {
+    marginTop: "0.5rem",
+  },
+})
 
 const Label = styled("label", {
   base: {
@@ -101,7 +105,7 @@ const Label = styled("label", {
   },
 })
 
-const LabelText = styled("span", {
+const LabelText = styled("sup", {
   base: {
     flexShrink: 0,
     paddingLeft: "0.25rem",
