@@ -94,13 +94,30 @@ const Box = styled("div", {
 
 const Block = Box // later we may need rows to share something boxes dont
 
+const Label = styled("label", {
+  base: {
+    display: "flex",
+    alignItems: "center",
+  },
+})
+
+const LabelText = styled("span", {
+  base: {
+    flexShrink: 0,
+    paddingLeft: "0.25rem",
+    paddingRight: "0.65rem",
+  },
+})
+
+
 const inputRecipe = cva({
   base: {
     border: "0",
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: "transparent",
-     w: "full",
+    flex: "1",
+    minWidth: "0",
     outline: "none",
     transition: "all 0.2s",
   },
@@ -173,10 +190,10 @@ export const CurrencyField = ({
 	editable
 }) =>
 <Box>
-	<label>
-    	<TextField align="r" value={value} editable={editable}/>
-    {label}
-  </label>
+	<Label>
+		<TextInput align="r" value={value} editable={editable}/>
+		<LabelText>{label}</LabelText>
+	</Label>
 </Box>
 
 export const Currency = ({
