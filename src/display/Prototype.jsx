@@ -100,12 +100,19 @@ const inputRecipe = cva({
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: "transparent",
-    p: "2",
      w: "full",
     outline: "none",
     transition: "all 0.2s",
   },
   variants: {
+    align: {
+		l: {
+			textAlign: "left"
+		},
+		r: {
+		textAlign: "right"
+		}
+	},
     editable: {
       true: {
         bg: "white",
@@ -120,6 +127,7 @@ const inputRecipe = cva({
     },
   },
   defaultVariants: {
+  align: "left",
     editable: false,
   },
 })
@@ -149,12 +157,13 @@ export function TextInput({
 export const TextField = ({
 	value,
 	label,
-	editable
+	editable,
+	align
 }) =>
 <Box>
 	<label>
 	   {label}
-    	<TextInput value={value} editable={editable}/>
+    	<TextInput value={value} editable={editable} align={align}/>
   </label>
 </Box>
 
@@ -165,18 +174,23 @@ export const CurrencyField = ({
 }) =>
 <Box>
 	<label>
-    	<TextField value={value} editable={editable}/>
+    	<TextField align="r" value={value} editable={editable}/>
     {label}
   </label>
 </Box>
 
 export const Currency = ({
-	editable
+	editable,
+	values = {
+		l: "x",
+		s: "vj",
+		d: "iij"
+	}
 }) =>
 	<Equally>
-		<CurrencyField label="li" editable={editable}/>
-		<CurrencyField label="s" editable={editable}/>
-		<CurrencyField label="d" editable={editable}/>
+		<CurrencyField label="li" editable={editable} value={values.l}/>
+		<CurrencyField label="s" editable={editable} value={values.s}/>
+		<CurrencyField label="d" editable={editable} value={values.d}/>
 	</Equally>
 
 export const BlockTitle = ({
