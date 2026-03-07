@@ -90,6 +90,7 @@ const Equally = styled("div", {
   base: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(0, 1fr))", // all children equal width
+    gap: "0",
   },
 })
 
@@ -266,27 +267,35 @@ export const ItemTotal = () =>
 		<BlockCurrency />
 	</Item>
 
+const Header = styled("header", {
+  base: {
+    margin: "1rem 0 3rem"
+  },
+})
+
+const HeaderBar = styled("div", {
+  base: {
+    display: "grid",
+    gridTemplateColumns: "auto auto 1fr auto",
+    alignItems: "center",
+  },
+})
+
 export const HeaderEdit = () =>
-	<header>
-	<PageWidth>
-	<Equally>
-
-
-<Button variant="primary">
-  Save
-</Button>
-<Button>Load</Button>
-<Button variant="danger">
-  Delete
-</Button>
-
-</Equally>	
-</PageWidth>
-	</header>
+	<Header>
+		<PageWidth>
+			<HeaderBar>
+				<Button variant="primary">Save</Button>
+				<Button>Load</Button>
+				<div />
+				<Button variant="danger">Clear</Button>
+			</HeaderBar>
+		</PageWidth>
+	</Header>
 
 export const ListOfItems = () =>
 	<section>
-		<ItemUnit />
+		<ItemUnit/>
 		<ItemExtended />
 		<ItemSubTotal />
 		<ItemTotal />

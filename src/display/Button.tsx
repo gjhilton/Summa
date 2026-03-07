@@ -18,9 +18,10 @@ const buttonRecipe = cva({
 
     borderWidth: "1px",
     borderStyle: "solid",
-    borderRadius: "md",
+    borderRadius: "0",
 
     whiteSpace: "nowrap",
+    maxWidth: { md: "10rem" },
 
     transition: "background 0.2s, color 0.2s, border-color 0.2s",
 
