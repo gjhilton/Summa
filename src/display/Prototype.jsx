@@ -5,9 +5,9 @@ import { Button } from "./Button"
 
 // Map border variant to thickness and color
 const borderMap = {
-  subtotal: { thickness: "1px", color: "transparent" },
-  total: { thickness: "5px", color: "black" },
-  default: { thickness: "1px", color: "transparent" },
+  subtotal: { thickness: "1px", color: "transparent", style: "solid" },
+  total: { thickness: "3px", color: "black", style: "double" },
+  default: { thickness: "1px", color: "transparent", style: "solid" },
 }
 
 // Base container: grid and button positioning
@@ -53,14 +53,16 @@ const ContentWrapper = styled("div", {
     //  true: { marginLeft: "1.5rem" },
     },
     borders: Object.fromEntries(
-      Object.entries(borderMap).map(([key, { thickness, color }]) => [
+      Object.entries(borderMap).map(([key, { thickness, color, style }]) => [
         key === "default" ? undefined : key,
         {
           borderTopWidth: thickness,
           borderBottomWidth: thickness,
+          borderTopStyle: style,
+          borderBottomStyle: style,
           borderTopColor: color,
           borderBottomColor: color,
-          ...(key === "total" ? { paddingBottom: "0.75rem" } : {}),
+          ...(key === "total" ? { paddingBottom: "1rem" } : {}),
         },
       ])
     ),
