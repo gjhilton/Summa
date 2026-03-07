@@ -6,4 +6,9 @@ export default defineConfig({
 	exclude: [],
 	jsxFramework: 'react',
 	outdir: 'src/styled-system',
+	globalCss: {
+		body: {
+			fontFamily: "'Libre Baskerville', serif",
+		},
+	},
 });
