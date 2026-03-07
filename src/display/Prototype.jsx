@@ -1,6 +1,7 @@
 import React from "react"
 import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
+import { Button } from "./Button"
 
 // Map border variant to thickness and color
 const borderMap = {
@@ -24,6 +25,12 @@ const LeftButtonWrapper = styled("div", {
     left: 0,
     top: "50%",
     transform: "translateY(-50%)",
+  },
+})
+
+const PageWidth = styled("div", {
+  base: {
+  margin: "0 1.5rem" // same as ContentWrapper
   },
 })
 
@@ -261,7 +268,20 @@ export const ItemTotal = () =>
 
 export const HeaderEdit = () =>
 	<header>
-	edit buttons here
+	<PageWidth>
+	<Equally>
+
+
+<Button variant="primary">
+  Save
+</Button>
+<Button>Load</Button>
+<Button variant="danger">
+  Delete
+</Button>
+
+</Equally>	
+</PageWidth>
 	</header>
 
 export const ListOfItems = () =>
