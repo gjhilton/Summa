@@ -122,6 +122,14 @@ const LabelText = styled("sup", {
 })
 
 
+const PlainLabelText = styled("span", {
+  base: {
+    flexShrink: 0,
+    paddingLeft: "0.25rem",
+    paddingRight: "0.65rem",
+  },
+})
+
 const inputRecipe = cva({
   base: {
     border: "0",
@@ -190,11 +198,22 @@ export const TextField = ({
 	editable,
 	align
 }) =>
-<Box>
+<Box paddingRight="1.5rem">
 	<label>
 	   {label}
     	<TextInput value={value} editable={editable} align={align}/>
   </label>
+</Box>
+
+export const QuantityField = ({
+	value,
+	editable
+}) =>
+<Box paddingLeft="1rem">
+	<Label>
+		<TextInput align="r" value={value} editable={editable}/>
+		<PlainLabelText>@</PlainLabelText>
+	</Label>
 </Box>
 
 export const CurrencyField = ({
@@ -228,7 +247,7 @@ export const BlockTitle = ({
 	children,
 	editable
 }) =>
-	<Block bg="red.200">
+	<Block>
 	<Equally>
 		<TextField value={title} editable={editable}/>
 		{children}
@@ -252,7 +271,7 @@ export const ItemUnit = () =>
 export const ItemExtended = () =>
 	<Item>
 		<BlockTitle title="extended item" editable={true}>
-			<div>quantity</div>
+			<QuantityField editable={true}/>
 		</BlockTitle>
 		<BlockCurrency editable={true}/>
 		<BlockCurrency />
