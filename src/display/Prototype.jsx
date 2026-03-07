@@ -129,6 +129,7 @@ const inputRecipe = cva({
     borderBottomStyle: "solid",
     borderBottomColor: "transparent",
     flex: "1",
+    width: "100%",
     minWidth: "0",
     outline: "none",
     transition: "all 0.2s",
@@ -227,7 +228,7 @@ export const BlockTitle = ({
 	children,
 	editable
 }) =>
-	<Block>
+	<Block bg="red.200">
 	<Equally>
 		<TextField value={title} editable={editable}/>
 		{children}
@@ -250,7 +251,9 @@ export const ItemUnit = () =>
 
 export const ItemExtended = () =>
 	<Item>
-		<BlockTitle title="extended item" editable={true}/>
+		<BlockTitle title="extended item" editable={true}>
+			<div>quantity</div>
+		</BlockTitle>
 		<BlockCurrency editable={true}/>
 		<BlockCurrency />
 	</Item>
