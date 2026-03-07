@@ -14,8 +14,6 @@ const StyledItem = styled("div", {
   base: {
     position: "relative", // for absolute button
     marginBottom: "1rem",
-    display: "grid",
-    gridTemplateColumns: { base: "1fr", md: "repeat(auto-fit, minmax(0, 1fr))" },
   },
 })
 
@@ -32,7 +30,9 @@ const LeftButtonWrapper = styled("div", {
 // Content wrapper: contains the borders and margins
 const ContentWrapper = styled("div", {
   base: {
-    display: "block",
+    display: { base: "block", md: "flex" },
+    "& > *": { flex: "1" },
+    "& > *:last-child": { flex: "0 0 33.333%" },
     borderTopWidth: "1px",
     borderBottomWidth: "1px",
     borderTopStyle: "solid",
