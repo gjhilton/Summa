@@ -14,7 +14,7 @@ const borderMap = {
 const StyledItem = styled("div", {
   base: {
     position: "relative", // for absolute button
-    marginBottom: "1rem",
+    marginBottom: "3rem",
   },
 })
 
@@ -60,6 +60,7 @@ const ContentWrapper = styled("div", {
           borderBottomWidth: thickness,
           borderTopColor: color,
           borderBottomColor: color,
+          ...(key === "total" ? { paddingBottom: "0.75rem" } : {}),
         },
       ])
     ),
@@ -102,7 +103,7 @@ const Box = styled("div", {
 
 const Block = styled("div", {
   base: {
-    marginTop: "0.5rem",
+    marginTop: "1rem",
   },
 })
 
@@ -155,12 +156,11 @@ const inputRecipe = cva({
       true: {
         bg: "white",
         color: "black",
-        borderBottomColor: "black",
+        borderBottomColor: "rgba(0,0,0,0.1)",
+        _focus: { borderBottomColor: "black" },
       },
       false: {
-        fontStyle: "italic",
         borderBottomColor: "transparent",
-       // color: "gray.500",
       },
     },
   },
@@ -201,7 +201,7 @@ export const TextField = ({
 <Box paddingRight="1.5rem">
 	<label>
 	   {label}
-    	<TextInput value={value} editable={editable} align={align}/>
+    	<TextInput value={value} editable={editable} align={align} fontWeight="bold"/>
   </label>
 </Box>
 
@@ -209,8 +209,9 @@ export const QuantityField = ({
 	value,
 	editable
 }) =>
-<Box paddingLeft="1rem">
+<Box>
 	<Label>
+		<PlainLabelText fontSize="1.1em">✕</PlainLabelText>
 		<TextInput align="r" value={value} editable={editable}/>
 		<PlainLabelText>@</PlainLabelText>
 	</Label>
