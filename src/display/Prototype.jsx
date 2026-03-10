@@ -14,7 +14,7 @@ const borderMap = {
 const SwipeContext = React.createContext({ openId: null, setOpenId: () => {} })
 function useSwipeContext() { return React.useContext(SwipeContext) }
 
-function SwipeProvider({ children }) {
+export function SwipeProvider({ children }) {
   const [openId, setOpenId] = React.useState(null)
   return (
     <SwipeContext.Provider value={{ openId, setOpenId }}>
@@ -166,11 +166,54 @@ const ContentWrapper = styled("div", {
 // Detect if device supports hover (non-touch pointer)
 const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches
 
-// Component
-export function Item({ borders, leftButton, noSwipe, children, ...props }) {
+const SWIPE_WIDTH = "240px"
+const SWIPE_TRANSLATE = "translateX(-240px)"
+
+// Pure display component — no hooks, no state
+// isOpen and desktopVisible are passed in; all event handlers are props
+export function Item({
+  borders,
+  leftButton,
+  showActions = false,
+  isOpen = false,
+  desktopVisible = false,
+  onClose,
+  onTouchStart,
+  onTouchMove,
+  onTouchEnd,
+  children,
+  ...props
+}) {
+  return (
+    <StyledItem {...props}>
+      {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
+      {showActions && <ActionStrip onClose={onClose} desktopVisible={desktopVisible} />}
+      <ContentWrapper
+        hasButton={!!leftButton}
+        borders={borders}
+        style={{
+          transform: isOpen ? SWIPE_TRANSLATE : "translateX(0)",
+          transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
+          touchAction: showActions ? "pan-y" : undefined,
+          background: isOpen ? "#fef9e0" : "white",
+          boxShadow: isOpen ? "6px 0 16px rgba(0,0,0,0.3)" : "none",
+        }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {children}
+      </ContentWrapper>
+    </StyledItem>
+  )
+}
+
+// Stateful wrapper — wires up swipe context, touch handlers, and hover state
+// Use this in the app; use Item directly in Storybook
+export function SwipeableItem({ children, ...props }) {
   const id = React.useId()
   const { openId, setOpenId } = useSwipeContext()
-  const isOpen = !noSwipe && openId === id
+  const isOpen = openId === id
   const [hovered, setHovered] = React.useState(false)
   const startX = React.useRef(null)
   const startY = React.useRef(null)
@@ -202,32 +245,23 @@ export function Item({ borders, leftButton, noSwipe, children, ...props }) {
   }
 
   return (
-    <StyledItem
+    <Item
       {...props}
-      onMouseEnter={!noSwipe && canHover ? () => setHovered(true) : undefined}
-      onMouseLeave={!noSwipe && canHover ? () => setHovered(false) : undefined}
+      showActions
+      isOpen={isOpen}
+      desktopVisible={canHover && hovered}
+      onClose={onClose}
+      onMouseEnter={canHover ? () => setHovered(true) : undefined}
+      onMouseLeave={canHover ? () => setHovered(false) : undefined}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
-      {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
-      {!noSwipe && <ActionStrip onClose={onClose} desktopVisible={canHover && hovered} />}
-      <ContentWrapper
-        hasButton={!!leftButton}
-        borders={borders}
-        style={{
-          transform: isOpen ? "translateX(-240px)" : "translateX(0)",
-          transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
-          touchAction: noSwipe ? undefined : "pan-y",
-          background: isOpen ? "#fef9e0" : "white",
-          boxShadow: isOpen ? "6px 0 16px rgba(0,0,0,0.3)" : "none",
-        }}
-        onTouchStart={noSwipe ? undefined : onTouchStart}
-        onTouchMove={noSwipe ? undefined : onTouchMove}
-        onTouchEnd={noSwipe ? undefined : onTouchEnd}
-      >
-        {children}
-      </ContentWrapper>
-    </StyledItem>
+      {children}
+    </Item>
   )
 }
+
 
 
 // -------- 
@@ -410,28 +444,28 @@ editable
 	</Block>
 
 export const ItemUnit = () =>
-	<Item>
+	<SwipeableItem>
 		<BlockTitle title="unit item" editable={true}/>
 		<BlockCurrency editable={true}/>
-	</Item>
+	</SwipeableItem>
 
 export const ItemExtended = () =>
-	<Item>
+	<SwipeableItem>
 		<BlockTitle title="extended item" editable={true}>
 			<QuantityField editable={true}/>
 		</BlockTitle>
 		<BlockCurrency editable={true}/>
 		<BlockCurrency />
-	</Item>
+	</SwipeableItem>
 
 export const ItemSubTotal = () =>
-	<Item borders="subtotal">
+	<SwipeableItem borders="subtotal">
 		<BlockTitle title="subtotal" editable={false}/>
 		<BlockCurrency />
-	</Item>
+	</SwipeableItem>
 
 export const ItemTotal = () =>
-	<Item borders="total" noSwipe>
+	<Item borders="total">
 		<BlockTitle title="total" editable={false}/>
 		<BlockCurrency />
 	</Item>
