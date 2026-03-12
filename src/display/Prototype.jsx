@@ -453,6 +453,60 @@ const PageWidth = styled("div", {
   base: { margin: "0 1.5rem" },
 })
 
+const FooterBar = styled("footer", {
+  base: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: "1rem",
+    margin: "3rem 1.5rem 1.5rem",
+    marginTop: "auto",
+  },
+})
+
+const FooterText = styled("div", {
+  base: {
+    fontStyle: "italic",
+  },
+})
+
+const FooterLink = styled("a", {
+  base: {
+    color: "inherit",
+    textDecoration: "underline",
+  },
+})
+
+const HelpButton = styled("button", {
+  base: {
+    flexShrink: 0,
+    fontFamily: "inherit",
+    fontWeight: "bold",
+    fontStyle: "normal",
+    cursor: "pointer",
+    textDecoration: "underline",
+    color: "blue",
+    background: "none",
+    border: "none",
+    padding: "0",
+    _hover: { opacity: 0.6 },
+  },
+})
+
+const GITHUB_URL = "https://github.com/gjhilton/Summa"
+const FUNERAL_GAMES_URL = "http://funeralgames.co.uk"
+
+export const FooterEdit = ({ onHelp }) =>
+  <FooterBar>
+    <FooterText>
+      Summa v{__APP_VERSION__}. Concept, design and{" "}
+      <FooterLink href={GITHUB_URL} title="Summa on GitHub">code</FooterLink>
+      {" "}copyright ©2026 g.j.hilton /{" "}
+      <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games">funeral games</FooterLink>.
+    </FooterText>
+    {onHelp && <HelpButton type="button" onClick={onHelp}>Help</HelpButton>}
+  </FooterBar>
+
 const Header = styled("header", {
   base: { margin: "1rem 0 3rem" },
 })
@@ -487,8 +541,17 @@ export const ListOfItems = () =>
     </section>
   </SwipeProvider>
 
+const ScreenContainer = styled("main", {
+  base: {
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "100dvh",
+  },
+})
+
 export const ScreenMain = () =>
-  <main>
+  <ScreenContainer>
     <HeaderEdit />
     <ListOfItems />
-  </main>
+    <FooterEdit onHelp={() => {}} />
+  </ScreenContainer>
