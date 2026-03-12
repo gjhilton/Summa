@@ -514,6 +514,30 @@ export const ItemTotal = () =>
     <BlockCurrency />
   </Item>
 
+// ─── Add item bar ─────────────────────────────────────────────────────────────
+
+const AddBar = styled("div", {
+  base: {
+    display: "flex",
+    gap: "0.5rem",
+    padding: "0.25rem 1.5rem",
+    justifyContent: { md: "flex-end" },
+  },
+})
+
+const PlusIcon = () => <strong>+</strong>
+
+export const AddItemBar = ({ advanced, onAdd, onAddUnit, onAddExtended, onAddSubtotal }) =>
+  <AddBar>
+    {advanced ? <>
+      <Button icon={PlusIcon} onClick={onAddUnit}>item</Button>
+      <Button icon={PlusIcon} onClick={onAddExtended}>extended</Button>
+      <Button icon={PlusIcon} onClick={onAddSubtotal}>subtotal</Button>
+    </> : (
+      <Button icon={PlusIcon} onClick={onAdd}>item</Button>
+    )}
+  </AddBar>
+
 // ─── Screen components ────────────────────────────────────────────────────────
 
 const PageWidth = styled("div", {
@@ -568,7 +592,7 @@ export const FooterEdit = ({ onHelp }) =>
       {" "}copyright ©2026 g.j.hilton /{" "}
       <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games" target="_blank" rel="noopener noreferrer">funeral games</FooterLink>.
     </FooterText>
-    {onHelp && <HelpButton type="button" onClick={onHelp}>Help</HelpButton>}
+    {onHelp && <HelpButton type="button" onClick={onHelp}>help</HelpButton>}
   </FooterBar>
 
 const Header = styled("header", {
@@ -580,6 +604,7 @@ const HeaderBar = styled("div", {
     display: "grid",
     gridTemplateColumns: "auto auto 1fr auto",
     alignItems: "center",
+    gap: "0.5rem",
   },
 })
 
@@ -587,10 +612,10 @@ export const HeaderEdit = () =>
   <Header>
     <PageWidth>
       <HeaderBar>
-        <Button variant="primary">Save</Button>
-        <Button>Load</Button>
+        <Button variant="primary">export</Button>
+        <Button>load</Button>
         <div />
-        <Button variant="danger">Clear</Button>
+        <Button variant="danger">clear</Button>
       </HeaderBar>
     </PageWidth>
   </Header>
@@ -601,6 +626,7 @@ export const ListOfItems = () =>
       <ItemUnit />
       <ItemExtended />
       <ItemSubTotal />
+      <AddItemBar advanced onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
       <ItemTotal />
     </section>
   </SwipeProvider>

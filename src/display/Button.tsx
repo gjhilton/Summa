@@ -1,3 +1,4 @@
+import React from 'react'
 import { styled } from "../styled-system/jsx"
 import { cva, type RecipeVariantProps } from "../styled-system/css"
 
@@ -8,6 +9,7 @@ const buttonRecipe = cva({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    columnGap: "0.35em",
 
     px: "4",
     py: "2",
@@ -81,6 +83,18 @@ const buttonRecipe = cva({
 type ButtonVariants = RecipeVariantProps<typeof buttonRecipe>
 
 export type ButtonProps =
-  React.ButtonHTMLAttributes<HTMLButtonElement> & ButtonVariants
+  React.ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonVariants & {
+    icon?: React.ComponentType
+  }
 
-export const Button = styled("button", buttonRecipe)
+const StyledButton = styled("button", buttonRecipe)
+
+export function Button({ icon: Icon, children, ...props }: ButtonProps) {
+  return (
+    <StyledButton {...props}>
+      {Icon && <Icon />}
+      {children}
+    </StyledButton>
+  )
+}

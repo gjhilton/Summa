@@ -1,5 +1,5 @@
 import React from "react"
-import { HeaderEdit, FooterEdit, ListOfItems, ScreenMain } from "../Prototype"
+import { HeaderEdit, FooterEdit, ListOfItems, ScreenMain, AddItemBar } from "../Prototype"
 
 export default {
   title: "Prototype/Screen",
@@ -52,6 +52,30 @@ export const FooterWithHelp = {
     ),
   ],
   render: () => <FooterEdit onHelp={() => alert("Help!")} />,
+}
+
+export const AddBarDefault = {
+  name: "AddItemBar — default",
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => <AddItemBar onAdd={() => {}} />,
+}
+
+export const AddBarAdvanced = {
+  name: "AddItemBar — advanced",
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => <AddItemBar advanced onAddUnit={() => {}} onAddExtended={() => {}} onAddSubtotal={() => {}} />,
 }
 
 export const Full = {
