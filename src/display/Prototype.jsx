@@ -104,6 +104,14 @@ const StyledItem = styled("div", {
     overflow: "hidden",
     marginBottom: "0.25rem",
   },
+  variants: {
+    sideMargins: {
+      true: {
+        marginLeft: { md: "1.5rem" },
+        marginRight: { md: "1.5rem" },
+      },
+    },
+  },
 })
 
 // Button wrapper: absolutely positioned outside content
@@ -142,6 +150,12 @@ const ContentWrapper = styled("div", {
     hasButton: {
     //  true: { marginLeft: "1.5rem" },
     },
+    sideMargins: {
+      true: {
+        paddingLeft: { md: "0" },
+        paddingRight: { md: "0" },
+      },
+    },
     borders: Object.fromEntries(
       Object.entries(borderMap).map(([key, { thickness, color, style }]) => [
         key === "default" ? undefined : key,
@@ -174,6 +188,7 @@ const SWIPE_TRANSLATE = "translateX(-240px)"
 export function Item({
   borders,
   leftButton,
+  sideMargins = false,
   showActions = false,
   isOpen = false,
   desktopVisible = false,
@@ -185,12 +200,13 @@ export function Item({
   ...props
 }) {
   return (
-    <StyledItem {...props}>
+    <StyledItem sideMargins={sideMargins || undefined} {...props}>
       {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
       {showActions && <ActionStrip onClose={onClose} desktopVisible={desktopVisible} />}
       <ContentWrapper
         hasButton={!!leftButton}
         borders={borders}
+        sideMargins={sideMargins || undefined}
         style={{
           transform: isOpen ? SWIPE_TRANSLATE : "translateX(0)",
           transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
@@ -465,7 +481,7 @@ export const ItemSubTotal = () =>
 	</SwipeableItem>
 
 export const ItemTotal = () =>
-	<Item borders="total">
+	<Item borders="total" sideMargins>
 		<BlockTitle title="total" editable={false}/>
 		<BlockCurrency />
 	</Item>
