@@ -101,8 +101,8 @@ function ActionStrip({ onClose, desktopVisible }) {
 const StyledItem = styled("div", {
   base: {
     position: "relative",
-    marginBottom: "3rem",
     overflow: "hidden",
+    marginBottom: "0.25rem",
   },
 })
 
@@ -136,7 +136,7 @@ const ContentWrapper = styled("div", {
     borderBottomStyle: "solid",
     borderTopColor: "transparent",
     borderBottomColor: "transparent",
-    padding: "0 1.5rem",
+    padding: "1rem 1.5rem",
   },
   variants: {
     hasButton: {
