@@ -3,13 +3,6 @@ import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
 import { Button } from "./Button"
 
-// ─── Border variants ──────────────────────────────────────────────────────────
-
-const borderMap = {
-  subtotal: { thickness: "1px", color: "transparent", style: "solid" },
-  total:    { thickness: "3px", color: "black",       style: "double" },
-}
-
 // ─── Swipe context ────────────────────────────────────────────────────────────
 
 const SwipeContext = React.createContext({ openId: null, setOpenId: () => {} })
@@ -40,7 +33,6 @@ const ActionStripWrapper = styled("div", {
     bottom: 0,
     width: "240px",
     display: "flex",
-    flexDirection: "row",
     zIndex: 1,
     overflow: "hidden",
     background: "#e8e8e8",
@@ -53,7 +45,6 @@ const ActionStripWrapper = styled("div", {
       false: { opacity: 0, transform: "translateX(12px)", pointerEvents: "none" },
     },
   },
-  defaultVariants: { visible: true },
 })
 
 const ActionButton = styled("button", {
@@ -168,20 +159,17 @@ const ContentWrapper = styled("div", {
         paddingRight: { md: "0" },
       },
     },
-    borders: Object.fromEntries(
-      Object.entries(borderMap).map(([key, { thickness, color, style }]) => [
-        key,
-        {
-          borderTopWidth: thickness,
-          borderBottomWidth: thickness,
-          borderTopStyle: style,
-          borderBottomStyle: style,
-          borderTopColor: color,
-          borderBottomColor: color,
-          ...(key === "total" ? { paddingBottom: "1rem" } : {}),
-        },
-      ])
-    ),
+    borders: {
+      total: {
+        borderTopWidth: "3px",
+        borderBottomWidth: "3px",
+        borderTopStyle: "double",
+        borderBottomStyle: "double",
+        borderTopColor: "black",
+        borderBottomColor: "black",
+        paddingBottom: "1rem",
+      },
+    },
   },
   defaultVariants: { open: false },
 })
@@ -283,7 +271,6 @@ const Equally = styled("div", {
   base: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(0, 1fr))",
-    gap: "0",
   },
 })
 
@@ -302,28 +289,20 @@ const Label = styled("label", {
   },
 })
 
-const LabelText = styled("sup", {
+// Shared base for inline label annotations (currency symbols, operators)
+const FieldAnnotation = styled("span", {
   base: {
     flexShrink: 0,
     paddingLeft: "0.25rem",
     paddingRight: "0.65rem",
   },
-})
-
-const PlainLabelText = styled("span", {
-  base: {
-    flexShrink: 0,
-    paddingLeft: "0.25rem",
-    paddingRight: "0.65rem",
-  },
-})
-
-const MultiplySymbol = styled("span", {
-  base: {
-    flexShrink: 0,
-    paddingLeft: "0.25rem",
-    paddingRight: "0.65rem",
-    fontSize: "1.1em",
+  variants: {
+    large: {
+      true: { fontSize: "1.1em" },
+    },
+    sup: {
+      true: { verticalAlign: "super", fontSize: "0.75em" },
+    },
   },
 })
 
@@ -392,15 +371,15 @@ export const TextField = ({ value, label, editable, align }) =>
 
 export const QuantityField = ({ value, editable }) =>
   <Label>
-    <MultiplySymbol>✕</MultiplySymbol>
+    <FieldAnnotation large>✕</FieldAnnotation>
     <TextInput align="r" value={value} editable={editable} />
-    <PlainLabelText>@</PlainLabelText>
+    <FieldAnnotation>@</FieldAnnotation>
   </Label>
 
 export const CurrencyField = ({ value, label, editable }) =>
   <Label>
     <TextInput align="r" value={value} editable={editable} />
-    <LabelText>{label}</LabelText>
+    <FieldAnnotation sup>{label}</FieldAnnotation>
   </Label>
 
 export const Currency = ({ editable, values = { l: "x", s: "vj", d: "iij" } }) =>
@@ -485,6 +464,7 @@ export function Logo({ size = "m" }) {
   )
 }
 
+// ─── Composite item components ────────────────────────────────────────────────
 
 const EditLink = styled("button", {
   base: {
@@ -502,8 +482,6 @@ const EditLink = styled("button", {
   },
 })
 
-// ─── Composite item components ────────────────────────────────────────────────
-
 export const ItemUnit = () =>
   <SwipeableItem>
     <BlockTitle title="unit item" editable={true} />
@@ -520,7 +498,7 @@ export const ItemExtended = () =>
   </SwipeableItem>
 
 export const ItemSubTotal = ({ count = 0, onEdit }) =>
-  <SwipeableItem borders="subtotal">
+  <SwipeableItem>
     <Block>
       <Label>
         <TextInput value={`subtotal (${count} items)`} editable={false} bold="true" />
@@ -548,15 +526,12 @@ const FooterBar = styled("footer", {
     alignItems: "baseline",
     justifyContent: "space-between",
     gap: "1rem",
-    margin: "3rem 1.5rem 1.5rem",
-    marginTop: "auto",
+    margin: "auto 1.5rem 1.5rem",
   },
 })
 
 const FooterText = styled("div", {
-  base: {
-    fontStyle: "italic",
-  },
+  base: { fontStyle: "italic" },
 })
 
 const FooterLink = styled("a", {
@@ -589,9 +564,9 @@ export const FooterEdit = ({ onHelp }) =>
   <FooterBar>
     <FooterText>
       Summa v{__APP_VERSION__}. Concept, design and{" "}
-      <FooterLink href={GITHUB_URL} title="Summa on GitHub">code</FooterLink>
+      <FooterLink href={GITHUB_URL} title="Summa on GitHub" target="_blank" rel="noopener noreferrer">code</FooterLink>
       {" "}copyright ©2026 g.j.hilton /{" "}
-      <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games">funeral games</FooterLink>.
+      <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games" target="_blank" rel="noopener noreferrer">funeral games</FooterLink>.
     </FooterText>
     {onHelp && <HelpButton type="button" onClick={onHelp}>Help</HelpButton>}
   </FooterBar>

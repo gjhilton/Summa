@@ -10,6 +10,10 @@ export default {
     config.css = {
       postcss: "src/config/postcss.config.cjs",
     }
+    config.define = {
+      ...config.define,
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? "0.0.0"),
+    }
     return config
   },
 }
