@@ -485,6 +485,23 @@ export function Logo({ size = "m" }) {
   )
 }
 
+
+const EditLink = styled("button", {
+  base: {
+    flexShrink: 0,
+    fontFamily: "inherit",
+    fontStyle: "italic",
+    fontSize: "0.85em",
+    cursor: "pointer",
+    background: "none",
+    border: "none",
+    padding: "0 0.5rem",
+    textDecoration: "underline",
+    opacity: 0.45,
+    _hover: { opacity: 1 },
+  },
+})
+
 // ─── Composite item components ────────────────────────────────────────────────
 
 export const ItemUnit = () =>
@@ -502,9 +519,14 @@ export const ItemExtended = () =>
     <BlockCurrency />
   </SwipeableItem>
 
-export const ItemSubTotal = () =>
+export const ItemSubTotal = ({ count = 0, onEdit }) =>
   <SwipeableItem borders="subtotal">
-    <BlockTitle title="subtotal" editable={false} />
+    <Block>
+      <Label>
+        <TextInput value={`subtotal (${count} items)`} editable={false} bold="true" />
+        <EditLink type="button" onClick={onEdit}>edit</EditLink>
+      </Label>
+    </Block>
     <BlockCurrency />
   </SwipeableItem>
 
