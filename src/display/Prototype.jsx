@@ -3,14 +3,15 @@ import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
 import { Button } from "./Button"
 
-// Map border variant to thickness and color
+// ─── Border variants ──────────────────────────────────────────────────────────
+
 const borderMap = {
   subtotal: { thickness: "1px", color: "transparent", style: "solid" },
-  total: { thickness: "3px", color: "black", style: "double" },
-  default: { thickness: "1px", color: "transparent", style: "solid" },
+  total:    { thickness: "3px", color: "black",       style: "double" },
 }
 
-// Swipe context — tracks which item's action strip is open
+// ─── Swipe context ────────────────────────────────────────────────────────────
+
 const SwipeContext = React.createContext({ openId: null, setOpenId: () => {} })
 function useSwipeContext() { return React.useContext(SwipeContext) }
 
@@ -23,7 +24,14 @@ export function SwipeProvider({ children }) {
   )
 }
 
-// Action strip — revealed on swipe left
+// ─── Hover capability (evaluated once at module load) ─────────────────────────
+
+const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches
+
+// ─── Action strip ─────────────────────────────────────────────────────────────
+
+// visible: true  = opaque and interactive
+// visible: false = faded and non-interactive (desktop hover devices only)
 const ActionStripWrapper = styled("div", {
   base: {
     position: "absolute",
@@ -37,67 +45,63 @@ const ActionStripWrapper = styled("div", {
     overflow: "hidden",
     background: "#e8e8e8",
     boxShadow: "inset 8px 0 16px -4px rgba(0,0,0,0.25)",
+    transition: "opacity 0.2s ease, transform 0.2s ease",
+  },
+  variants: {
+    visible: {
+      true:  { opacity: 1, transform: "translateX(0)",    pointerEvents: "auto" },
+      false: { opacity: 0, transform: "translateX(12px)", pointerEvents: "none" },
+    },
+  },
+  defaultVariants: { visible: true },
+})
+
+const ActionButton = styled("button", {
+  base: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "2px",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "0.65rem",
+    fontFamily: "inherit",
+    color: "#333",
+    padding: "0 4px",
+    lineHeight: 1.2,
+    background: "transparent",
   },
 })
 
-const actionButtonBase = {
-  flex: 1,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "2px",
-  border: "none",
-  cursor: "pointer",
-  fontSize: "0.65rem",
-  fontFamily: "inherit",
-  color: "white",
-  padding: "0 4px",
-  lineHeight: 1.2,
-}
+const ActionButtonIcon = styled("span", {
+  base: { fontSize: "1rem" },
+})
 
 function ActionStrip({ onClose, desktopVisible }) {
-  // Touch devices: strip is always opaque — content slides away to reveal it
-  // Hover devices: strip fades in/out on row hover
-  const style = canHover
-    ? {
-        opacity: desktopVisible ? 1 : 0,
-        transform: desktopVisible ? "translateX(0)" : "translateX(12px)",
-        transition: "opacity 0.2s ease, transform 0.2s ease",
-        pointerEvents: desktopVisible ? "auto" : "none",
-      }
-    : {}
+  // Touch: always visible. Desktop: fades in/out on row hover.
+  const visible = !canHover || desktopVisible
   return (
-    <ActionStripWrapper style={style}>
-      <button
-        style={{ ...actionButtonBase, background: "transparent", color: "#333" }}
-        onClick={onClose}
-        aria-label="Delete row"
-      >
-        <span style={{ fontSize: "1rem" }}>🗑</span>
+    <ActionStripWrapper visible={visible}>
+      <ActionButton onClick={onClose} aria-label="Delete row">
+        <ActionButtonIcon>🗑</ActionButtonIcon>
         Delete
-      </button>
-      <button
-        style={{ ...actionButtonBase, background: "transparent", color: "#333" }}
-        onClick={onClose}
-        aria-label="Duplicate row"
-      >
-        <span style={{ fontSize: "1rem" }}>⧉</span>
+      </ActionButton>
+      <ActionButton onClick={onClose} aria-label="Duplicate row">
+        <ActionButtonIcon>⧉</ActionButtonIcon>
         Duplicate
-      </button>
-      <button
-        style={{ ...actionButtonBase, background: "transparent", color: "#333" }}
-        onClick={onClose}
-        aria-label="Clear item"
-      >
-        <span style={{ fontSize: "1rem" }}>✕</span>
+      </ActionButton>
+      <ActionButton onClick={onClose} aria-label="Clear item">
+        <ActionButtonIcon>✕</ActionButtonIcon>
         Clear
-      </button>
+      </ActionButton>
     </ActionStripWrapper>
   )
 }
 
-// Base container: grid and button positioning
+// ─── Item layout ──────────────────────────────────────────────────────────────
+
 const StyledItem = styled("div", {
   base: {
     position: "relative",
@@ -114,7 +118,6 @@ const StyledItem = styled("div", {
   },
 })
 
-// Button wrapper: absolutely positioned outside content
 const LeftButtonWrapper = styled("div", {
   base: {
     position: "absolute",
@@ -124,13 +127,6 @@ const LeftButtonWrapper = styled("div", {
   },
 })
 
-const PageWidth = styled("div", {
-  base: {
-  margin: "0 1.5rem" // same as ContentWrapper
-  },
-})
-
-// Content wrapper: contains the borders and margins
 const ContentWrapper = styled("div", {
   base: {
     position: "relative",
@@ -145,10 +141,23 @@ const ContentWrapper = styled("div", {
     borderTopColor: "transparent",
     borderBottomColor: "transparent",
     padding: "1rem 1.5rem",
+    transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
   },
   variants: {
-    hasButton: {
-    //  true: { marginLeft: "1.5rem" },
+    open: {
+      true: {
+        transform: "translateX(-240px)",
+        background: "#fef9e0",
+        boxShadow: "6px 0 16px rgba(0,0,0,0.3)",
+      },
+      false: {
+        transform: "translateX(0)",
+        background: "white",
+        boxShadow: "none",
+      },
+    },
+    swipeable: {
+      true: { touchAction: "pan-y" },
     },
     sideMargins: {
       true: {
@@ -158,7 +167,7 @@ const ContentWrapper = styled("div", {
     },
     borders: Object.fromEntries(
       Object.entries(borderMap).map(([key, { thickness, color, style }]) => [
-        key === "default" ? undefined : key,
+        key,
         {
           borderTopWidth: thickness,
           borderBottomWidth: thickness,
@@ -171,20 +180,11 @@ const ContentWrapper = styled("div", {
       ])
     ),
   },
-  defaultVariants: {
-    hasButton: false,
-    borders: undefined,
-  },
+  defaultVariants: { open: false },
 })
 
-// Detect if device supports hover (non-touch pointer)
-const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches
+// ─── Item — pure display component ───────────────────────────────────────────
 
-const SWIPE_WIDTH = "240px"
-const SWIPE_TRANSLATE = "translateX(-240px)"
-
-// Pure display component — no hooks, no state
-// isOpen and desktopVisible are passed in; all event handlers are props
 export function Item({
   borders,
   leftButton,
@@ -204,16 +204,10 @@ export function Item({
       {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
       {showActions && <ActionStrip onClose={onClose} desktopVisible={desktopVisible} />}
       <ContentWrapper
-        hasButton={!!leftButton}
         borders={borders}
+        open={isOpen}
+        swipeable={showActions || undefined}
         sideMargins={sideMargins || undefined}
-        style={{
-          transform: isOpen ? SWIPE_TRANSLATE : "translateX(0)",
-          transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
-          touchAction: showActions ? "pan-y" : undefined,
-          background: isOpen ? "#fef9e0" : "white",
-          boxShadow: isOpen ? "6px 0 16px rgba(0,0,0,0.3)" : "none",
-        }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -224,8 +218,8 @@ export function Item({
   )
 }
 
-// Stateful wrapper — wires up swipe context, touch handlers, and hover state
-// Use this in the app; use Item directly in Storybook
+// ─── SwipeableItem — stateful container ──────────────────────────────────────
+
 export function SwipeableItem({ children, ...props }) {
   const id = React.useId()
   const { openId, setOpenId } = useSwipeContext()
@@ -278,29 +272,22 @@ export function SwipeableItem({ children, ...props }) {
   )
 }
 
+// ─── Field primitives ─────────────────────────────────────────────────────────
 
-
-// -------- 
-
-// container: always equal columns
 const Equally = styled("div", {
   base: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(0, 1fr))", // all children equal width
+    gridTemplateColumns: "repeat(auto-fit, minmax(0, 1fr))",
     gap: "0",
   },
 })
 
-const Box = styled("div", {
-  base: {
-    // bg: "gray.100"
-  },
+const TextFieldBox = styled("div", {
+  base: { paddingRight: "1.5rem" },
 })
 
 const Block = styled("div", {
-  base: {
-    marginTop: "1rem",
-  },
+  base: { marginTop: "1rem" },
 })
 
 const Label = styled("label", {
@@ -318,12 +305,20 @@ const LabelText = styled("sup", {
   },
 })
 
-
 const PlainLabelText = styled("span", {
   base: {
     flexShrink: 0,
     paddingLeft: "0.25rem",
     paddingRight: "0.65rem",
+  },
+})
+
+const MultiplySymbol = styled("span", {
+  base: {
+    flexShrink: 0,
+    paddingLeft: "0.25rem",
+    paddingRight: "0.65rem",
+    fontSize: "1.1em",
   },
 })
 
@@ -341,13 +336,9 @@ const inputRecipe = cva({
   },
   variants: {
     align: {
-		l: {
-			textAlign: "left"
-		},
-		r: {
-		textAlign: "right"
-		}
-	},
+      l: { textAlign: "left" },
+      r: { textAlign: "right" },
+    },
     editable: {
       true: {
         bg: "transparent",
@@ -359,27 +350,25 @@ const inputRecipe = cva({
         borderBottomColor: "transparent",
       },
     },
+    bold: {
+      true: { fontWeight: "bold" },
+    },
   },
   defaultVariants: {
-  align: "left",
+    align: "l",
     editable: false,
+    bold: false,
   },
 })
 
 const StyledInput = styled("input", inputRecipe)
 
+// ─── Exported field components ────────────────────────────────────────────────
 
-/* ----- exported components ---- */
-
-export function TextInput({ 
-	editable, 
-	value, 
-	onChange, 
-	...props
-}) {
+export function TextInput({ editable, value, onChange, ...props }) {
   return (
     <StyledInput
-      editable={editable ? "true" : "false"} // recipe expects string "true"/"false"
+      editable={editable ? "true" : "false"}
       value={value}
       onChange={editable ? onChange : undefined}
       readOnly={!editable}
@@ -388,108 +377,84 @@ export function TextInput({
   )
 }
 
-export const TextField = ({
-	value,
-	label,
-	editable,
-	align
-}) =>
-<Box paddingRight="1.5rem">
-	<label>
-	   {label}
-    	<TextInput value={value} editable={editable} align={align} fontWeight="bold"/>
-  </label>
-</Box>
+export const TextField = ({ value, label, editable, align }) =>
+  <TextFieldBox>
+    <Label>
+      {label}
+      <TextInput value={value} editable={editable} align={align} bold="true" />
+    </Label>
+  </TextFieldBox>
 
-export const QuantityField = ({
-	value,
-	editable
-}) =>
-<Box>
-	<Label>
-		<PlainLabelText fontSize="1.1em">✕</PlainLabelText>
-		<TextInput align="r" value={value} editable={editable}/>
-		<PlainLabelText>@</PlainLabelText>
-	</Label>
-</Box>
+export const QuantityField = ({ value, editable }) =>
+  <Label>
+    <MultiplySymbol>✕</MultiplySymbol>
+    <TextInput align="r" value={value} editable={editable} />
+    <PlainLabelText>@</PlainLabelText>
+  </Label>
 
-export const CurrencyField = ({
-	value,
-	label,
-	editable
-}) =>
-<Box>
-	<Label>
-		<TextInput align="r" value={value} editable={editable}/>
-		<LabelText>{label}</LabelText>
-	</Label>
-</Box>
+export const CurrencyField = ({ value, label, editable }) =>
+  <Label>
+    <TextInput align="r" value={value} editable={editable} />
+    <LabelText>{label}</LabelText>
+  </Label>
 
-export const Currency = ({
-	editable,
-	values = {
-		l: "x",
-		s: "vj",
-		d: "iij"
-	}
-}) =>
-	<Equally>
-		<CurrencyField label="li" editable={editable} value={values.l}/>
-		<CurrencyField label="s" editable={editable} value={values.s}/>
-		<CurrencyField label="d" editable={editable} value={values.d}/>
-	</Equally>
+export const Currency = ({ editable, values = { l: "x", s: "vj", d: "iij" } }) =>
+  <Equally>
+    <CurrencyField label="li" editable={editable} value={values.l} />
+    <CurrencyField label="s"  editable={editable} value={values.s} />
+    <CurrencyField label="d"  editable={editable} value={values.d} />
+  </Equally>
 
-export const BlockTitle = ({
-	title,
-	children,
-	editable
-}) =>
-	<Block>
-	<Equally>
-		<TextField value={title} editable={editable}/>
-		{children}
-		</Equally>
-	</Block>
+export const BlockTitle = ({ title, children, editable }) =>
+  <Block>
+    <Equally>
+      <TextField value={title} editable={editable} />
+      {children}
+    </Equally>
+  </Block>
 
-export const BlockCurrency = ({
-children,
-editable
-}) =>
-	<Block>
-		<Currency editable={editable}/>
-	</Block>
+export const BlockCurrency = ({ editable }) =>
+  <Block>
+    <Currency editable={editable} />
+  </Block>
+
+// ─── Composite item components ────────────────────────────────────────────────
 
 export const ItemUnit = () =>
-	<SwipeableItem>
-		<BlockTitle title="unit item" editable={true}/>
-		<BlockCurrency editable={true}/>
-	</SwipeableItem>
+  <SwipeableItem>
+    <BlockTitle title="unit item" editable={true} />
+    <BlockCurrency editable={true} />
+  </SwipeableItem>
 
 export const ItemExtended = () =>
-	<SwipeableItem>
-		<BlockTitle title="extended item" editable={true}>
-			<QuantityField editable={true}/>
-		</BlockTitle>
-		<BlockCurrency editable={true}/>
-		<BlockCurrency />
-	</SwipeableItem>
+  <SwipeableItem>
+    <BlockTitle title="extended item" editable={true}>
+      <QuantityField editable={true} />
+    </BlockTitle>
+    <BlockCurrency editable={true} />
+    <BlockCurrency />
+  </SwipeableItem>
 
 export const ItemSubTotal = () =>
-	<SwipeableItem borders="subtotal">
-		<BlockTitle title="subtotal" editable={false}/>
-		<BlockCurrency />
-	</SwipeableItem>
+  <SwipeableItem borders="subtotal">
+    <BlockTitle title="subtotal" editable={false} />
+    <BlockCurrency />
+  </SwipeableItem>
 
 export const ItemTotal = () =>
-	<Item borders="total" sideMargins>
-		<BlockTitle title="total" editable={false}/>
-		<BlockCurrency />
-	</Item>
+  <Item borders="total" sideMargins>
+    <BlockTitle title="total" editable={false} />
+    <BlockCurrency />
+  </Item>
+
+// ─── Screen components ────────────────────────────────────────────────────────
+
+const PageWidth = styled("div", {
+  base: { margin: "0 1.5rem" },
+})
 
 const Header = styled("header", {
-  base: {
-    margin: "1rem 0 3rem"
-  },
+  base: { margin: "1rem 0 3rem" },
 })
 
 const HeaderBar = styled("div", {
@@ -501,31 +466,29 @@ const HeaderBar = styled("div", {
 })
 
 export const HeaderEdit = () =>
-	<Header>
-		<PageWidth>
-			<HeaderBar>
-				<Button variant="primary">Save</Button>
-				<Button>Load</Button>
-				<div />
-				<Button variant="danger">Clear</Button>
-			</HeaderBar>
-		</PageWidth>
-	</Header>
+  <Header>
+    <PageWidth>
+      <HeaderBar>
+        <Button variant="primary">Save</Button>
+        <Button>Load</Button>
+        <div />
+        <Button variant="danger">Clear</Button>
+      </HeaderBar>
+    </PageWidth>
+  </Header>
 
 export const ListOfItems = () =>
-	<SwipeProvider>
-		<section>
-			<ItemUnit/>
-			<ItemExtended />
-			<ItemSubTotal />
-			<ItemTotal />
-		</section>
-	</SwipeProvider>
+  <SwipeProvider>
+    <section>
+      <ItemUnit />
+      <ItemExtended />
+      <ItemSubTotal />
+      <ItemTotal />
+    </section>
+  </SwipeProvider>
 
 export const ScreenMain = () =>
-	<main>
-		<HeaderEdit />
-		<ListOfItems/>
-	</main>
-	
-
+  <main>
+    <HeaderEdit />
+    <ListOfItems />
+  </main>
