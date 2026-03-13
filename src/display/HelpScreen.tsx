@@ -1,7 +1,7 @@
-import { Button } from './Button'
-import { ScreenHeader } from './Header'
-import { ScreenFooter } from './Footer'
-import { ScreenContainer } from './ScreenContainer'
+import { Button } from './shared/Button'
+import { ScreenHeader } from './shared/Header'
+import { ScreenFooter } from './shared/Footer'
+import { ScreenContainer } from './shared/ScreenContainer'
 
 interface Props {
   onBack?: () => void

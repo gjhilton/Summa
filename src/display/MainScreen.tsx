@@ -1,17 +1,24 @@
 import React from 'react'
 import { styled } from '@/styled-system/jsx'
 import { cva } from '@/styled-system/css'
-import { Button } from './Button'
-import { ScreenHeader, HeaderSpacer } from './Header'
-import { ScreenFooter } from './Footer'
-import { ScreenContainer } from './ScreenContainer'
+import { Button } from './shared/Button'
+import { ScreenHeader, HeaderSpacer } from './shared/Header'
+import { ScreenFooter } from './shared/Footer'
+import { ScreenContainer } from './shared/ScreenContainer'
 import { ItemType } from '@/types/calculation'
 import type { AnyLineState, LsdStrings } from '@/types/calculation'
 import { explain, explainTotal } from '@/utils/explanation'
 import type { ExplanationTerm } from '@/utils/explanation'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { DragCtx } from './DragContext'
+import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
+
+interface DragCtxValue {
+  listeners: DraggableSyntheticListeners
+  attributes: DraggableAttributes
+}
+
+const DragCtx = React.createContext<DragCtxValue | null>(null)
 
 // ─── Swipe context ────────────────────────────────────────────────────────────
 
@@ -963,14 +970,15 @@ interface MainScreenProps {
   onShowExplanationChange: (value: boolean) => void
   advancedMode: boolean
   onAdvancedModeChange: (value: boolean) => void
+  onHelp: () => void
 }
 
-export const MainScreen = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }: MainScreenProps) =>
+export const MainScreen = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange, onHelp }: MainScreenProps) =>
   <ScreenContainer>
     <HeaderEdit />
     <ListOfItems lines={lines} totalDisplay={totalDisplay} totalPence={totalPence} advanced={advancedMode} showExplanation={showExplanation} />
     <FooterEdit
-      onHelp={() => {}}
+      onHelp={onHelp}
       showExplanation={showExplanation}
       onShowExplanationChange={onShowExplanationChange}
       advancedMode={advancedMode}

@@ -2,7 +2,7 @@ import React from "react"
 import { DndContext } from "@dnd-kit/core"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
 import { ItemUnit, ItemExtended, ItemSubTotal, ItemTotal, SwipeProvider, DragCtx } from "@/display/MainScreen"
-import { DUMMY_DATA } from "@/display/dummyData"
+import { DUMMY_DATA } from "@/utils/dummyData"
 
 // Wraps a single item as a sortable so DragHandle receives context
 function WithDrag({ id, children }) {

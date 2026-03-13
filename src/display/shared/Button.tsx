@@ -1,6 +1,6 @@
 import React from 'react'
-import { styled } from "../styled-system/jsx"
-import { cva, type RecipeVariantProps } from "../styled-system/css"
+import { styled } from "@/styled-system/jsx"
+import { cva, type RecipeVariantProps } from "@/styled-system/css"
 
 
 const buttonRecipe = cva({

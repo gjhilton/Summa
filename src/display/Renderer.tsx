@@ -12,6 +12,7 @@ interface Props {
   advancedMode: boolean
   onAdvancedModeChange: (value: boolean) => void
   onDragEnd: (event: DragEndEvent) => void
+  onHelp: () => void
 }
 
 export function Renderer({
@@ -23,6 +24,7 @@ export function Renderer({
   advancedMode,
   onAdvancedModeChange,
   onDragEnd,
+  onHelp,
 }: Props) {
   const sensors = useSensors(useSensor(PointerSensor))
 
@@ -36,6 +38,7 @@ export function Renderer({
         onShowExplanationChange={onShowExplanationChange}
         advancedMode={advancedMode}
         onAdvancedModeChange={onAdvancedModeChange}
+        onHelp={onHelp}
       />
     </DndContext>
   )
