@@ -35,9 +35,10 @@ const buttonRecipe = cva({
     _disabled: {
       bg: "gray.200",
       borderColor: "gray.300",
-      color: "gray.500",
+      color: "gray.400",
       cursor: "not-allowed",
       opacity: 1,
+      textDecoration: "line-through",
     },
   },
 

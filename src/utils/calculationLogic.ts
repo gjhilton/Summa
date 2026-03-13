@@ -72,6 +72,25 @@ export function emptySubtotalItem(): SubtotalItemState {
 	};
 }
 
+export function clearItem(line: AnyLineState): AnyLineState {
+	if (line.itemType === ItemType.SUBTOTAL_ITEM) {
+		const lines: AnyLineState[] = [emptyLine(), emptyLine()];
+		const { totalPence, totalDisplay } = computeGrandTotal(lines);
+		return { ...line, title: '', lines, totalPence, totalDisplay, error: false };
+	}
+	if (line.itemType === ItemType.EXTENDED_ITEM) {
+		return { ...line, title: '', literals: { l: '', s: '', d: '' }, quantity: 'j', error: false, fieldErrors: { l: false, s: false, d: false }, quantityError: false, basePence: 0, totalPence: 0 };
+	}
+	return { ...line, title: '', literals: { l: '', s: '', d: '' }, error: false, fieldErrors: { l: false, s: false, d: false }, totalPence: 0 };
+}
+
+export function duplicateLine(line: AnyLineState): AnyLineState {
+	if (line.itemType === ItemType.SUBTOTAL_ITEM) {
+		return { ...line, id: generateId(), lines: line.lines.map(duplicateLine) };
+	}
+	return { ...line, id: generateId() };
+}
+
 export function recomputeSubtotal(item: SubtotalItemState): SubtotalItemState {
 	const error = item.lines.some(l => l.error);
 	const { totalPence, totalDisplay } = computeGrandTotal(item.lines);

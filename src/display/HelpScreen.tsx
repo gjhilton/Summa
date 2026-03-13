@@ -9,7 +9,7 @@ interface Props {
 
 export function HelpScreen({ onBack }: Props) {
   return (
-    <ScreenContainer>
+    <ScreenContainer background="grey">
       <ScreenHeader>
         {onBack && <Button onClick={onBack}>← back</Button>}
       </ScreenHeader>

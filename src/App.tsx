@@ -1,41 +1,192 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { arrayMove } from '@dnd-kit/sortable'
 import type { DragEndEvent } from '@dnd-kit/core'
-import { DUMMY_DATA } from '@/utils/dummyData'
 import { Renderer } from '@/display/Renderer'
 import { HelpScreen } from '@/display/HelpScreen'
 import type { AnyLineState } from '@/types/calculation'
+import { isSubtotalItem } from '@/types/calculation'
+import {
+  processFieldUpdate,
+  processQuantityUpdate,
+  updateTitle,
+  emptyLine,
+  emptyExtendedItem,
+  emptySubtotalItem,
+  initialState,
+  computeGrandTotal,
+  clearItem,
+  duplicateLine,
+  getLinesAtPath,
+  getBreadcrumbs,
+  updateLinesAtPath,
+} from '@/utils/calculationLogic'
+import type { IdPath } from '@/utils/calculationLogic'
+import { createSummaFile, parseSummaFile } from '@/utils/serialization'
+import { loadFromStorage, saveToStorage } from '@/utils/storage'
 
 type Screen = 'main' | 'help'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('main')
-  const [lines, setLines] = useState<AnyLineState[]>(DUMMY_DATA.lines)
+  const [lines, setLines] = useState<AnyLineState[]>(() => loadFromStorage())
+  const [navigationPath, setNavigationPath] = useState<IdPath>([])
   const [showExplanation, setShowExplanation] = useState(true)
   const [advancedMode, setAdvancedMode] = useState(false)
 
+  useEffect(() => {
+    saveToStorage(lines)
+  }, [lines])
+
+  const visibleLines = getLinesAtPath(lines, navigationPath)
+  const { totalPence, totalDisplay, hasError } = computeGrandTotal(visibleLines)
+  const breadcrumbs = getBreadcrumbs(lines, navigationPath)
+
+  // Derive subTitle from raw state, not the breadcrumb display (which substitutes
+  // 'Untitled' for empty titles — causing the edit field to ghost-write 'Untitled'
+  // on blur for any sub-calc the user navigates into without typing a title).
+  const subTitle = (() => {
+    if (navigationPath.length === 0) return undefined
+    const id = navigationPath[navigationPath.length - 1]
+    const item = getLinesAtPath(lines, navigationPath.slice(0, -1)).find(l => l.id === id)
+    return item && isSubtotalItem(item) ? item.title : ''
+  })()
+
+  function mutate(updater: (lines: AnyLineState[]) => AnyLineState[]) {
+    setLines(prev => updateLinesAtPath(prev, navigationPath, updater))
+  }
+
   function handleDragEnd({ active, over }: DragEndEvent) {
     if (!over || active.id === over.id) return
-    setLines(prev => {
+    mutate(prev => {
       const oldIndex = prev.findIndex(l => l.id === active.id)
       const newIndex = prev.findIndex(l => l.id === over.id)
+      if (oldIndex === -1 || newIndex === -1) return prev
       return arrayMove(prev, oldIndex, newIndex)
     })
+  }
+
+  function handleFieldChange(id: string, field: 'l' | 's' | 'd', value: string) {
+    mutate(prev => processFieldUpdate(prev, id, field, value))
+  }
+
+  function handleQuantityChange(id: string, value: string) {
+    mutate(prev => processQuantityUpdate(prev, id, value))
+  }
+
+  function handleTitleChange(id: string, value: string) {
+    mutate(prev => updateTitle(prev, id, value))
+  }
+
+  function handleRemoveLine(id: string) {
+    mutate(prev => prev.filter(l => l.id !== id))
+  }
+
+  function handleAddLine() {
+    mutate(prev => [...prev, emptyLine()])
+  }
+
+  function handleAddExtended() {
+    mutate(prev => [...prev, emptyExtendedItem()])
+  }
+
+  function handleAddSubtotal() {
+    mutate(prev => [...prev, emptySubtotalItem()])
+  }
+
+  function handleClear() {
+    if (navigationPath.length === 0) {
+      setLines(initialState().lines)
+    } else {
+      mutate(() => [emptyLine(), emptyLine()])
+    }
+  }
+
+  function handleDuplicateLine(id: string) {
+    mutate(prev => {
+      const idx = prev.findIndex(l => l.id === id)
+      if (idx === -1) return prev
+      const copy = duplicateLine(prev[idx])
+      return [...prev.slice(0, idx + 1), copy, ...prev.slice(idx + 1)]
+    })
+  }
+
+  function handleClearItem(id: string) {
+    mutate(prev => prev.map(l => l.id === id ? clearItem(l) : l))
+  }
+
+  function handleSave(filename: string) {
+    const { totalPence: tp, totalDisplay: td, hasError } = computeGrandTotal(lines)
+    const file = createSummaFile({ lines, totalPence: tp, totalDisplay: td, hasError })
+    const json = JSON.stringify(file, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${filename}.summa.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleLoad(file: File): Promise<void> {
+    const json = await file.text()
+    const state = parseSummaFile(json)
+    setLines(state.lines)
+    setNavigationPath([])
+  }
+
+  function handleNavigate(path: IdPath) {
+    setNavigationPath(path)
+  }
+
+  function handleDone() {
+    setNavigationPath(prev => prev.slice(0, -1))
+  }
+
+  function handleEditSubtotal(id: string) {
+    setNavigationPath(prev => [...prev, id])
+  }
+
+  function handleSubTitleChange(v: string) {
+    const subtotalId = navigationPath[navigationPath.length - 1]
+    const parentPath = navigationPath.slice(0, -1)
+    setLines(prev => updateLinesAtPath(prev, parentPath, parentLines => updateTitle(parentLines, subtotalId, v)))
   }
 
   if (screen === 'help') return <HelpScreen onBack={() => setScreen('main')} />
 
   return (
     <Renderer
-      lines={lines}
-      totalDisplay={DUMMY_DATA.totalDisplay}
-      totalPence={DUMMY_DATA.totalPence}
+      lines={visibleLines}
+      totalDisplay={totalDisplay}
+      totalPence={totalPence}
       showExplanation={showExplanation}
       onShowExplanationChange={setShowExplanation}
       advancedMode={advancedMode}
       onAdvancedModeChange={setAdvancedMode}
       onDragEnd={handleDragEnd}
       onHelp={() => setScreen('help')}
+      onFieldChange={handleFieldChange}
+      onQuantityChange={handleQuantityChange}
+      onTitleChange={handleTitleChange}
+      onRemoveLine={handleRemoveLine}
+      onAddLine={handleAddLine}
+      onAddExtended={handleAddExtended}
+      onAddSubtotal={handleAddSubtotal}
+      onClear={handleClear}
+      onDuplicateLine={handleDuplicateLine}
+      onClearItem={handleClearItem}
+      onSave={handleSave}
+      onLoad={handleLoad}
+      breadcrumbs={breadcrumbs}
+      navigationPath={navigationPath}
+      subTitle={subTitle}
+      onSubTitleChange={handleSubTitleChange}
+      onNavigate={handleNavigate}
+      onDone={navigationPath.length > 0 ? handleDone : undefined}
+      onEditSubtotal={handleEditSubtotal}
+      hasError={hasError || undefined}
     />
   )
 }

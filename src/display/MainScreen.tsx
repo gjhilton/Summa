@@ -3,22 +3,18 @@ import { styled } from '@/styled-system/jsx'
 import { cva } from '@/styled-system/css'
 import { Button } from './shared/Button'
 import { ScreenHeader, HeaderSpacer } from './shared/Header'
+import { PageWidth } from './shared/PageWidth'
+import type { IdPath } from '@/utils/calculationLogic'
 import { ScreenFooter } from './shared/Footer'
 import { ScreenContainer } from './shared/ScreenContainer'
 import { ItemType } from '@/types/calculation'
-import type { AnyLineState, LsdStrings } from '@/types/calculation'
+import type { AnyLineState, LsdStrings, LsdBooleans } from '@/types/calculation'
+import { formatLsdDisplay } from '@/utils/calculationLogic'
 import { explain, explainTotal } from '@/utils/explanation'
 import type { ExplanationTerm } from '@/utils/explanation'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
-
-interface DragCtxValue {
-  listeners: DraggableSyntheticListeners
-  attributes: DraggableAttributes
-}
-
-const DragCtx = React.createContext<DragCtxValue | null>(null)
+import { DragCtx } from './DragCtx'
 
 // ─── Swipe context ────────────────────────────────────────────────────────────
 
@@ -95,22 +91,25 @@ const ActionButtonIcon = styled('span', {
 interface ActionStripProps {
   onClose: () => void
   desktopVisible: boolean
+  onRemove?: () => void
+  onDuplicate?: () => void
+  onClearItem?: () => void
 }
 
-function ActionStrip({ onClose, desktopVisible }: ActionStripProps) {
+function ActionStrip({ onClose, desktopVisible, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
   // Touch: always visible. Desktop: fades in/out on row hover.
   const visible = !canHover || desktopVisible
   return (
     <ActionStripWrapper visible={visible}>
-      <ActionButton onClick={onClose} aria-label="Delete row">
+      <ActionButton onClick={onRemove ?? onClose} aria-label="Delete row">
         <ActionButtonIcon>🗑</ActionButtonIcon>
         Delete
       </ActionButton>
-      <ActionButton onClick={onClose} aria-label="Duplicate row">
+      <ActionButton onClick={() => { onDuplicate?.(); onClose() }} aria-label="Duplicate row">
         <ActionButtonIcon>⧉</ActionButtonIcon>
         Duplicate
       </ActionButton>
-      <ActionButton onClick={onClose} aria-label="Clear item">
+      <ActionButton onClick={() => { onClearItem?.(); onClose() }} aria-label="Clear item">
         <ActionButtonIcon>✕</ActionButtonIcon>
         Clear
       </ActionButton>
@@ -150,21 +149,27 @@ const ContentWrapper = styled('div', {
     borderBottomStyle: 'solid',
     borderTopColor: 'transparent',
     borderBottomColor: 'transparent',
-    padding: '1rem 1.5rem',
+    paddingTop: '0',
+    paddingBottom: '1rem',
+    paddingLeft: '1.5rem',
+    paddingRight: '1.5rem',
     transition: 'transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease',
   },
   variants: {
     open: {
       true: {
         transform: 'translateX(-240px)',
-        background: '#fef9e0',
         boxShadow: '6px 0 16px rgba(0,0,0,0.3)',
       },
       false: {
         transform: 'translateX(0)',
-        background: 'white',
         boxShadow: 'none',
       },
+    },
+    bg: {
+      default: { background: 'white' },
+      error:   { background: '#fee2e2' },
+      open:    { background: '#fef9e0' },
     },
     swipeable: {
       true: { touchAction: 'pan-y' },
@@ -241,8 +246,12 @@ interface ItemProps {
   sideMargins?: boolean
   showActions?: boolean
   isOpen?: boolean
+  error?: boolean
   desktopVisible?: boolean
   onClose?: () => void
+  onRemove?: () => void
+  onDuplicate?: () => void
+  onClearItem?: () => void
   onTouchStart?: React.TouchEventHandler
   onTouchMove?: React.TouchEventHandler
   onTouchEnd?: React.TouchEventHandler
@@ -256,8 +265,12 @@ export function Item({
   sideMargins = false,
   showActions = false,
   isOpen = false,
+  error = false,
   desktopVisible = false,
   onClose,
+  onRemove,
+  onDuplicate,
+  onClearItem,
   onTouchStart,
   onTouchMove,
   onTouchEnd,
@@ -265,13 +278,15 @@ export function Item({
   onMouseLeave,
   children,
 }: ItemProps) {
+  const bg = error ? 'error' : isOpen ? 'open' : 'default'
   return (
     <StyledItem sideMargins={sideMargins || undefined} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      {showActions && <ActionStrip onClose={onClose!} desktopVisible={desktopVisible} />}
+      {showActions && <ActionStrip onClose={onClose!} desktopVisible={desktopVisible} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
       <DragHandle />
       <ContentWrapper
         borders={borders}
         open={isOpen}
+        bg={bg}
         swipeable={showActions || undefined}
         sideMargins={sideMargins || undefined}
         onTouchStart={onTouchStart}
@@ -286,7 +301,7 @@ export function Item({
 
 // ─── SwipeableItem — stateful container ──────────────────────────────────────
 
-export function SwipeableItem({ children }: { children: React.ReactNode }) {
+export function SwipeableItem({ children, onRemove, onDuplicate, onClearItem, error }: { children: React.ReactNode, onRemove?: () => void, onDuplicate?: () => void, onClearItem?: () => void, error?: boolean }) {
   const id = React.useId()
   const { openId, setOpenId } = useSwipeContext()
   const isOpen = openId === id
@@ -324,8 +339,12 @@ export function SwipeableItem({ children }: { children: React.ReactNode }) {
     <Item
       showActions
       isOpen={isOpen}
+      error={error}
       desktopVisible={canHover && hovered}
       onClose={onClose}
+      onRemove={onRemove}
+      onDuplicate={onDuplicate}
+      onClearItem={onClearItem}
       onMouseEnter={canHover ? () => setHovered(true) : undefined}
       onMouseLeave={canHover ? () => setHovered(false) : undefined}
       onTouchStart={onTouchStart}
@@ -344,8 +363,8 @@ const SupD = () => <sup>d</sup>
 function renderExplanationTerms(terms: ExplanationTerm[]): React.ReactNode[] {
   return terms.flatMap((t, i) => {
     const term = t.multiplier === 1
-      ? <React.Fragment key={t.multiplier}>{t.pence}<SupD /></React.Fragment>
-      : <React.Fragment key={t.multiplier}>({t.integer} × {t.multiplier}<SupD /> = {t.pence}<SupD />)</React.Fragment>
+      ? <React.Fragment key={i}>{t.pence}<SupD /></React.Fragment>
+      : <React.Fragment key={i}>({t.integer} × {t.multiplier}<SupD /> = {t.pence}<SupD />)</React.Fragment>
     return i === 0 ? [term] : [' + ', term]
   })
 }
@@ -360,6 +379,36 @@ function renderExplanation(line: AnyLineState): React.ReactNode {
       return <>{renderExplanationTerms(result.unitCostTerms)} = {result.basePence}<SupD /> unit cost × {result.quantity} = {result.totalPence}<SupD /></>
     case 'total':
       return null
+  }
+}
+
+function formatFieldList(labels: string[]): string {
+  if (labels.length === 1) return `${labels[0]} field`
+  return `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]} fields`
+}
+
+function renderErrorExplanation(line: AnyLineState): React.ReactNode | null {
+  switch (line.itemType) {
+    case ItemType.LINE_ITEM: {
+      const labels = (['l', 's', 'd'] as const).filter(f => line.fieldErrors[f]).map(f => f === 'l' ? 'li' : f)
+      if (labels.length === 0) return null
+      return <>this item has an error: only Roman numerals allowed in {formatFieldList(labels)}</>
+    }
+    case ItemType.EXTENDED_ITEM: {
+      const invalidFields = [
+        ...(['l', 's', 'd'] as const).filter(f => line.fieldErrors[f]).map(f => f === 'l' ? 'li' : f),
+        ...(line.quantityError && line.quantity.trim() ? ['quantity'] : []),
+      ]
+      const quantityMissing = line.quantityError && !line.quantity.trim()
+      if (invalidFields.length === 0 && !quantityMissing) return null
+      const parts: string[] = []
+      if (invalidFields.length > 0) parts.push(`only Roman numerals allowed in ${formatFieldList(invalidFields)}`)
+      if (quantityMissing) parts.push('quantity is required')
+      return <>this item has an error: {parts.join('; ')}</>
+    }
+    case ItemType.SUBTOTAL_ITEM:
+      if (!line.error) return null
+      return <>this item has an error: a sub-item contains invalid input</>
   }
 }
 
@@ -412,6 +461,11 @@ const ExplanationRow = styled('div', {
     fontStyle: 'italic',
     paddingTop: '0.25rem',
   },
+  variants: {
+    isError: {
+      true: { color: '#ff0000', opacity: 1, fontStyle: 'normal' },
+    },
+  },
 })
 
 const Label = styled('label', {
@@ -461,10 +515,12 @@ const inputRecipe = cva({
     editable: {
       true: {
         bg: 'transparent',
-        color: 'black',
         borderBottomColor: 'rgba(0,0,0,0.1)',
         _focus: { borderBottomColor: 'black' },
       },
+    },
+    error: {
+      true: { color: '#ff0000' },
     },
     bold: {
       true: { fontWeight: 'bold' },
@@ -494,9 +550,10 @@ interface TextInputProps {
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   align?: 'l' | 'r'
   bold?: boolean
+  error?: boolean
 }
 
-export function TextInput({ editable, numeric, value, onChange, align, bold }: TextInputProps) {
+export function TextInput({ editable, numeric, value, onChange, align, bold, error }: TextInputProps) {
   return (
     <StyledInput
       editable={editable || undefined}
@@ -506,6 +563,10 @@ export function TextInput({ editable, numeric, value, onChange, align, bold }: T
       readOnly={!editable}
       align={align}
       bold={bold || undefined}
+      error={error || undefined}
+      autoCapitalize="off"
+      autoCorrect="off"
+      spellCheck={false}
     />
   )
 }
@@ -515,25 +576,28 @@ interface TextFieldProps {
   label?: string
   editable?: boolean
   align?: 'l' | 'r'
+  onChange?: (v: string) => void
 }
 
-export const TextField = ({ value, label, editable, align }: TextFieldProps) =>
+export const TextField = ({ value, label, editable, align, onChange }: TextFieldProps) =>
   <TextFieldBox>
     <Label>
       {label}
-      <TextInput value={value} editable={editable} align={align} bold />
+      <TextInput value={value} editable={editable} align={align} bold onChange={e => onChange?.(e.target.value)} />
     </Label>
   </TextFieldBox>
 
 interface QuantityFieldProps {
   value: string
   editable?: boolean
+  onChange?: (v: string) => void
+  error?: boolean
 }
 
-export const QuantityField = ({ value, editable }: QuantityFieldProps) =>
+export const QuantityField = ({ value, editable, onChange, error }: QuantityFieldProps) =>
   <Label>
     <FieldAnnotation large>✕</FieldAnnotation>
-    <TextInput align="r" numeric value={value} editable={editable} />
+    <TextInput align="r" numeric value={value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} />
     <FieldAnnotation>@</FieldAnnotation>
   </Label>
 
@@ -541,36 +605,41 @@ interface CurrencyFieldProps {
   value: string
   label: string
   editable?: boolean
+  onChange?: (v: string) => void
+  error?: boolean
 }
 
-export const CurrencyField = ({ value, label, editable }: CurrencyFieldProps) =>
+export const CurrencyField = ({ value, label, editable, onChange, error }: CurrencyFieldProps) =>
   <Label>
-    <TextInput align="r" numeric value={value === '0' ? '' : value} editable={editable} />
+    <TextInput align="r" numeric value={value === '0' ? '' : value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} />
     <FieldAnnotation sup dim={value === '0' || undefined}>{label}</FieldAnnotation>
   </Label>
 
 interface CurrencyProps {
   editable?: boolean
   values?: LsdStrings
+  onFieldChange?: (field: 'l' | 's' | 'd', value: string) => void
+  fieldErrors?: LsdBooleans
 }
 
-export const Currency = ({ editable, values = { l: 'x', s: 'vj', d: 'iij' } }: CurrencyProps) =>
+export const Currency = ({ editable, values = { l: 'x', s: 'vj', d: 'iij' }, onFieldChange, fieldErrors }: CurrencyProps) =>
   <Equally>
-    <CurrencyField label="li" editable={editable} value={values.l} />
-    <CurrencyField label="s"  editable={editable} value={values.s} />
-    <CurrencyField label="d"  editable={editable} value={values.d} />
+    <CurrencyField label="li" editable={editable} value={values.l} onChange={v => onFieldChange?.('l', v)} error={fieldErrors?.l || undefined} />
+    <CurrencyField label="s"  editable={editable} value={values.s} onChange={v => onFieldChange?.('s', v)} error={fieldErrors?.s || undefined} />
+    <CurrencyField label="d"  editable={editable} value={values.d} onChange={v => onFieldChange?.('d', v)} error={fieldErrors?.d || undefined} />
   </Equally>
 
 interface BlockTitleProps {
   title: string
   editable?: boolean
   children?: React.ReactNode
+  onChange?: (v: string) => void
 }
 
-export const BlockTitle = ({ title, children, editable }: BlockTitleProps) =>
+export const BlockTitle = ({ title, children, editable, onChange }: BlockTitleProps) =>
   <Block>
     <Equally>
-      <TextField value={title} editable={editable} />
+      <TextField value={title} editable={editable} onChange={onChange} />
       {children}
     </Equally>
   </Block>
@@ -578,11 +647,13 @@ export const BlockTitle = ({ title, children, editable }: BlockTitleProps) =>
 interface BlockCurrencyProps {
   editable?: boolean
   values?: LsdStrings
+  onFieldChange?: (field: 'l' | 's' | 'd', value: string) => void
+  fieldErrors?: LsdBooleans
 }
 
-export const BlockCurrency = ({ editable, values }: BlockCurrencyProps) =>
+export const BlockCurrency = ({ editable, values, onFieldChange, fieldErrors }: BlockCurrencyProps) =>
   <Block>
-    <Currency editable={editable} values={values} />
+    <Currency editable={editable} values={values} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
   </Block>
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
@@ -673,15 +744,23 @@ interface ItemUnitProps {
   title: string
   literals: LsdStrings
   explanation?: React.ReactNode
+  explanationIsError?: boolean
+  onTitleChange?: (v: string) => void
+  onFieldChange?: (field: 'l' | 's' | 'd', value: string) => void
+  onRemove?: () => void
+  onDuplicate?: () => void
+  onClearItem?: () => void
+  fieldErrors?: LsdBooleans
+  error?: boolean
 }
 
-export const ItemUnit = ({ title, literals, explanation }: ItemUnitProps) =>
-  <SwipeableItem>
+export const ItemUnit = ({ title, literals, explanation, explanationIsError, onTitleChange, onFieldChange, onRemove, onDuplicate, onClearItem, fieldErrors, error }: ItemUnitProps) =>
+  <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow>
-      <BlockTitle title={title} editable />
-      <BlockCurrency editable values={literals} />
+      <BlockTitle title={title} editable onChange={onTitleChange} />
+      <BlockCurrency editable values={literals} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
     </BlockRow>
-    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
+    {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 interface ItemExtendedProps {
@@ -689,18 +768,29 @@ interface ItemExtendedProps {
   literals: LsdStrings
   quantity: string
   explanation?: React.ReactNode
+  explanationIsError?: boolean
+  onTitleChange?: (v: string) => void
+  onFieldChange?: (field: 'l' | 's' | 'd', value: string) => void
+  onQuantityChange?: (v: string) => void
+  onRemove?: () => void
+  onDuplicate?: () => void
+  onClearItem?: () => void
+  fieldErrors?: LsdBooleans
+  quantityError?: boolean
+  resultDisplay?: LsdStrings
+  error?: boolean
 }
 
-export const ItemExtended = ({ title, literals, quantity, explanation }: ItemExtendedProps) =>
-  <SwipeableItem>
+export const ItemExtended = ({ title, literals, quantity, explanation, explanationIsError, onTitleChange, onFieldChange, onQuantityChange, onRemove, onDuplicate, onClearItem, fieldErrors, quantityError, resultDisplay, error }: ItemExtendedProps) =>
+  <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow>
-      <BlockTitle title={title} editable>
-        <QuantityField editable value={quantity} />
+      <BlockTitle title={title} editable onChange={onTitleChange}>
+        <QuantityField editable value={quantity} onChange={onQuantityChange} error={quantityError || undefined} />
       </BlockTitle>
-      <BlockCurrency editable values={literals} />
-      <BlockCurrency />
+      <BlockCurrency editable values={literals} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
+      <BlockCurrency values={resultDisplay} />
     </BlockRow>
-    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
+    {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 interface ItemSubTotalProps {
@@ -708,11 +798,16 @@ interface ItemSubTotalProps {
   count?: number
   totalDisplay: LsdStrings
   onEdit: () => void
+  onRemove?: () => void
+  onDuplicate?: () => void
+  onClearItem?: () => void
   explanation?: React.ReactNode
+  explanationIsError?: boolean
+  error?: boolean
 }
 
-export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanation }: ItemSubTotalProps) =>
-  <SwipeableItem>
+export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, onRemove, onDuplicate, onClearItem, explanation, explanationIsError, error }: ItemSubTotalProps) =>
+  <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow>
       <Block>
         <Label>
@@ -722,7 +817,7 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanati
       </Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
+    {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 interface ItemTotalProps {
@@ -890,12 +985,137 @@ export const FooterEdit = ({ onHelp, showExplanation, onShowExplanationChange, a
     <Toggle id="advanced-mode" label="advanced mode" checked={advancedMode} onChange={onAdvancedModeChange} />
   </>} />
 
-export const HeaderEdit = () =>
+// ─── Sub-level header ─────────────────────────────────────────────────────────
+
+const SubHeaderEl = styled('header', {
+  base: { margin: '1rem 0 3rem' },
+})
+
+const SubHeaderNavRow = styled('nav', {
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+    fontSize: '0.8em',
+    opacity: 0.55,
+    marginBottom: '0.65rem',
+    flexWrap: 'wrap',
+  },
+})
+
+const BreadcrumbBtn = styled('button', {
+  base: {
+    background: 'none',
+    border: 'none',
+    fontFamily: 'inherit',
+    fontSize: 'inherit',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    padding: 0,
+    _hover: { opacity: 0.7 },
+  },
+})
+
+const BreadcrumbSep = styled('span', {
+  base: { userSelect: 'none', paddingLeft: '0.1rem', paddingRight: '0.1rem' },
+})
+
+const SubHeaderActionRow = styled('div', {
+  base: { display: 'flex', alignItems: 'center', gap: '0.5rem' },
+})
+
+const SubTitleInput = styled('input', {
+  base: {
+    flex: 1,
+    background: 'transparent',
+    borderWidth: '0',
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'rgba(0,0,0,0.15)',
+    outline: 'none',
+    fontFamily: 'inherit',
+    fontSize: '1.1em',
+    paddingBottom: '0.2rem',
+    _focus: { borderBottomColor: 'black' },
+    _placeholder: { opacity: 0.3 },
+  },
+})
+
+export interface BreadcrumbItem {
+  id: string
+  title: string
+  path: IdPath
+}
+
+interface BreadcrumbNavProps {
+  breadcrumbs: BreadcrumbItem[]
+  onNavigate: (path: IdPath) => void
+}
+
+export function BreadcrumbNav({ breadcrumbs, onNavigate }: BreadcrumbNavProps) {
+  if (!breadcrumbs.length) return null
+  return (
+    <SubHeaderNavRow aria-label="Breadcrumb">
+      {breadcrumbs.slice(0, -1).map((crumb, i) => (
+        <React.Fragment key={crumb.id || 'root'}>
+          {i > 0 && <BreadcrumbSep aria-hidden="true">/</BreadcrumbSep>}
+          <BreadcrumbBtn type="button" onClick={() => onNavigate(crumb.path)}>
+            {crumb.title}
+          </BreadcrumbBtn>
+        </React.Fragment>
+      ))}
+      {breadcrumbs.length > 1 && <BreadcrumbSep aria-hidden="true">/</BreadcrumbSep>}
+      <span>{breadcrumbs[breadcrumbs.length - 1].title}</span>
+    </SubHeaderNavRow>
+  )
+}
+
+interface SubHeaderEditProps {
+  breadcrumbs: BreadcrumbItem[]
+  onNavigate: (path: IdPath) => void
+  subTitle: string
+  onSubTitleChange: (v: string) => void
+  onDone: () => void
+}
+
+export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleChange, onDone }: SubHeaderEditProps) {
+  const [draft, setDraft] = React.useState(subTitle)
+
+  React.useEffect(() => { setDraft(subTitle) }, [subTitle])
+
+  function handleBlur() {
+    onSubTitleChange(draft.trim())
+  }
+
+  return (
+    <SubHeaderEl>
+      <PageWidth>
+        <BreadcrumbNav breadcrumbs={breadcrumbs} onNavigate={onNavigate} />
+        <SubHeaderActionRow>
+          <SubTitleInput
+            value={draft}
+            placeholder="Untitled sub-calculation"
+            onChange={e => setDraft(e.target.value)}
+            onBlur={handleBlur}
+            aria-label="Sub-calculation title"
+            autoCapitalize="off"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck={false}
+          />
+          <Button onClick={onDone}>done</Button>
+        </SubHeaderActionRow>
+      </PageWidth>
+    </SubHeaderEl>
+  )
+}
+
+export const HeaderEdit = ({ onClear, onSaveClick, onLoadClick, hasError }: { onClear?: () => void, onSaveClick?: () => void, onLoadClick?: () => void, hasError?: boolean }) =>
   <ScreenHeader>
-    <Button variant="primary">export</Button>
-    <Button>load</Button>
+    <Button variant="primary" onClick={onSaveClick} disabled={hasError}>export</Button>
+    <Button onClick={onLoadClick}>load</Button>
     <HeaderSpacer />
-    <Button variant="danger">clear</Button>
+    <Button variant="danger" onClick={onClear}>clear</Button>
   </ScreenHeader>
 
 // ─── Sortable line wrapper ────────────────────────────────────────────────────
@@ -935,32 +1155,246 @@ interface ListOfItemsProps {
   totalPence: number
   advanced?: boolean
   showExplanation: boolean
+  onFieldChange: (id: string, field: 'l' | 's' | 'd', value: string) => void
+  onQuantityChange: (id: string, value: string) => void
+  onTitleChange: (id: string, value: string) => void
+  onRemoveLine: (id: string) => void
+  onAddLine: () => void
+  onAddExtended: () => void
+  onAddSubtotal: () => void
+  onDuplicateLine: (id: string) => void
+  onClearItem: (id: string) => void
+  onEditSubtotal: (id: string) => void
 }
 
-export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation }: ListOfItemsProps) {
+export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onDuplicateLine, onClearItem, onEditSubtotal }: ListOfItemsProps) {
   return (
     <SwipeProvider>
       <section>
         <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {lines.map(line => {
-            const explanation = showExplanation ? renderExplanation(line) : null
+            const errorExplanation = showExplanation ? renderErrorExplanation(line) : null
+            const explanation = errorExplanation ?? (showExplanation ? renderExplanation(line) : null)
+            const explanationIsError = !!errorExplanation
             switch (line.itemType) {
               case ItemType.LINE_ITEM:
-                return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} explanation={explanation} /></SortableLine>
+                return <SortableLine key={line.id} id={line.id}>
+                  <ItemUnit
+                    title={line.title} literals={line.literals} explanation={explanation} explanationIsError={explanationIsError || undefined}
+                    onTitleChange={v => onTitleChange(line.id, v)}
+                    onFieldChange={(f, v) => onFieldChange(line.id, f, v)}
+                    onRemove={() => onRemoveLine(line.id)}
+                    onDuplicate={() => onDuplicateLine(line.id)}
+                    onClearItem={() => onClearItem(line.id)}
+                    fieldErrors={line.fieldErrors}
+                    error={line.error || undefined}
+                  />
+                </SortableLine>
               case ItemType.EXTENDED_ITEM:
-                return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} explanation={explanation} /></SortableLine>
+                return <SortableLine key={line.id} id={line.id}>
+                  <ItemExtended
+                    title={line.title} literals={line.literals} quantity={line.quantity} explanation={explanation} explanationIsError={explanationIsError || undefined}
+                    onTitleChange={v => onTitleChange(line.id, v)}
+                    onFieldChange={(f, v) => onFieldChange(line.id, f, v)}
+                    onQuantityChange={v => onQuantityChange(line.id, v)}
+                    onRemove={() => onRemoveLine(line.id)}
+                    onDuplicate={() => onDuplicateLine(line.id)}
+                    onClearItem={() => onClearItem(line.id)}
+                    fieldErrors={line.fieldErrors}
+                    quantityError={line.quantityError || undefined}
+                    resultDisplay={formatLsdDisplay(line.totalPence)}
+                    error={line.error || undefined}
+                  />
+                </SortableLine>
               case ItemType.SUBTOTAL_ITEM:
-                return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} explanation={explanation} /></SortableLine>
+                return <SortableLine key={line.id} id={line.id}>
+                  <ItemSubTotal
+                    title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} explanation={explanation} explanationIsError={explanationIsError || undefined}
+                    onEdit={() => onEditSubtotal(line.id)}
+                    onRemove={() => onRemoveLine(line.id)}
+                    onDuplicate={() => onDuplicateLine(line.id)}
+                    onClearItem={() => onClearItem(line.id)}
+                    error={line.error || undefined}
+                  />
+                </SortableLine>
             }
           })}
         </SortableContext>
-        <AddItemBar advanced={advanced} onAdd={() => alert('add item')} onAddUnit={() => alert('unit')} onAddExtended={() => alert('extended')} onAddSubtotal={() => alert('subtotal')} />
+        <AddItemBar
+          advanced={advanced}
+          onAdd={onAddLine}
+          onAddUnit={onAddLine}
+          onAddExtended={onAddExtended}
+          onAddSubtotal={onAddSubtotal}
+        />
         <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} />
       </section>
     </SwipeProvider>
   )
 }
 
+
+// ─── Modals ───────────────────────────────────────────────────────────────────
+
+const DialogEl = styled('dialog', {
+  base: {
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'rgba(0,0,0,0.25)',
+    background: 'white',
+    padding: '1.5rem',
+    minWidth: '280px',
+    maxWidth: '400px',
+    width: '90vw',
+    fontFamily: 'inherit',
+    _backdrop: { background: 'rgba(0,0,0,0.4)' },
+  },
+})
+
+const DialogTitle = styled('div', {
+  base: { fontWeight: 'bold', marginBottom: '1rem', fontSize: '1.05em' },
+})
+
+const DialogButtonRow = styled('div', {
+  base: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '0.5rem',
+    marginTop: '1rem',
+  },
+})
+
+const FilenameRow = styled('div', {
+  base: { display: 'flex', alignItems: 'center', gap: '0.5rem' },
+})
+
+const FilenameInput = styled('input', {
+  base: {
+    flex: 1,
+    borderWidth: '0',
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'rgba(0,0,0,0.2)',
+    outline: 'none',
+    fontFamily: 'inherit',
+    fontSize: '1em',
+    paddingBottom: '0.2rem',
+    background: 'transparent',
+    _focus: { borderBottomColor: 'black' },
+  },
+})
+
+const FilenameSuffix = styled('span', {
+  base: { opacity: 0.45, fontSize: '0.85em', flexShrink: 0 },
+})
+
+const ModalErrorText = styled('div', {
+  base: { color: '#ff0000', fontSize: '0.85em', marginTop: '0.5rem' },
+})
+
+function SummaDialog({ isOpen, onClose, title, children }: { isOpen: boolean, onClose: () => void, title: string, children: React.ReactNode }) {
+  const ref = React.useRef<HTMLDialogElement>(null)
+
+  React.useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    if (isOpen) { if (!el.open) el.showModal() }
+    else { if (el.open) el.close() }
+  }, [isOpen])
+
+  function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
+    const rect = ref.current?.getBoundingClientRect()
+    if (!rect) return
+    const { clientX, clientY } = e
+    if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) onClose()
+  }
+
+  return (
+    <DialogEl ref={ref} onClose={onClose} onClick={handleBackdropClick}>
+      <div>
+        <DialogTitle>{title}</DialogTitle>
+        {children}
+      </div>
+    </DialogEl>
+  )
+}
+
+function SaveModalUI({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () => void, onSave: (filename: string) => void }) {
+  const [filename, setFilename] = React.useState('')
+
+  React.useEffect(() => { if (isOpen) setFilename('') }, [isOpen])
+
+  function handleSave() {
+    onSave(filename.trim() || 'summa')
+    onClose()
+  }
+
+  return (
+    <SummaDialog isOpen={isOpen} onClose={onClose} title="Save calculation">
+      <FilenameRow>
+        <FilenameInput
+          type="text"
+          value={filename}
+          onChange={e => setFilename(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSave()}
+          placeholder="summa"
+          autoFocus
+          autoCapitalize="off"
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck={false}
+        />
+        <FilenameSuffix>.summa.json</FilenameSuffix>
+      </FilenameRow>
+      <DialogButtonRow>
+        <Button onClick={onClose}>cancel</Button>
+        <Button variant="primary" onClick={handleSave}>save</Button>
+      </DialogButtonRow>
+    </SummaDialog>
+  )
+}
+
+function LoadModalUI({ isOpen, onClose, onLoad }: { isOpen: boolean, onClose: () => void, onLoad: (file: File) => Promise<void> }) {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [error, setError] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
+
+  React.useEffect(() => {
+    if (isOpen && inputRef.current) inputRef.current.value = ''
+    if (isOpen) setError('')
+  }, [isOpen])
+
+  async function handleLoad() {
+    const file = inputRef.current?.files?.[0]
+    if (!file) { setError('Please select a file.'); return }
+    setError('')
+    setLoading(true)
+    try {
+      await onLoad(file)
+      if (inputRef.current) inputRef.current.value = ''
+      onClose()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load file.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  function handleClose() { setError(''); onClose() }
+
+  return (
+    <SummaDialog isOpen={isOpen} onClose={handleClose} title="Load calculation">
+      <div>
+        <input ref={inputRef} type="file" accept=".json" onChange={() => setError('')} />
+        {error && <ModalErrorText>{error}</ModalErrorText>}
+      </div>
+      <DialogButtonRow>
+        <Button onClick={handleClose}>cancel</Button>
+        <Button variant="primary" onClick={handleLoad} disabled={loading}>load</Button>
+      </DialogButtonRow>
+    </SummaDialog>
+  )
+}
 
 interface MainScreenProps {
   lines: AnyLineState[]
@@ -971,17 +1405,69 @@ interface MainScreenProps {
   advancedMode: boolean
   onAdvancedModeChange: (value: boolean) => void
   onHelp: () => void
+  onFieldChange: (id: string, field: 'l' | 's' | 'd', value: string) => void
+  onQuantityChange: (id: string, value: string) => void
+  onTitleChange: (id: string, value: string) => void
+  onRemoveLine: (id: string) => void
+  onAddLine: () => void
+  onAddExtended: () => void
+  onAddSubtotal: () => void
+  onClear: () => void
+  onDuplicateLine: (id: string) => void
+  onClearItem: (id: string) => void
+  onSave: (filename: string) => void
+  onLoad: (file: File) => Promise<void>
+  breadcrumbs: Array<{ id: string; title: string; path: IdPath }>
+  navigationPath: IdPath
+  subTitle?: string
+  onSubTitleChange: (v: string) => void
+  onNavigate: (path: IdPath) => void
+  onDone?: () => void
+  onEditSubtotal: (id: string) => void
+  hasError?: boolean
 }
 
-export const MainScreen = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange, onHelp }: MainScreenProps) =>
-  <ScreenContainer>
-    <HeaderEdit />
-    <ListOfItems lines={lines} totalDisplay={totalDisplay} totalPence={totalPence} advanced={advancedMode} showExplanation={showExplanation} />
-    <FooterEdit
-      onHelp={onHelp}
-      showExplanation={showExplanation}
-      onShowExplanationChange={onShowExplanationChange}
-      advancedMode={advancedMode}
-      onAdvancedModeChange={onAdvancedModeChange}
-    />
-  </ScreenContainer>
+export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange, onHelp, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onClear, onDuplicateLine, onClearItem, onSave, onLoad, breadcrumbs, navigationPath, subTitle, onSubTitleChange, onNavigate, onDone, onEditSubtotal, hasError }: MainScreenProps) {
+  const [saveOpen, setSaveOpen] = React.useState(false)
+  const [loadOpen, setLoadOpen] = React.useState(false)
+  const isSubLevel = navigationPath.length > 0
+
+  return (
+    <ScreenContainer>
+      {isSubLevel
+        ? <SubHeaderEdit
+            breadcrumbs={breadcrumbs}
+            onNavigate={onNavigate}
+            subTitle={subTitle ?? ''}
+            onSubTitleChange={onSubTitleChange}
+            onDone={onDone!}
+          />
+        : <HeaderEdit onClear={onClear} onSaveClick={() => setSaveOpen(true)} onLoadClick={() => setLoadOpen(true)} hasError={hasError} />
+      }
+      <ListOfItems
+        lines={lines} totalDisplay={totalDisplay} totalPence={totalPence} advanced={advancedMode} showExplanation={showExplanation}
+        onFieldChange={onFieldChange}
+        onQuantityChange={onQuantityChange}
+        onTitleChange={onTitleChange}
+        onRemoveLine={onRemoveLine}
+        onAddLine={onAddLine}
+        onAddExtended={onAddExtended}
+        onAddSubtotal={onAddSubtotal}
+        onDuplicateLine={onDuplicateLine}
+        onClearItem={onClearItem}
+        onEditSubtotal={onEditSubtotal}
+      />
+      <FooterEdit
+        onHelp={onHelp}
+        showExplanation={showExplanation}
+        onShowExplanationChange={onShowExplanationChange}
+        advancedMode={advancedMode}
+        onAdvancedModeChange={onAdvancedModeChange}
+      />
+      {!isSubLevel && <>
+        <SaveModalUI isOpen={saveOpen} onClose={() => setSaveOpen(false)} onSave={onSave} />
+        <LoadModalUI isOpen={loadOpen} onClose={() => setLoadOpen(false)} onLoad={onLoad} />
+      </>}
+    </ScreenContainer>
+  )
+}

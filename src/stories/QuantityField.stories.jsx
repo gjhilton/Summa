@@ -27,3 +27,8 @@ export const EditableEmpty = {
   name: "Editable · empty",
   render: () => <QuantityField editable={true} value="" />,
 }
+
+export const WithError = {
+  name: "Editable — error state",
+  render: () => <QuantityField value="xyz" editable error />,
+}

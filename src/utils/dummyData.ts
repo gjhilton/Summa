@@ -30,7 +30,7 @@ export const DUMMY_DATA: CalculationState = {
       totalPence: 12, totalDisplay: { l: '0', s: 'j', d: '0' }, error: false,
     },
   ],
-  totalDisplay: { l: 'j', s: 'vij', d: 'vj' },
+  totalDisplay: { l: 'j', s: 'viij', d: 'vj' },
   totalPence: 342,
   hasError: false,
 }

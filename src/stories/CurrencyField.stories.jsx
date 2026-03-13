@@ -37,3 +37,13 @@ export const EditableEmpty = {
   name: "Editable · empty",
   render: () => <CurrencyField editable={true} label="s" value="" />,
 }
+
+export const PoundsFieldWithError = {
+  name: "Pounds field — error state",
+  render: () => <CurrencyField label="li" value="xyz" editable error />,
+}
+
+export const ShillingsFieldWithError = {
+  name: "Shillings field — error state",
+  render: () => <CurrencyField label="s" value="xyz" editable error />,
+}
