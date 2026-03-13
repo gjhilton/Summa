@@ -725,6 +725,14 @@ export function Logo({ size = 'm' }: LogoProps) {
 
 // ─── Composite item components ────────────────────────────────────────────────
 
+const SubtotalTitleRow = styled('div', {
+  base: { display: 'flex', alignItems: 'baseline', gap: '0.5em' },
+})
+
+const SubtotalTitleText = styled('span', {
+  base: { fontWeight: 'bold' },
+})
+
 const EditLinkButton = styled('button', {
   base: {
     flexShrink: 0,
@@ -735,7 +743,7 @@ const EditLinkButton = styled('button', {
     cursor: 'pointer',
     background: 'none',
     border: 'none',
-    padding: '0 0.5rem',
+    padding: '0',
     textDecoration: 'none',
     color: 'blue',
     display: 'inline-flex',
@@ -745,18 +753,8 @@ const EditLinkButton = styled('button', {
   },
 })
 
-const EditIconSvg = styled('svg', {
-  base: { display: 'inline', verticalAlign: '-1px' },
-})
-
-const EditIcon = () => (
-  <EditIconSvg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true">
-    <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.5 9.5a.5.5 0 0 1-.168.11l-4 1.5a.5.5 0 0 1-.65-.65l1.5-4a.5.5 0 0 1 .11-.168l9.5-9.5zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 4.072 4.072-1.528.106-.106A.5.5 0 0 1 5 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.468-.325z"/>
-  </EditIconSvg>
-)
-
 const EditLink = ({ onClick }: { onClick?: () => void }) => (
-  <EditLinkButton type="button" onClick={onClick}><EditIcon />edit</EditLinkButton>
+  <EditLinkButton type="button" onClick={onClick}>edit</EditLinkButton>
 )
 
 interface ItemUnitProps {
@@ -829,12 +827,14 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, onRemove,
   <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow>
       <Block>
-        <Label>
-          <TextInput value={`${title} (${count} items)`} editable={false} bold />
+        <SubtotalTitleRow>
+          <SubtotalTitleText>{title} ({count} items)</SubtotalTitleText>
           <EditLink onClick={onEdit} />
-        </Label>
+        </SubtotalTitleRow>
       </Block>
-      <BlockCurrency values={totalDisplay} />
+      <Block>
+        <Currency values={totalDisplay} />
+      </Block>
     </BlockRow>
     {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
