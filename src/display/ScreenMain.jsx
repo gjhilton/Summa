@@ -382,6 +382,14 @@ const inputRecipe = cva({
     bold: {
       true: { fontWeight: "bold" },
     },
+    numeric: {
+      true: {
+        fontSize: "1.4em",
+        paddingTop: "0",
+        paddingBottom: "0",
+        lineHeight: "1",
+      },
+    },
   },
   defaultVariants: {
     align: "l",
@@ -392,10 +400,11 @@ const StyledInput = styled("input", inputRecipe)
 
 // ─── Exported field components ────────────────────────────────────────────────
 
-export function TextInput({ editable, value, onChange, ...props }) {
+export function TextInput({ editable, numeric, value, onChange, ...props }) {
   return (
     <StyledInput
       editable={editable ? "true" : "false"}
+      numeric={numeric || undefined}
       value={value}
       onChange={editable ? onChange : undefined}
       readOnly={!editable}
@@ -415,13 +424,13 @@ export const TextField = ({ value, label, editable, align }) =>
 export const QuantityField = ({ value, editable }) =>
   <Label>
     <FieldAnnotation large>✕</FieldAnnotation>
-    <TextInput align="r" value={value} editable={editable} />
+    <TextInput align="r" numeric value={value} editable={editable} />
     <FieldAnnotation>@</FieldAnnotation>
   </Label>
 
 export const CurrencyField = ({ value, label, editable }) =>
   <Label>
-    <TextInput align="r" value={value === "0" ? "" : value} editable={editable} />
+    <TextInput align="r" numeric value={value === "0" ? "" : value} editable={editable} />
     <FieldAnnotation sup dim={value === "0" || undefined}>{label}</FieldAnnotation>
   </Label>
 
