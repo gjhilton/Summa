@@ -11,7 +11,7 @@ interface Props {
 
 export function Renderer({ data }: Props) {
   const [lines, setLines] = useState<AnyLineState[]>(() => data.lines)
-  const [showCalculations, setShowCalculations] = useState(false)
+  const [showExplanation, setShowExplanation] = useState(true)
   const [advancedMode, setAdvancedMode] = useState(false)
   const sensors = useSensors(useSensor(PointerSensor))
 
@@ -29,8 +29,8 @@ export function Renderer({ data }: Props) {
       <ScreenMain
         lines={lines}
         totalDisplay={data.totalDisplay}
-        showCalculations={showCalculations}
-        onShowCalculationsChange={setShowCalculations}
+        showExplanation={showExplanation}
+        onShowExplanationChange={setShowExplanation}
         advancedMode={advancedMode}
         onAdvancedModeChange={setAdvancedMode}
       />

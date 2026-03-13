@@ -3,9 +3,7 @@ import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
 import { Button } from "./Button"
 import { ItemType } from "@/types/calculation"
-import { computeFieldWorking } from "@/state/calculationLogic"
-import { romanToInteger, isValidRoman } from "@/utils/roman"
-import { normalizeEarlyModernInput } from "@/utils/earlyModern"
+import { computeLsdExplanation, computeExtendedExplanation } from "./explanation"
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
@@ -305,31 +303,31 @@ export function SwipeableItem({ children, ...props }) {
   )
 }
 
-// ─── Show-calculations helpers ────────────────────────────────────────────────
+// ─── Explanation helpers ──────────────────────────────────────────────────────
 
 const SupD = () => <sup>d</sup>
 
-function lsdWorking(literals, error) {
-  if (error) return null
-  const parts = ["l", "s", "d"].flatMap(f => {
-    const r = computeFieldWorking(literals[f], f)
-    return r ? [<React.Fragment key={f}>{r.prefix}{r.pence}<SupD /></React.Fragment>] : []
-  })
-  return parts.length ? parts.reduce((acc, el, i) => i === 0 ? [el] : [...acc, "\u00a0\u00a0", el], []) : null
+function renderExplanationTerms(terms) {
+  const parts = terms.map((t, i) =>
+    t.multiplier === 1
+      ? <React.Fragment key={i}>({t.pence}<SupD />)</React.Fragment>
+      : <React.Fragment key={i}>({t.integer} × {t.multiplier}<SupD /> = {t.pence}<SupD />)</React.Fragment>
+  )
+  return parts.reduce((acc, el, i) => i === 0 ? [el] : [...acc, " + ", el], [])
 }
 
-function extendedWorking(quantity, basePence, totalPence, error) {
-  if (error || !basePence) return null
-  const norm = normalizeEarlyModernInput(quantity)
-  if (!isValidRoman(norm)) return null
-  const qInt = romanToInteger(norm)
-  return <>{qInt} × {basePence}<SupD /> = {totalPence}<SupD /></>
+function renderLsdExplanation(literals, totalPence, error) {
+  const result = computeLsdExplanation(literals, totalPence, error)
+  if (!result) return null
+  return <>{renderExplanationTerms(result.terms)} = {result.totalPence}<SupD /></>
 }
 
-function subtotalWorking(count, totalPence, error) {
-  if (error) return null
-  return <>{count} item{count !== 1 ? "s" : ""} = {totalPence}<SupD /></>
+function renderExtendedExplanation(literals, quantity, basePence, totalPence, error) {
+  const result = computeExtendedExplanation(literals, quantity, basePence, totalPence, error)
+  if (!result) return null
+  return <>({renderExplanationTerms(result.unitCostTerms)} = {result.basePence}<SupD /> unit cost) × {result.quantity} quantity = {result.totalPence}<SupD /></>
 }
+
 
 // ─── Field primitives ─────────────────────────────────────────────────────────
 
@@ -583,16 +581,16 @@ const EditLink = styled("button", {
   },
 })
 
-export const ItemUnit = ({ title, literals, working }) =>
+export const ItemUnit = ({ title, literals, explanation }) =>
   <SwipeableItem>
     <BlockRow>
       <BlockTitle title={title} editable />
       <BlockCurrency editable values={literals} />
     </BlockRow>
-    {working && <WorkingRow>{working}</WorkingRow>}
+    {explanation && <WorkingRow>{explanation}</WorkingRow>}
   </SwipeableItem>
 
-export const ItemExtended = ({ title, literals, quantity, working }) =>
+export const ItemExtended = ({ title, literals, quantity, explanation }) =>
   <SwipeableItem>
     <BlockRow>
       <BlockTitle title={title} editable>
@@ -601,10 +599,10 @@ export const ItemExtended = ({ title, literals, quantity, working }) =>
       <BlockCurrency editable values={literals} />
       <BlockCurrency />
     </BlockRow>
-    {working && <WorkingRow>{working}</WorkingRow>}
+    {explanation && <WorkingRow>{explanation}</WorkingRow>}
   </SwipeableItem>
 
-export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, working }) =>
+export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanation }) =>
   <SwipeableItem>
     <BlockRow>
       <Block>
@@ -615,16 +613,16 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, working }
       </Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {working && <WorkingRow>{working}</WorkingRow>}
+    {explanation && <WorkingRow>{explanation}</WorkingRow>}
   </SwipeableItem>
 
-export const ItemTotal = ({ totalDisplay, working }) =>
+export const ItemTotal = ({ totalDisplay, explanation }) =>
   <Item borders="total" sideMargins>
     <BlockRow centerItems>
       <Block indented><Logo size="s" /></Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {working && <WorkingRow>{working}</WorkingRow>}
+    {explanation && <WorkingRow>{explanation}</WorkingRow>}
   </Item>
 
 // ─── Add item bar ─────────────────────────────────────────────────────────────
@@ -809,10 +807,10 @@ const HelpButton = styled("button", {
 const GITHUB_URL = "https://github.com/gjhilton/Summa"
 const FUNERAL_GAMES_URL = "http://funeralgames.co.uk"
 
-export const FooterEdit = ({ onHelp, showCalculations, onShowCalculationsChange, advancedMode, onAdvancedModeChange }) =>
+export const FooterEdit = ({ onHelp, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }) =>
   <FooterBar>
     <FooterControls>
-      <Toggle id="show-calculations" label="show calculations" checked={showCalculations} onChange={onShowCalculationsChange} />
+      <Toggle id="explain-calculations" label="explain calculations" checked={showExplanation} onChange={onShowExplanationChange} />
       <Toggle id="advanced-mode" label="advanced mode" checked={advancedMode} onChange={onAdvancedModeChange} />
     </FooterControls>
     <FooterCredits>
@@ -878,18 +876,18 @@ function SortableLine({ id, children }) {
 
 // ─── List of items ────────────────────────────────────────────────────────────
 
-export function ListOfItems({ lines, totalDisplay, advanced, showCalculations }) {
+export function ListOfItems({ lines, totalDisplay, advanced, showExplanation }) {
   return (
     <SwipeProvider>
       <section>
         <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {lines.map(line => {
             if (line.itemType === ItemType.LINE_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} working={showCalculations ? lsdWorking(line.literals, line.error) : null} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} explanation={showExplanation ? renderLsdExplanation(line.literals, line.totalPence, line.error) : null} /></SortableLine>
             if (line.itemType === ItemType.EXTENDED_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} working={showCalculations ? extendedWorking(line.quantity, line.basePence, line.totalPence, line.error) : null} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} explanation={showExplanation ? renderExtendedExplanation(line.literals, line.quantity, line.basePence, line.totalPence, line.error) : null} /></SortableLine>
             if (line.itemType === ItemType.SUBTOTAL_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} working={showCalculations ? subtotalWorking(line.lines.length, line.totalPence, line.error) : null} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} explanation={showExplanation ? renderLsdExplanation(line.totalDisplay, line.totalPence, line.error) : null} /></SortableLine>
             return null
           })}
         </SortableContext>
@@ -908,14 +906,14 @@ const ScreenContainer = styled("main", {
   },
 })
 
-export const ScreenMain = ({ lines, totalDisplay, showCalculations, onShowCalculationsChange, advancedMode, onAdvancedModeChange }) =>
+export const ScreenMain = ({ lines, totalDisplay, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }) =>
   <ScreenContainer>
     <HeaderEdit />
-    <ListOfItems lines={lines} totalDisplay={totalDisplay} advanced={advancedMode} showCalculations={showCalculations} />
+    <ListOfItems lines={lines} totalDisplay={totalDisplay} advanced={advancedMode} showExplanation={showExplanation} />
     <FooterEdit
       onHelp={() => {}}
-      showCalculations={showCalculations}
-      onShowCalculationsChange={onShowCalculationsChange}
+      showExplanation={showExplanation}
+      onShowExplanationChange={onShowExplanationChange}
       advancedMode={advancedMode}
       onAdvancedModeChange={onAdvancedModeChange}
     />
