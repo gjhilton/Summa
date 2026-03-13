@@ -1,5 +1,5 @@
 import React from "react"
-import { HeaderEdit, FooterEdit, ListOfItems, ScreenMain, AddItemBar } from "../Prototype"
+import { HeaderEdit, FooterEdit, ListOfItems, Renderer, AddItemBar, DUMMY_DATA } from "../Prototype"
 
 export default {
   title: "Prototype/Screen",
@@ -27,7 +27,7 @@ export const List = {
       </div>
     ),
   ],
-  render: () => <ListOfItems />,
+  render: () => <ListOfItems lines={DUMMY_DATA.lines} totalDisplay={DUMMY_DATA.totalDisplay} advanced={false} />,
 }
 
 export const Footer = {
@@ -79,10 +79,10 @@ export const AddBarAdvanced = {
 }
 
 export const Full = {
-  name: "ScreenMain (full screen)",
+  name: "Renderer (full screen)",
   render: () => (
     <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
-      <ScreenMain />
+      <Renderer />
     </div>
   ),
 }

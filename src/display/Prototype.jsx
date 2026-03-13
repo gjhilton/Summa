@@ -109,7 +109,6 @@ const StyledItem = styled("div", {
   },
 })
 
-
 const ContentWrapper = styled("div", {
   base: {
     position: "relative",
@@ -350,7 +349,7 @@ export const TextField = ({ value, label, editable, align }) =>
   <TextFieldBox>
     <Label>
       {label}
-      <TextInput value={value} editable={editable} align={align} bold="true" />
+      <TextInput value={value} editable={editable} align={align} bold />
     </Label>
   </TextFieldBox>
 
@@ -382,9 +381,9 @@ export const BlockTitle = ({ title, children, editable }) =>
     </Equally>
   </Block>
 
-export const BlockCurrency = ({ editable }) =>
+export const BlockCurrency = ({ editable, values }) =>
   <Block>
-    <Currency editable={editable} />
+    <Currency editable={editable} values={values} />
   </Block>
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
@@ -467,36 +466,36 @@ const EditLink = styled("button", {
   },
 })
 
-export const ItemUnit = () =>
+export const ItemUnit = ({ title, literals }) =>
   <SwipeableItem>
-    <BlockTitle title="unit item" editable={true} />
-    <BlockCurrency editable={true} />
+    <BlockTitle title={title} editable />
+    <BlockCurrency editable values={literals} />
   </SwipeableItem>
 
-export const ItemExtended = () =>
+export const ItemExtended = ({ title, literals, quantity }) =>
   <SwipeableItem>
-    <BlockTitle title="extended item" editable={true}>
-      <QuantityField editable={true} />
+    <BlockTitle title={title} editable>
+      <QuantityField editable value={quantity} />
     </BlockTitle>
-    <BlockCurrency editable={true} />
+    <BlockCurrency editable values={literals} />
     <BlockCurrency />
   </SwipeableItem>
 
-export const ItemSubTotal = ({ count = 0, onEdit }) =>
+export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit }) =>
   <SwipeableItem>
     <Block>
       <Label>
-        <TextInput value={`subtotal (${count} items)`} editable={false} bold="true" />
+        <TextInput value={`${title} (${count} items)`} editable={false} bold />
         <EditLink type="button" onClick={onEdit}>edit</EditLink>
       </Label>
     </Block>
-    <BlockCurrency />
+    <BlockCurrency values={totalDisplay} />
   </SwipeableItem>
 
-export const ItemTotal = () =>
+export const ItemTotal = ({ totalDisplay }) =>
   <Item borders="total" sideMargins centerItems>
     <Block><Logo size="s" /></Block>
-    <BlockCurrency />
+    <BlockCurrency values={totalDisplay} />
   </Item>
 
 // ─── Add item bar ─────────────────────────────────────────────────────────────
@@ -719,14 +718,50 @@ export const HeaderEdit = () =>
     </PageWidth>
   </Header>
 
-export const ListOfItems = () =>
+export const DUMMY_DATA = {
+  lines: [
+    {
+      id: "1", itemType: "LINE_ITEM",
+      title: "Candles, tallow",
+      literals: { l: "0", s: "iij", d: "vj" },
+      error: false, fieldErrors: { l: false, s: false, d: false }, totalPence: 42,
+    },
+    {
+      id: "2", itemType: "EXTENDED_ITEM",
+      title: "Beeswax candles",
+      literals: { l: "0", s: "ij", d: "0" },
+      quantity: "xij",
+      error: false, fieldErrors: { l: false, s: false, d: false },
+      quantityError: false, basePence: 24, totalPence: 288,
+    },
+    {
+      id: "3", itemType: "SUBTOTAL_ITEM",
+      title: "sundries",
+      lines: [
+        { id: "3a", itemType: "LINE_ITEM", title: "Rushes",
+          literals: { l: "0", s: "j", d: "0" },
+          error: false, fieldErrors: { l: false, s: false, d: false }, totalPence: 12 }
+      ],
+      totalPence: 12, totalDisplay: { l: "0", s: "j", d: "0" }, error: false,
+    },
+  ],
+  totalDisplay: { l: "j", s: "vij", d: "vj" },
+}
+
+export const ListOfItems = ({ lines, totalDisplay, advanced }) =>
   <SwipeProvider>
     <section>
-      <ItemUnit />
-      <ItemExtended />
-      <ItemSubTotal />
-      <AddItemBar advanced onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
-      <ItemTotal />
+      {lines.map(line => {
+        if (line.itemType === "LINE_ITEM")
+          return <ItemUnit key={line.id} title={line.title} literals={line.literals} />
+        if (line.itemType === "EXTENDED_ITEM")
+          return <ItemExtended key={line.id} title={line.title} literals={line.literals} quantity={line.quantity} />
+        if (line.itemType === "SUBTOTAL_ITEM")
+          return <ItemSubTotal key={line.id} title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} />
+        return null
+      })}
+      <AddItemBar advanced={advanced} onAdd={() => alert("add item")} onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
+      <ItemTotal totalDisplay={totalDisplay} />
     </section>
   </SwipeProvider>
 
@@ -738,20 +773,29 @@ const ScreenContainer = styled("main", {
   },
 })
 
-export function ScreenMain() {
+export const ScreenMain = ({ data, showCalculations, onShowCalculationsChange, advancedMode, onAdvancedModeChange }) =>
+  <ScreenContainer>
+    <HeaderEdit />
+    <ListOfItems lines={data.lines} totalDisplay={data.totalDisplay} advanced={advancedMode} />
+    <FooterEdit
+      onHelp={() => {}}
+      showCalculations={showCalculations}
+      onShowCalculationsChange={onShowCalculationsChange}
+      advancedMode={advancedMode}
+      onAdvancedModeChange={onAdvancedModeChange}
+    />
+  </ScreenContainer>
+
+export function Renderer({ data = DUMMY_DATA }) {
   const [showCalculations, setShowCalculations] = React.useState(false)
   const [advancedMode, setAdvancedMode] = React.useState(false)
   return (
-    <ScreenContainer>
-      <HeaderEdit />
-      <ListOfItems />
-      <FooterEdit
-        onHelp={() => {}}
-        showCalculations={showCalculations}
-        onShowCalculationsChange={setShowCalculations}
-        advancedMode={advancedMode}
-        onAdvancedModeChange={setAdvancedMode}
-      />
-    </ScreenContainer>
+    <ScreenMain
+      data={data}
+      showCalculations={showCalculations}
+      onShowCalculationsChange={setShowCalculations}
+      advancedMode={advancedMode}
+      onAdvancedModeChange={setAdvancedMode}
+    />
   )
 }
