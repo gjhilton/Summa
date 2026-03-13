@@ -3,6 +3,9 @@ import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
 import { Button } from "./Button"
 import { ItemType } from "@/types/calculation"
+import { computeFieldWorking } from "@/state/calculationLogic"
+import { romanToInteger, isValidRoman } from "@/utils/roman"
+import { normalizeEarlyModernInput } from "@/utils/earlyModern"
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
@@ -124,9 +127,6 @@ const ContentWrapper = styled("div", {
     minWidth: 0,
     position: "relative",
     zIndex: 2,
-    display: { base: "block", md: "flex" },
-    "& > *": { flex: "1" },
-    "& > *:last-child": { flex: "0 0 33.333%" },
     borderTopWidth: "1px",
     borderBottomWidth: "1px",
     borderTopStyle: "solid",
@@ -151,9 +151,6 @@ const ContentWrapper = styled("div", {
     },
     swipeable: {
       true: { touchAction: "pan-y" },
-    },
-    centerItems: {
-      true: { alignItems: { md: "center" } },
     },
     sideMargins: {
       true: {
@@ -225,7 +222,6 @@ export function DragHandle() {
 export function Item({
   borders,
   sideMargins = false,
-  centerItems = false,
   showActions = false,
   isOpen = false,
   desktopVisible = false,
@@ -245,7 +241,6 @@ export function Item({
         open={isOpen}
         swipeable={showActions || undefined}
         sideMargins={sideMargins || undefined}
-        centerItems={centerItems || undefined}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -310,6 +305,32 @@ export function SwipeableItem({ children, ...props }) {
   )
 }
 
+// ─── Show-calculations helpers ────────────────────────────────────────────────
+
+const SupD = () => <sup>d</sup>
+
+function lsdWorking(literals, error) {
+  if (error) return null
+  const parts = ["l", "s", "d"].flatMap(f => {
+    const r = computeFieldWorking(literals[f], f)
+    return r ? [<React.Fragment key={f}>{r.prefix}{r.pence}<SupD /></React.Fragment>] : []
+  })
+  return parts.length ? parts.reduce((acc, el, i) => i === 0 ? [el] : [...acc, "\u00a0\u00a0", el], []) : null
+}
+
+function extendedWorking(quantity, basePence, totalPence, error) {
+  if (error || !basePence) return null
+  const norm = normalizeEarlyModernInput(quantity)
+  if (!isValidRoman(norm)) return null
+  const qInt = romanToInteger(norm)
+  return <>{qInt} × {basePence}<SupD /> = {totalPence}<SupD /></>
+}
+
+function subtotalWorking(count, totalPence, error) {
+  if (error) return null
+  return <>{count} item{count !== 1 ? "s" : ""} = {totalPence}<SupD /></>
+}
+
 // ─── Field primitives ─────────────────────────────────────────────────────────
 
 const Equally = styled("div", {
@@ -325,6 +346,34 @@ const TextFieldBox = styled("div", {
 
 const Block = styled("div", {
   base: { marginTop: "1rem" },
+  variants: {
+    indented: {
+      true: { paddingLeft: "2rem" },
+    },
+  },
+})
+
+const BlockRow = styled("div", {
+  base: {
+    display: { base: "block", md: "flex" },
+    "& > *": { flex: "1" },
+    "& > *:last-child": { flex: "0 0 33.333%" },
+  },
+  variants: {
+    centerItems: {
+      true: { alignItems: { md: "center" } },
+    },
+  },
+})
+
+const WorkingRow = styled("div", {
+  base: {
+    textAlign: "right",
+    fontSize: "0.8em",
+    opacity: 0.65,
+    fontStyle: "italic",
+    paddingTop: "0.25rem",
+  },
 })
 
 const Label = styled("label", {
@@ -534,36 +583,48 @@ const EditLink = styled("button", {
   },
 })
 
-export const ItemUnit = ({ title, literals }) =>
+export const ItemUnit = ({ title, literals, working }) =>
   <SwipeableItem>
-    <BlockTitle title={title} editable />
-    <BlockCurrency editable values={literals} />
+    <BlockRow>
+      <BlockTitle title={title} editable />
+      <BlockCurrency editable values={literals} />
+    </BlockRow>
+    {working && <WorkingRow>{working}</WorkingRow>}
   </SwipeableItem>
 
-export const ItemExtended = ({ title, literals, quantity }) =>
+export const ItemExtended = ({ title, literals, quantity, working }) =>
   <SwipeableItem>
-    <BlockTitle title={title} editable>
-      <QuantityField editable value={quantity} />
-    </BlockTitle>
-    <BlockCurrency editable values={literals} />
-    <BlockCurrency />
+    <BlockRow>
+      <BlockTitle title={title} editable>
+        <QuantityField editable value={quantity} />
+      </BlockTitle>
+      <BlockCurrency editable values={literals} />
+      <BlockCurrency />
+    </BlockRow>
+    {working && <WorkingRow>{working}</WorkingRow>}
   </SwipeableItem>
 
-export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit }) =>
+export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, working }) =>
   <SwipeableItem>
-    <Block>
-      <Label>
-        <TextInput value={`${title} (${count} items)`} editable={false} bold />
-        <EditLink type="button" onClick={onEdit}>edit</EditLink>
-      </Label>
-    </Block>
-    <BlockCurrency values={totalDisplay} />
+    <BlockRow>
+      <Block>
+        <Label>
+          <TextInput value={`${title} (${count} items)`} editable={false} bold />
+          <EditLink type="button" onClick={onEdit}>edit</EditLink>
+        </Label>
+      </Block>
+      <BlockCurrency values={totalDisplay} />
+    </BlockRow>
+    {working && <WorkingRow>{working}</WorkingRow>}
   </SwipeableItem>
 
-export const ItemTotal = ({ totalDisplay }) =>
-  <Item borders="total" sideMargins centerItems>
-    <Block><Logo size="s" /></Block>
-    <BlockCurrency values={totalDisplay} />
+export const ItemTotal = ({ totalDisplay, working }) =>
+  <Item borders="total" sideMargins>
+    <BlockRow centerItems>
+      <Block indented><Logo size="s" /></Block>
+      <BlockCurrency values={totalDisplay} />
+    </BlockRow>
+    {working && <WorkingRow>{working}</WorkingRow>}
   </Item>
 
 // ─── Add item bar ─────────────────────────────────────────────────────────────
@@ -572,8 +633,10 @@ const AddBar = styled("div", {
   base: {
     display: "flex",
     gap: "0.5rem",
-    padding: "0.25rem 1.5rem",
-    paddingBottom: { base: "1rem", md: "0.25rem" },
+    paddingLeft: "1.5rem",
+    paddingRight: "1.5rem",
+    paddingTop: { base: "0.25rem", md: "0.75rem" },
+    paddingBottom: { base: "1rem", md: "0.75rem" },
     justifyContent: { md: "flex-end" },
   },
 })
@@ -815,18 +878,18 @@ function SortableLine({ id, children }) {
 
 // ─── List of items ────────────────────────────────────────────────────────────
 
-export function ListOfItems({ lines, totalDisplay, advanced }) {
+export function ListOfItems({ lines, totalDisplay, advanced, showCalculations }) {
   return (
     <SwipeProvider>
       <section>
         <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {lines.map(line => {
             if (line.itemType === ItemType.LINE_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} working={showCalculations ? lsdWorking(line.literals, line.error) : null} /></SortableLine>
             if (line.itemType === ItemType.EXTENDED_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} working={showCalculations ? extendedWorking(line.quantity, line.basePence, line.totalPence, line.error) : null} /></SortableLine>
             if (line.itemType === ItemType.SUBTOTAL_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} working={showCalculations ? subtotalWorking(line.lines.length, line.totalPence, line.error) : null} /></SortableLine>
             return null
           })}
         </SortableContext>
@@ -848,7 +911,7 @@ const ScreenContainer = styled("main", {
 export const ScreenMain = ({ lines, totalDisplay, showCalculations, onShowCalculationsChange, advancedMode, onAdvancedModeChange }) =>
   <ScreenContainer>
     <HeaderEdit />
-    <ListOfItems lines={lines} totalDisplay={totalDisplay} advanced={advancedMode} />
+    <ListOfItems lines={lines} totalDisplay={totalDisplay} advanced={advancedMode} showCalculations={showCalculations} />
     <FooterEdit
       onHelp={() => {}}
       showCalculations={showCalculations}
