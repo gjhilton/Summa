@@ -1,19 +1,27 @@
-import React from "react"
-import { styled } from "../styled-system/jsx"
-import { cva } from "../styled-system/css"
-import { Button } from "./Button"
-import { ItemType } from "@/types/calculation"
-import { explain, explainTotal } from "@/utils/explanation"
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import React from 'react'
+import { styled } from '@/styled-system/jsx'
+import { cva } from '@/styled-system/css'
+import { Button } from './Button'
+import { ItemType } from '@/types/calculation'
+import type { AnyLineState, LsdStrings } from '@/types/calculation'
+import { explain, explainTotal } from '@/utils/explanation'
+import type { ExplanationTerm } from '@/utils/explanation'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { DragCtx } from './DragContext'
 
 // ─── Swipe context ────────────────────────────────────────────────────────────
 
-const SwipeContext = React.createContext({ openId: null, setOpenId: () => {} })
+interface SwipeContextValue {
+  openId: string | null
+  setOpenId: (id: string | null) => void
+}
+
+const SwipeContext = React.createContext<SwipeContextValue>({ openId: null, setOpenId: () => {} })
 function useSwipeContext() { return React.useContext(SwipeContext) }
 
-export function SwipeProvider({ children }) {
-  const [openId, setOpenId] = React.useState(null)
+export function SwipeProvider({ children }: { children: React.ReactNode }) {
+  const [openId, setOpenId] = React.useState<string | null>(null)
   return (
     <SwipeContext.Provider value={{ openId, setOpenId }}>
       {children}
@@ -21,64 +29,65 @@ export function SwipeProvider({ children }) {
   )
 }
 
-// ─── Drag context ─────────────────────────────────────────────────────────────
-
-export const DragCtx = React.createContext(null)
-
 // ─── Hover capability (evaluated once at module load) ─────────────────────────
 
-const canHover = typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches
+const canHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches
 
 // ─── Action strip ─────────────────────────────────────────────────────────────
 
 // visible: true  = opaque and interactive
 // visible: false = faded and non-interactive (desktop hover devices only)
-const ActionStripWrapper = styled("div", {
+const ActionStripWrapper = styled('div', {
   base: {
-    position: "absolute",
+    position: 'absolute',
     right: 0,
     top: 0,
     bottom: 0,
-    width: "240px",
-    display: "flex",
+    width: '240px',
+    display: 'flex',
     zIndex: 1,
-    overflow: "hidden",
-    background: "#e8e8e8",
-    boxShadow: "inset 8px 0 16px -4px rgba(0,0,0,0.25)",
-    transition: "opacity 0.2s ease, transform 0.2s ease",
+    overflow: 'hidden',
+    background: '#e8e8e8',
+    boxShadow: 'inset 8px 0 16px -4px rgba(0,0,0,0.25)',
+    transition: 'opacity 0.2s ease, transform 0.2s ease',
   },
   variants: {
     visible: {
-      true:  { opacity: 1, transform: "translateX(0)",    pointerEvents: "auto" },
-      false: { opacity: 0, transform: "translateX(12px)", pointerEvents: "none" },
+      true:  { opacity: 1, transform: 'translateX(0)',    pointerEvents: 'auto' },
+      false: { opacity: 0, transform: 'translateX(12px)', pointerEvents: 'none' },
     },
   },
 })
 
-const ActionButton = styled("button", {
+const ActionButton = styled('button', {
   base: {
     flex: 1,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "2px",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "0.65rem",
-    fontFamily: "inherit",
-    color: "#333",
-    padding: "0 4px",
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '2px',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '0.65rem',
+    fontFamily: 'inherit',
+    color: '#333',
+    padding: '0 4px',
     lineHeight: 1.2,
-    background: "transparent",
+    background: 'transparent',
   },
 })
 
-const ActionButtonIcon = styled("span", {
-  base: { fontSize: "1rem" },
+const ActionButtonIcon = styled('span', {
+  base: { fontSize: '1rem' },
 })
 
-function ActionStrip({ onClose, desktopVisible }) {
+interface ActionStripProps {
+  onClose: () => void
+  desktopVisible: boolean
+}
+
+function ActionStrip({ onClose, desktopVisible }: ActionStripProps) {
   // Touch: always visible. Desktop: fades in/out on row hover.
   const visible = !canHover || desktopVisible
   return (
@@ -101,71 +110,71 @@ function ActionStrip({ onClose, desktopVisible }) {
 
 // ─── Item layout ──────────────────────────────────────────────────────────────
 
-const StyledItem = styled("div", {
+const StyledItem = styled('div', {
   base: {
-    position: "relative",
-    overflow: "hidden",
-    display: "flex",
-    alignItems: "stretch",
-    marginBottom: "0.25rem",
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'stretch',
+    marginBottom: '0.25rem',
   },
   variants: {
     sideMargins: {
       true: {
-        marginLeft: "1.5rem",
-        marginRight: "1.5rem",
+        marginLeft: '1.5rem',
+        marginRight: '1.5rem',
       },
     },
   },
 })
 
-const ContentWrapper = styled("div", {
+const ContentWrapper = styled('div', {
   base: {
     flex: 1,
     minWidth: 0,
-    position: "relative",
+    position: 'relative',
     zIndex: 2,
-    borderTopWidth: "1px",
-    borderBottomWidth: "1px",
-    borderTopStyle: "solid",
-    borderBottomStyle: "solid",
-    borderTopColor: "transparent",
-    borderBottomColor: "transparent",
-    padding: "1rem 1.5rem",
-    transition: "transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease",
+    borderTopWidth: '1px',
+    borderBottomWidth: '1px',
+    borderTopStyle: 'solid',
+    borderBottomStyle: 'solid',
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    padding: '1rem 1.5rem',
+    transition: 'transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease',
   },
   variants: {
     open: {
       true: {
-        transform: "translateX(-240px)",
-        background: "#fef9e0",
-        boxShadow: "6px 0 16px rgba(0,0,0,0.3)",
+        transform: 'translateX(-240px)',
+        background: '#fef9e0',
+        boxShadow: '6px 0 16px rgba(0,0,0,0.3)',
       },
       false: {
-        transform: "translateX(0)",
-        background: "white",
-        boxShadow: "none",
+        transform: 'translateX(0)',
+        background: 'white',
+        boxShadow: 'none',
       },
     },
     swipeable: {
-      true: { touchAction: "pan-y" },
+      true: { touchAction: 'pan-y' },
     },
     sideMargins: {
       true: {
-        paddingLeft: "0",
-        paddingRight: "0",
+        paddingLeft: '0',
+        paddingRight: '0',
       },
     },
     borders: {
       total: {
-        borderTopWidth: "3px",
-        borderBottomWidth: "3px",
-        borderTopStyle: "double",
-        borderBottomStyle: "double",
-        borderTopColor: "black",
-        borderBottomColor: "black",
-        paddingTop: { base: "0.25rem", md: "1rem" },
-        paddingBottom: "1rem",
+        borderTopWidth: '3px',
+        borderBottomWidth: '3px',
+        borderTopStyle: 'double',
+        borderBottomStyle: 'double',
+        borderTopColor: 'black',
+        borderBottomColor: 'black',
+        paddingTop: { base: '0.25rem', md: '1rem' },
+        paddingBottom: '1rem',
       },
     },
   },
@@ -174,23 +183,23 @@ const ContentWrapper = styled("div", {
 
 // ─── Drag handle ──────────────────────────────────────────────────────────────
 
-const DragHandleButton = styled("button", {
+const DragHandleButton = styled('button', {
   base: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     flexShrink: 0,
-    width: "2rem",
-    border: "none",
-    background: "transparent",
-    cursor: "grab",
-    color: "rgba(0,0,0,0.2)",
-    touchAction: "none",
-    userSelect: "none",
+    width: '2rem',
+    border: 'none',
+    background: 'transparent',
+    cursor: 'grab',
+    color: 'rgba(0,0,0,0.2)',
+    touchAction: 'none',
+    userSelect: 'none',
     padding: 0,
     zIndex: 3,
-    _hover: { color: "rgba(0,0,0,0.5)" },
-    _active: { cursor: "grabbing" },
+    _hover: { color: 'rgba(0,0,0,0.5)' },
+    _active: { cursor: 'grabbing' },
   },
 })
 
@@ -217,6 +226,21 @@ export function DragHandle() {
 
 // ─── Item — pure display component ───────────────────────────────────────────
 
+interface ItemProps {
+  borders?: 'total'
+  sideMargins?: boolean
+  showActions?: boolean
+  isOpen?: boolean
+  desktopVisible?: boolean
+  onClose?: () => void
+  onTouchStart?: React.TouchEventHandler
+  onTouchMove?: React.TouchEventHandler
+  onTouchEnd?: React.TouchEventHandler
+  onMouseEnter?: React.MouseEventHandler
+  onMouseLeave?: React.MouseEventHandler
+  children: React.ReactNode
+}
+
 export function Item({
   borders,
   sideMargins = false,
@@ -227,12 +251,13 @@ export function Item({
   onTouchStart,
   onTouchMove,
   onTouchEnd,
+  onMouseEnter,
+  onMouseLeave,
   children,
-  ...props
-}) {
+}: ItemProps) {
   return (
-    <StyledItem sideMargins={sideMargins || undefined} {...props}>
-      {showActions && <ActionStrip onClose={onClose} desktopVisible={desktopVisible} />}
+    <StyledItem sideMargins={sideMargins || undefined} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      {showActions && <ActionStrip onClose={onClose!} desktopVisible={desktopVisible} />}
       <DragHandle />
       <ContentWrapper
         borders={borders}
@@ -251,31 +276,31 @@ export function Item({
 
 // ─── SwipeableItem — stateful container ──────────────────────────────────────
 
-export function SwipeableItem({ children, ...props }) {
+export function SwipeableItem({ children }: { children: React.ReactNode }) {
   const id = React.useId()
   const { openId, setOpenId } = useSwipeContext()
   const isOpen = openId === id
   const [hovered, setHovered] = React.useState(false)
-  const startX = React.useRef(null)
-  const startY = React.useRef(null)
+  const startX = React.useRef<number | null>(null)
+  const startY = React.useRef<number | null>(null)
   const isVertical = React.useRef(false)
 
-  function onTouchStart(e) {
+  function onTouchStart(e: React.TouchEvent) {
     startX.current = e.touches[0].clientX
     startY.current = e.touches[0].clientY
     isVertical.current = false
   }
 
-  function onTouchMove(e) {
+  function onTouchMove(e: React.TouchEvent) {
     if (isVertical.current) return
-    const dx = e.touches[0].clientX - startX.current
-    const dy = e.touches[0].clientY - startY.current
+    const dx = e.touches[0].clientX - startX.current!
+    const dy = e.touches[0].clientY - startY.current!
     if (Math.abs(dy) > Math.abs(dx)) isVertical.current = true
   }
 
-  function onTouchEnd(e) {
+  function onTouchEnd(e: React.TouchEvent) {
     if (isVertical.current) return
-    const dx = e.changedTouches[0].clientX - startX.current
+    const dx = e.changedTouches[0].clientX - startX.current!
     if (dx < -40) setOpenId(id)
     else if (dx > 20) setOpenId(null)
   }
@@ -287,7 +312,6 @@ export function SwipeableItem({ children, ...props }) {
 
   return (
     <Item
-      {...props}
       showActions
       isOpen={isOpen}
       desktopVisible={canHover && hovered}
@@ -307,16 +331,16 @@ export function SwipeableItem({ children, ...props }) {
 
 const SupD = () => <sup>d</sup>
 
-function renderExplanationTerms(terms) {
+function renderExplanationTerms(terms: ExplanationTerm[]): React.ReactNode[] {
   return terms.flatMap((t, i) => {
     const term = t.multiplier === 1
       ? <React.Fragment key={t.multiplier}>{t.pence}<SupD /></React.Fragment>
       : <React.Fragment key={t.multiplier}>({t.integer} × {t.multiplier}<SupD /> = {t.pence}<SupD />)</React.Fragment>
-    return i === 0 ? [term] : [" + ", term]
+    return i === 0 ? [term] : [' + ', term]
   })
 }
 
-function renderExplanation(line) {
+function renderExplanation(line: AnyLineState): React.ReactNode {
   const result = explain(line)
   if (!result) return null
   switch (result.type) {
@@ -324,10 +348,12 @@ function renderExplanation(line) {
       return <>{renderExplanationTerms(result.terms)} = {result.totalPence}<SupD /></>
     case 'extended':
       return <>{renderExplanationTerms(result.unitCostTerms)} = {result.basePence}<SupD /> unit cost × {result.quantity} = {result.totalPence}<SupD /></>
+    case 'total':
+      return null
   }
 }
 
-function renderTotalExplanation(totalDisplay, totalPence) {
+function renderTotalExplanation(totalDisplay: LsdStrings, totalPence: number): React.ReactNode {
   const result = explainTotal(totalDisplay, totalPence)
   if (!result) return null
   return <>{result.totalPence}<SupD /> = {renderExplanationTerms(result.terms)}</>
@@ -335,69 +361,69 @@ function renderTotalExplanation(totalDisplay, totalPence) {
 
 // ─── Field primitives ─────────────────────────────────────────────────────────
 
-const Equally = styled("div", {
+const Equally = styled('div', {
   base: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(0, 1fr))",
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(0, 1fr))',
   },
 })
 
-const TextFieldBox = styled("div", {
-  base: { paddingRight: "1.5rem" },
+const TextFieldBox = styled('div', {
+  base: { paddingRight: '1.5rem' },
 })
 
-const Block = styled("div", {
-  base: { marginTop: "1rem" },
+const Block = styled('div', {
+  base: { marginTop: '1rem' },
   variants: {
     indented: {
-      true: { paddingLeft: "2rem" },
+      true: { paddingLeft: '2rem' },
     },
   },
 })
 
-const BlockRow = styled("div", {
+const BlockRow = styled('div', {
   base: {
-    display: { base: "block", md: "flex" },
-    "& > *": { flex: "1" },
-    "& > *:last-child": { flex: "0 0 33.333%" },
+    display: { base: 'block', md: 'flex' },
+    '& > *': { flex: '1' },
+    '& > *:last-child': { flex: '0 0 33.333%' },
   },
   variants: {
     centerItems: {
-      true: { alignItems: { md: "center" } },
+      true: { alignItems: { md: 'center' } },
     },
   },
 })
 
-const ExplanationRow = styled("div", {
+const ExplanationRow = styled('div', {
   base: {
-    textAlign: "right",
-    fontSize: "0.8em",
+    textAlign: 'right',
+    fontSize: '0.8em',
     opacity: 0.65,
-    fontStyle: "italic",
-    paddingTop: "0.25rem",
+    fontStyle: 'italic',
+    paddingTop: '0.25rem',
   },
 })
 
-const Label = styled("label", {
+const Label = styled('label', {
   base: {
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
   },
 })
 
 // Shared base for inline label annotations (currency symbols, operators)
-const FieldAnnotation = styled("span", {
+const FieldAnnotation = styled('span', {
   base: {
     flexShrink: 0,
-    paddingLeft: "0.25rem",
-    paddingRight: "0.65rem",
+    paddingLeft: '0.25rem',
+    paddingRight: '0.65rem',
   },
   variants: {
     large: {
-      true: { fontSize: "1.1em" },
+      true: { fontSize: '1.1em' },
     },
     sup: {
-      true: { verticalAlign: "super", fontSize: "0.75em" },
+      true: { verticalAlign: 'super', fontSize: '0.75em' },
     },
     dim: {
       true: { opacity: 0.2 },
@@ -407,51 +433,60 @@ const FieldAnnotation = styled("span", {
 
 const inputRecipe = cva({
   base: {
-    border: "0",
-    borderBottomWidth: "1px",
-    borderBottomStyle: "solid",
-    borderBottomColor: "transparent",
-    flex: "1",
-    width: "100%",
-    minWidth: "0",
-    outline: "none",
-    transition: "all 0.2s",
+    border: '0',
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'transparent',
+    flex: '1',
+    width: '100%',
+    minWidth: '0',
+    outline: 'none',
+    transition: 'all 0.2s',
   },
   variants: {
     align: {
-      l: { textAlign: "left" },
-      r: { textAlign: "right" },
+      l: { textAlign: 'left' },
+      r: { textAlign: 'right' },
     },
     editable: {
       true: {
-        bg: "transparent",
-        color: "black",
-        borderBottomColor: "rgba(0,0,0,0.1)",
-        _focus: { borderBottomColor: "black" },
+        bg: 'transparent',
+        color: 'black',
+        borderBottomColor: 'rgba(0,0,0,0.1)',
+        _focus: { borderBottomColor: 'black' },
       },
     },
     bold: {
-      true: { fontWeight: "bold" },
+      true: { fontWeight: 'bold' },
     },
     numeric: {
       true: {
-        fontSize: "1.4em",
-        paddingTop: "0",
-        paddingBottom: "0",
-        lineHeight: "1",
+        fontSize: '1.4em',
+        paddingTop: '0',
+        paddingBottom: '0',
+        lineHeight: '1',
       },
     },
   },
   defaultVariants: {
-    align: "l",
+    align: 'l',
   },
 })
 
-const StyledInput = styled("input", inputRecipe)
+const StyledInput = styled('input', inputRecipe)
 
 // ─── Exported field components ────────────────────────────────────────────────
 
-export function TextInput({ editable, numeric, value, onChange, ...props }) {
+interface TextInputProps {
+  value: string
+  editable?: boolean
+  numeric?: boolean
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
+  align?: 'l' | 'r'
+  bold?: boolean
+}
+
+export function TextInput({ editable, numeric, value, onChange, align, bold }: TextInputProps) {
   return (
     <StyledInput
       editable={editable || undefined}
@@ -459,12 +494,20 @@ export function TextInput({ editable, numeric, value, onChange, ...props }) {
       value={value}
       onChange={editable ? onChange : undefined}
       readOnly={!editable}
-      {...props}
+      align={align}
+      bold={bold || undefined}
     />
   )
 }
 
-export const TextField = ({ value, label, editable, align }) =>
+interface TextFieldProps {
+  value: string
+  label?: string
+  editable?: boolean
+  align?: 'l' | 'r'
+}
+
+export const TextField = ({ value, label, editable, align }: TextFieldProps) =>
   <TextFieldBox>
     <Label>
       {label}
@@ -472,27 +515,49 @@ export const TextField = ({ value, label, editable, align }) =>
     </Label>
   </TextFieldBox>
 
-export const QuantityField = ({ value, editable }) =>
+interface QuantityFieldProps {
+  value: string
+  editable?: boolean
+}
+
+export const QuantityField = ({ value, editable }: QuantityFieldProps) =>
   <Label>
     <FieldAnnotation large>✕</FieldAnnotation>
     <TextInput align="r" numeric value={value} editable={editable} />
     <FieldAnnotation>@</FieldAnnotation>
   </Label>
 
-export const CurrencyField = ({ value, label, editable }) =>
+interface CurrencyFieldProps {
+  value: string
+  label: string
+  editable?: boolean
+}
+
+export const CurrencyField = ({ value, label, editable }: CurrencyFieldProps) =>
   <Label>
-    <TextInput align="r" numeric value={value === "0" ? "" : value} editable={editable} />
-    <FieldAnnotation sup dim={value === "0" || undefined}>{label}</FieldAnnotation>
+    <TextInput align="r" numeric value={value === '0' ? '' : value} editable={editable} />
+    <FieldAnnotation sup dim={value === '0' || undefined}>{label}</FieldAnnotation>
   </Label>
 
-export const Currency = ({ editable, values = { l: "x", s: "vj", d: "iij" } }) =>
+interface CurrencyProps {
+  editable?: boolean
+  values?: LsdStrings
+}
+
+export const Currency = ({ editable, values = { l: 'x', s: 'vj', d: 'iij' } }: CurrencyProps) =>
   <Equally>
     <CurrencyField label="li" editable={editable} value={values.l} />
     <CurrencyField label="s"  editable={editable} value={values.s} />
     <CurrencyField label="d"  editable={editable} value={values.d} />
   </Equally>
 
-export const BlockTitle = ({ title, children, editable }) =>
+interface BlockTitleProps {
+  title: string
+  editable?: boolean
+  children?: React.ReactNode
+}
+
+export const BlockTitle = ({ title, children, editable }: BlockTitleProps) =>
   <Block>
     <Equally>
       <TextField value={title} editable={editable} />
@@ -500,39 +565,48 @@ export const BlockTitle = ({ title, children, editable }) =>
     </Equally>
   </Block>
 
-export const BlockCurrency = ({ editable, values }) =>
+interface BlockCurrencyProps {
+  editable?: boolean
+  values?: LsdStrings
+}
+
+export const BlockCurrency = ({ editable, values }: BlockCurrencyProps) =>
   <Block>
     <Currency editable={editable} values={values} />
   </Block>
 
 // ─── Logo ─────────────────────────────────────────────────────────────────────
 
-const LogoWrapper = styled("div", {
-  base: { display: "inline-block" },
+const LogoWrapper = styled('div', {
+  base: { display: 'inline-block' },
 })
 
-const FadedGroup = styled("g", {
+const FadedGroup = styled('g', {
   base: { opacity: 0.85 },
 })
 
-const LogoSvg = styled("svg", {
+const LogoSvg = styled('svg', {
   base: {
-    width: "100%",
-    height: "auto",
-    "& .ink": { fill: "black" },
-    "& .red": { fill: "#b91c1c" },
+    width: '100%',
+    height: 'auto',
+    '& .ink': { fill: 'black' },
+    '& .red': { fill: '#b91c1c' },
   },
   variants: {
     size: {
-      s: { maxWidth: "150px" },
-      m: { maxWidth: "300px" },
-      l: { maxWidth: "500px" },
+      s: { maxWidth: '150px' },
+      m: { maxWidth: '300px' },
+      l: { maxWidth: '500px' },
     },
   },
-  defaultVariants: { size: "m" },
+  defaultVariants: { size: 'm' },
 })
 
-export function Logo({ size = "m" }) {
+interface LogoProps {
+  size?: 's' | 'm' | 'l'
+}
+
+export function Logo({ size = 'm' }: LogoProps) {
   return (
     <LogoWrapper>
       <LogoSvg
@@ -569,23 +643,29 @@ export function Logo({ size = "m" }) {
 
 // ─── Composite item components ────────────────────────────────────────────────
 
-const EditLink = styled("button", {
+const EditLink = styled('button', {
   base: {
     flexShrink: 0,
-    fontFamily: "inherit",
-    fontStyle: "italic",
-    fontSize: "0.85em",
-    cursor: "pointer",
-    background: "none",
-    border: "none",
-    padding: "0 0.5rem",
-    textDecoration: "underline",
+    fontFamily: 'inherit',
+    fontStyle: 'italic',
+    fontSize: '0.85em',
+    cursor: 'pointer',
+    background: 'none',
+    border: 'none',
+    padding: '0 0.5rem',
+    textDecoration: 'underline',
     opacity: 0.45,
     _hover: { opacity: 1 },
   },
 })
 
-export const ItemUnit = ({ title, literals, explanation }) =>
+interface ItemUnitProps {
+  title: string
+  literals: LsdStrings
+  explanation?: React.ReactNode
+}
+
+export const ItemUnit = ({ title, literals, explanation }: ItemUnitProps) =>
   <SwipeableItem>
     <BlockRow>
       <BlockTitle title={title} editable />
@@ -594,7 +674,14 @@ export const ItemUnit = ({ title, literals, explanation }) =>
     {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
-export const ItemExtended = ({ title, literals, quantity, explanation }) =>
+interface ItemExtendedProps {
+  title: string
+  literals: LsdStrings
+  quantity: string
+  explanation?: React.ReactNode
+}
+
+export const ItemExtended = ({ title, literals, quantity, explanation }: ItemExtendedProps) =>
   <SwipeableItem>
     <BlockRow>
       <BlockTitle title={title} editable>
@@ -606,7 +693,15 @@ export const ItemExtended = ({ title, literals, quantity, explanation }) =>
     {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
-export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanation }) =>
+interface ItemSubTotalProps {
+  title: string
+  count?: number
+  totalDisplay: LsdStrings
+  onEdit: () => void
+  explanation?: React.ReactNode
+}
+
+export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanation }: ItemSubTotalProps) =>
   <SwipeableItem>
     <BlockRow>
       <Block>
@@ -620,7 +715,12 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanati
     {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
-export const ItemTotal = ({ totalDisplay, explanation }) =>
+interface ItemTotalProps {
+  totalDisplay: LsdStrings
+  explanation?: React.ReactNode
+}
+
+export const ItemTotal = ({ totalDisplay, explanation }: ItemTotalProps) =>
   <Item borders="total" sideMargins>
     <BlockRow centerItems>
       <Block indented><Logo size="s" /></Block>
@@ -631,21 +731,29 @@ export const ItemTotal = ({ totalDisplay, explanation }) =>
 
 // ─── Add item bar ─────────────────────────────────────────────────────────────
 
-const AddBar = styled("div", {
+const AddBar = styled('div', {
   base: {
-    display: "flex",
-    gap: "0.5rem",
-    paddingLeft: "1.5rem",
-    paddingRight: "1.5rem",
-    paddingTop: { base: "0.25rem", md: "0.75rem" },
-    paddingBottom: { base: "1rem", md: "0.75rem" },
-    justifyContent: { md: "flex-end" },
+    display: 'flex',
+    gap: '0.5rem',
+    paddingLeft: '1.5rem',
+    paddingRight: '1.5rem',
+    paddingTop: { base: '0.25rem', md: '0.75rem' },
+    paddingBottom: { base: '1rem', md: '0.75rem' },
+    justifyContent: { md: 'flex-end' },
   },
 })
 
 const PlusIcon = () => <strong>+</strong>
 
-export const AddItemBar = ({ advanced, onAdd, onAddUnit, onAddExtended, onAddSubtotal }) =>
+interface AddItemBarProps {
+  advanced?: boolean
+  onAdd: () => void
+  onAddUnit: () => void
+  onAddExtended: () => void
+  onAddSubtotal: () => void
+}
+
+export const AddItemBar = ({ advanced, onAdd, onAddUnit, onAddExtended, onAddSubtotal }: AddItemBarProps) =>
   <AddBar>
     {advanced ? <>
       <Button icon={PlusIcon} onClick={onAddUnit}>item</Button>
@@ -658,75 +766,83 @@ export const AddItemBar = ({ advanced, onAdd, onAddUnit, onAddExtended, onAddSub
 
 // ─── Toggle switch ────────────────────────────────────────────────────────────
 
-const ToggleRow = styled("div", {
+const ToggleRow = styled('div', {
   base: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.6rem",
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.6rem',
   },
 })
 
-const ToggleTrack = styled("button", {
+const ToggleTrack = styled('button', {
   base: {
-    position: "relative",
-    width: "44px",
-    height: "26px",
-    borderRadius: "999px",
+    position: 'relative',
+    width: '44px',
+    height: '26px',
+    borderRadius: '999px',
     borderWidth: 0,
-    cursor: "pointer",
+    cursor: 'pointer',
     flexShrink: 0,
-    transition: "background-color 0.25s ease-in-out",
+    transition: 'background-color 0.25s ease-in-out',
     _focusVisible: {
-      outlineWidth: "2px",
-      outlineStyle: "solid",
-      outlineColor: "black",
-      outlineOffset: "2px",
+      outlineWidth: '2px',
+      outlineStyle: 'solid',
+      outlineColor: 'black',
+      outlineOffset: '2px',
     },
-    _active: { transform: "scale(0.96)" },
-    _disabled: { opacity: 0.4, cursor: "not-allowed" },
+    _active: { transform: 'scale(0.96)' },
+    _disabled: { opacity: 0.4, cursor: 'not-allowed' },
   },
   variants: {
     checked: {
-      true:  { background: "#34c759" },
-      false: { background: "#c7c7cc" },
+      true:  { background: '#34c759' },
+      false: { background: '#c7c7cc' },
     },
   },
   defaultVariants: { checked: false },
 })
 
-const ToggleKnob = styled("span", {
+const ToggleKnob = styled('span', {
   base: {
-    position: "absolute",
-    top: "2px",
-    width: "22px",
-    height: "22px",
-    borderRadius: "999px",
-    background: "white",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
-    transition: "left 0.25s ease-in-out",
+    position: 'absolute',
+    top: '2px',
+    width: '22px',
+    height: '22px',
+    borderRadius: '999px',
+    background: 'white',
+    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+    transition: 'left 0.25s ease-in-out',
   },
   variants: {
     checked: {
-      true:  { left: "20px" },
-      false: { left: "2px" },
+      true:  { left: '20px' },
+      false: { left: '2px' },
     },
   },
   defaultVariants: { checked: false },
 })
 
-const ToggleLabel = styled("label", {
+const ToggleLabel = styled('label', {
   base: {
-    fontStyle: "italic",
-    cursor: "pointer",
+    fontStyle: 'italic',
+    cursor: 'pointer',
   },
   variants: {
     disabled: {
-      true: { opacity: 0.4, cursor: "not-allowed" },
+      true: { opacity: 0.4, cursor: 'not-allowed' },
     },
   },
 })
 
-export function Toggle({ id, label, checked, onChange, disabled = false }) {
+interface ToggleProps {
+  id: string
+  label: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+  disabled?: boolean
+}
+
+export function Toggle({ id, label, checked, onChange, disabled = false }: ToggleProps) {
   return (
     <ToggleRow>
       <ToggleTrack
@@ -750,68 +866,76 @@ export function Toggle({ id, label, checked, onChange, disabled = false }) {
 
 // ─── Screen components ────────────────────────────────────────────────────────
 
-const PageWidth = styled("div", {
-  base: { margin: "0 1.5rem" },
+const PageWidth = styled('div', {
+  base: { margin: '0 1.5rem' },
 })
 
-const FooterBar = styled("footer", {
+const FooterBar = styled('footer', {
   base: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.75rem",
-    margin: "auto 1.5rem 1.5rem",
-    paddingTop: { base: "4rem", md: "0" },
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    margin: 'auto 1.5rem 1.5rem',
+    paddingTop: { base: '4rem', md: '0' },
   },
 })
 
-const FooterControls = styled("div", {
+const FooterControls = styled('div', {
   base: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.4rem",
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.4rem',
   },
 })
 
-const FooterCredits = styled("div", {
+const FooterCredits = styled('div', {
   base: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: "1rem",
+    display: 'flex',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: '1rem',
   },
 })
 
-const FooterText = styled("div", {
-  base: { fontStyle: "italic" },
+const FooterText = styled('div', {
+  base: { fontStyle: 'italic' },
 })
 
-const FooterLink = styled("a", {
+const FooterLink = styled('a', {
   base: {
-    color: "inherit",
-    textDecoration: "underline",
+    color: 'inherit',
+    textDecoration: 'underline',
   },
 })
 
-const HelpButton = styled("button", {
+const HelpButton = styled('button', {
   base: {
     flexShrink: 0,
-    fontFamily: "inherit",
-    fontWeight: "bold",
-    fontStyle: "normal",
-    cursor: "pointer",
-    textDecoration: "underline",
-    color: "blue",
-    background: "none",
-    border: "none",
-    padding: "0",
+    fontFamily: 'inherit',
+    fontWeight: 'bold',
+    fontStyle: 'normal',
+    cursor: 'pointer',
+    textDecoration: 'underline',
+    color: 'blue',
+    background: 'none',
+    border: 'none',
+    padding: '0',
     _hover: { opacity: 0.6 },
   },
 })
 
-const GITHUB_URL = "https://github.com/gjhilton/Summa"
-const FUNERAL_GAMES_URL = "http://funeralgames.co.uk"
+const GITHUB_URL = 'https://github.com/gjhilton/Summa'
+const FUNERAL_GAMES_URL = 'http://funeralgames.co.uk'
 
-export const FooterEdit = ({ onHelp, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }) =>
+interface FooterEditProps {
+  onHelp?: () => void
+  showExplanation: boolean
+  onShowExplanationChange: (value: boolean) => void
+  advancedMode: boolean
+  onAdvancedModeChange: (value: boolean) => void
+}
+
+export const FooterEdit = ({ onHelp, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }: FooterEditProps) =>
   <FooterBar>
     <FooterControls>
       <Toggle id="explain-calculations" label="explain calculations" checked={showExplanation} onChange={onShowExplanationChange} />
@@ -819,25 +943,25 @@ export const FooterEdit = ({ onHelp, showExplanation, onShowExplanationChange, a
     </FooterControls>
     <FooterCredits>
       <FooterText>
-        Summa v{__APP_VERSION__}. Concept, design and{" "}
+        Summa v{__APP_VERSION__}. Concept, design and{' '}
         <FooterLink href={GITHUB_URL} title="Summa on GitHub" target="_blank" rel="noopener noreferrer">code</FooterLink>
-        {" "}copyright ©2026 g.j.hilton /{" "}
+        {' '}copyright ©2026 g.j.hilton /{' '}
         <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games" target="_blank" rel="noopener noreferrer">funeral games</FooterLink>.
       </FooterText>
       {onHelp && <HelpButton type="button" onClick={onHelp}>help</HelpButton>}
     </FooterCredits>
   </FooterBar>
 
-const Header = styled("header", {
-  base: { margin: "1rem 0 3rem" },
+const Header = styled('header', {
+  base: { margin: '1rem 0 3rem' },
 })
 
-const HeaderBar = styled("div", {
+const HeaderBar = styled('div', {
   base: {
-    display: "grid",
-    gridTemplateColumns: "auto auto 1fr auto",
-    alignItems: "center",
-    gap: "0.5rem",
+    display: 'grid',
+    gridTemplateColumns: 'auto auto 1fr auto',
+    alignItems: 'center',
+    gap: '0.5rem',
   },
 })
 
@@ -853,24 +977,28 @@ export const HeaderEdit = () =>
     </PageWidth>
   </Header>
 
-
 // ─── Sortable line wrapper ────────────────────────────────────────────────────
 
-const SortableWrapper = styled("div", {
-  base: { position: "relative" },
+const SortableWrapper = styled('div', {
+  base: { position: 'relative' },
   variants: {
     dragging: { true: { opacity: 0.4, zIndex: 1 } },
   },
 })
 
-function SortableLine({ id, children }) {
+interface SortableLineProps {
+  id: string
+  children: React.ReactNode
+}
+
+function SortableLine({ id, children }: SortableLineProps) {
   const { listeners, attributes, setNodeRef, transform, transition, isDragging } = useSortable({ id })
   return (
     <DragCtx.Provider value={{ listeners, attributes }}>
       <SortableWrapper
         ref={setNodeRef}
         dragging={isDragging || undefined}
-        style={{ transform: CSS.Transform.toString(transform), transition }}
+        style={{ transform: CSS.Transform.toString(transform), transition: transition ?? undefined }}
       >
         {children}
       </SortableWrapper>
@@ -880,7 +1008,15 @@ function SortableLine({ id, children }) {
 
 // ─── List of items ────────────────────────────────────────────────────────────
 
-export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation }) {
+interface ListOfItemsProps {
+  lines: AnyLineState[]
+  totalDisplay: LsdStrings
+  totalPence: number
+  advanced?: boolean
+  showExplanation: boolean
+}
+
+export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation }: ListOfItemsProps) {
   return (
     <SwipeProvider>
       <section>
@@ -897,22 +1033,32 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
             }
           })}
         </SortableContext>
-        <AddItemBar advanced={advanced} onAdd={() => alert("add item")} onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
+        <AddItemBar advanced={advanced} onAdd={() => alert('add item')} onAddUnit={() => alert('unit')} onAddExtended={() => alert('extended')} onAddSubtotal={() => alert('subtotal')} />
         <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} />
       </section>
     </SwipeProvider>
   )
 }
 
-const ScreenContainer = styled("main", {
+const ScreenContainer = styled('main', {
   base: {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100dvh",
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100dvh',
   },
 })
 
-export const ScreenMain = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }) =>
+interface ScreenMainProps {
+  lines: AnyLineState[]
+  totalDisplay: LsdStrings
+  totalPence: number
+  showExplanation: boolean
+  onShowExplanationChange: (value: boolean) => void
+  advancedMode: boolean
+  onAdvancedModeChange: (value: boolean) => void
+}
+
+export const ScreenMain = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }: ScreenMainProps) =>
   <ScreenContainer>
     <HeaderEdit />
     <ListOfItems lines={lines} totalDisplay={totalDisplay} totalPence={totalPence} advanced={advancedMode} showExplanation={showExplanation} />
@@ -924,4 +1070,3 @@ export const ScreenMain = ({ lines, totalDisplay, totalPence, showExplanation, o
       onAdvancedModeChange={onAdvancedModeChange}
     />
   </ScreenContainer>
-
