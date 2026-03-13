@@ -28,7 +28,7 @@ import Calculation from '@/components/Calculation';
 import CalculationHeader from '@/components/CalculationHeader';
 import SaveModal from '@/components/SaveModal';
 import LoadModal from '@/components/LoadModal';
-import { FEATURES } from '@/features';
+import { FEATURES } from '@/utils/features';
 
 const STORAGE_KEY = 'summa_calculation';
 
