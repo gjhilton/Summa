@@ -1,37 +1,41 @@
-import { useState } from 'react'
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import type { DragEndEvent } from '@dnd-kit/core'
-import { arrayMove } from '@dnd-kit/sortable'
-import type { AnyLineState, CalculationState } from '@/types/calculation'
+import type { AnyLineState, LsdStrings } from '@/types/calculation'
 import { ScreenMain } from './ScreenMain'
 
 interface Props {
-  data: CalculationState
-  onReorder?: (lines: AnyLineState[]) => void
+  lines: AnyLineState[]
+  totalDisplay: LsdStrings
+  totalPence: number
+  showExplanation: boolean
+  onShowExplanationChange: (value: boolean) => void
+  advancedMode: boolean
+  onAdvancedModeChange: (value: boolean) => void
+  onDragEnd: (event: DragEndEvent) => void
 }
 
-export function Renderer({ data, onReorder }: Props) {
-  const [showExplanation, setShowExplanation] = useState(true)
-  const [advancedMode, setAdvancedMode] = useState(false)
+export function Renderer({
+  lines,
+  totalDisplay,
+  totalPence,
+  showExplanation,
+  onShowExplanationChange,
+  advancedMode,
+  onAdvancedModeChange,
+  onDragEnd,
+}: Props) {
   const sensors = useSensors(useSensor(PointerSensor))
 
-  function handleDragEnd({ active, over }: DragEndEvent) {
-    if (!over || active.id === over.id || !onReorder) return
-    const oldIndex = data.lines.findIndex(l => l.id === active.id)
-    const newIndex = data.lines.findIndex(l => l.id === over.id)
-    onReorder(arrayMove(data.lines, oldIndex, newIndex))
-  }
-
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={onDragEnd}>
       <ScreenMain
-        lines={data.lines}
-        totalDisplay={data.totalDisplay}
-        totalPence={data.totalPence}
+        lines={lines}
+        totalDisplay={totalDisplay}
+        totalPence={totalPence}
         showExplanation={showExplanation}
-        onShowExplanationChange={setShowExplanation}
+        onShowExplanationChange={onShowExplanationChange}
         advancedMode={advancedMode}
-        onAdvancedModeChange={setAdvancedMode}
+        onAdvancedModeChange={onAdvancedModeChange}
       />
     </DndContext>
   )
