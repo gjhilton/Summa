@@ -1,5 +1,5 @@
 import React from "react"
-import { BlockTitle, QuantityField } from "../ScreenMain"
+import { BlockTitle, QuantityField } from "@/display/ScreenMain"
 
 const narrow = (Story) => (
   <div style={{ maxWidth: 480, margin: "2rem auto", fontFamily: "serif" }}>

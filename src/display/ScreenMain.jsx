@@ -718,45 +718,16 @@ export const HeaderEdit = () =>
     </PageWidth>
   </Header>
 
-export const DUMMY_DATA = {
-  lines: [
-    {
-      id: "1", itemType: "LINE_ITEM",
-      title: "Candles, tallow",
-      literals: { l: "0", s: "iij", d: "vj" },
-      error: false, fieldErrors: { l: false, s: false, d: false }, totalPence: 42,
-    },
-    {
-      id: "2", itemType: "EXTENDED_ITEM",
-      title: "Beeswax candles",
-      literals: { l: "0", s: "ij", d: "0" },
-      quantity: "xij",
-      error: false, fieldErrors: { l: false, s: false, d: false },
-      quantityError: false, basePence: 24, totalPence: 288,
-    },
-    {
-      id: "3", itemType: "SUBTOTAL_ITEM",
-      title: "sundries",
-      lines: [
-        { id: "3a", itemType: "LINE_ITEM", title: "Rushes",
-          literals: { l: "0", s: "j", d: "0" },
-          error: false, fieldErrors: { l: false, s: false, d: false }, totalPence: 12 }
-      ],
-      totalPence: 12, totalDisplay: { l: "0", s: "j", d: "0" }, error: false,
-    },
-  ],
-  totalDisplay: { l: "j", s: "vij", d: "vj" },
-}
 
 export const ListOfItems = ({ lines, totalDisplay, advanced }) =>
   <SwipeProvider>
     <section>
       {lines.map(line => {
-        if (line.itemType === "LINE_ITEM")
+        if (line.itemType === ItemType.LINE_ITEM)
           return <ItemUnit key={line.id} title={line.title} literals={line.literals} />
-        if (line.itemType === "EXTENDED_ITEM")
+        if (line.itemType === ItemType.EXTENDED_ITEM)
           return <ItemExtended key={line.id} title={line.title} literals={line.literals} quantity={line.quantity} />
-        if (line.itemType === "SUBTOTAL_ITEM")
+        if (line.itemType === ItemType.SUBTOTAL_ITEM)
           return <ItemSubTotal key={line.id} title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} />
         return null
       })}

@@ -1,6 +1,7 @@
 import React from "react"
-import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar, DUMMY_DATA } from "../ScreenMain"
-import { Renderer } from "../Renderer"
+import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar } from "@/display/ScreenMain"
+import { DUMMY_DATA } from "@/display/dummyData"
+import { Renderer } from "@/display/Renderer"
 
 export default {
   title: "Prototype/Screen",

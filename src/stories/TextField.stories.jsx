@@ -1,5 +1,5 @@
 import React from "react"
-import { TextField } from "../ScreenMain"
+import { TextField } from "@/display/ScreenMain"
 
 const narrow = (Story) => (
   <div style={{ maxWidth: 480, margin: "2rem auto", fontFamily: "serif" }}>

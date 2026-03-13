@@ -1,5 +1,5 @@
 import React from "react"
-import { Currency } from "../ScreenMain"
+import { Currency } from "@/display/ScreenMain"
 
 const narrow = (Story) => (
   <div style={{ maxWidth: 480, margin: "2rem auto", fontFamily: "serif" }}>
