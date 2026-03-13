@@ -2,6 +2,9 @@ import React from 'react'
 import { styled } from '@/styled-system/jsx'
 import { cva } from '@/styled-system/css'
 import { Button } from './Button'
+import { ScreenHeader, HeaderSpacer } from './Header'
+import { ScreenFooter } from './Footer'
+import { ScreenContainer } from './ScreenContainer'
 import { ItemType } from '@/types/calculation'
 import type { AnyLineState, LsdStrings } from '@/types/calculation'
 import { explain, explainTotal } from '@/utils/explanation'
@@ -866,67 +869,6 @@ export function Toggle({ id, label, checked, onChange, disabled = false }: Toggl
 
 // ─── Screen components ────────────────────────────────────────────────────────
 
-const PageWidth = styled('div', {
-  base: { margin: '0 1.5rem' },
-})
-
-const FooterBar = styled('footer', {
-  base: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem',
-    margin: 'auto 1.5rem 1.5rem',
-    paddingTop: { base: '4rem', md: '0' },
-  },
-})
-
-const FooterControls = styled('div', {
-  base: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.4rem',
-  },
-})
-
-const FooterCredits = styled('div', {
-  base: {
-    display: 'flex',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: '1rem',
-  },
-})
-
-const FooterText = styled('div', {
-  base: { fontStyle: 'italic' },
-})
-
-const FooterLink = styled('a', {
-  base: {
-    color: 'inherit',
-    textDecoration: 'underline',
-  },
-})
-
-const HelpButton = styled('button', {
-  base: {
-    flexShrink: 0,
-    fontFamily: 'inherit',
-    fontWeight: 'bold',
-    fontStyle: 'normal',
-    cursor: 'pointer',
-    textDecoration: 'underline',
-    color: 'blue',
-    background: 'none',
-    border: 'none',
-    padding: '0',
-    _hover: { opacity: 0.6 },
-  },
-})
-
-const GITHUB_URL = 'https://github.com/gjhilton/Summa'
-const FUNERAL_GAMES_URL = 'http://funeralgames.co.uk'
-
 interface FooterEditProps {
   onHelp?: () => void
   showExplanation: boolean
@@ -936,46 +878,18 @@ interface FooterEditProps {
 }
 
 export const FooterEdit = ({ onHelp, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }: FooterEditProps) =>
-  <FooterBar>
-    <FooterControls>
-      <Toggle id="explain-calculations" label="explain calculations" checked={showExplanation} onChange={onShowExplanationChange} />
-      <Toggle id="advanced-mode" label="advanced mode" checked={advancedMode} onChange={onAdvancedModeChange} />
-    </FooterControls>
-    <FooterCredits>
-      <FooterText>
-        Summa v{__APP_VERSION__}. Concept, design and{' '}
-        <FooterLink href={GITHUB_URL} title="Summa on GitHub" target="_blank" rel="noopener noreferrer">code</FooterLink>
-        {' '}copyright ©2026 g.j.hilton /{' '}
-        <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games" target="_blank" rel="noopener noreferrer">funeral games</FooterLink>.
-      </FooterText>
-      {onHelp && <HelpButton type="button" onClick={onHelp}>help</HelpButton>}
-    </FooterCredits>
-  </FooterBar>
-
-const Header = styled('header', {
-  base: { margin: '1rem 0 3rem' },
-})
-
-const HeaderBar = styled('div', {
-  base: {
-    display: 'grid',
-    gridTemplateColumns: 'auto auto 1fr auto',
-    alignItems: 'center',
-    gap: '0.5rem',
-  },
-})
+  <ScreenFooter onHelp={onHelp} controls={<>
+    <Toggle id="explain-calculations" label="explain calculations" checked={showExplanation} onChange={onShowExplanationChange} />
+    <Toggle id="advanced-mode" label="advanced mode" checked={advancedMode} onChange={onAdvancedModeChange} />
+  </>} />
 
 export const HeaderEdit = () =>
-  <Header>
-    <PageWidth>
-      <HeaderBar>
-        <Button variant="primary">export</Button>
-        <Button>load</Button>
-        <div />
-        <Button variant="danger">clear</Button>
-      </HeaderBar>
-    </PageWidth>
-  </Header>
+  <ScreenHeader>
+    <Button variant="primary">export</Button>
+    <Button>load</Button>
+    <HeaderSpacer />
+    <Button variant="danger">clear</Button>
+  </ScreenHeader>
 
 // ─── Sortable line wrapper ────────────────────────────────────────────────────
 
@@ -1040,13 +954,6 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
   )
 }
 
-const ScreenContainer = styled('main', {
-  base: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100dvh',
-  },
-})
 
 interface MainScreenProps {
   lines: AnyLineState[]
