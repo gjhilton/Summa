@@ -18,6 +18,13 @@ export function HelpHistoricalNote() {
         If you prefer conventional Roman numerals they work equally well. You
         can mix both styles freely within the same calculation.
       </HelpPara>
+
+      <HelpPara>
+        Under the hood, Summa converts every field to an integer number of
+        pence (£1 = 240d; 1s = 12d), sums the column, then converts the total
+        back to pounds, shillings and pence and formats it as Roman numerals
+        for display.
+      </HelpPara>
     </HelpSection>
   )
 }

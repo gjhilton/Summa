@@ -39,7 +39,7 @@ export const ScreenSample = styled('div', {
   },
 })
 
-export const CentredRow = styled('div', {
+export const ToggleRow = styled('div', {
   base: {
     display: 'flex',
     justifyContent: 'flex-start',
@@ -50,12 +50,6 @@ export const CentredRow = styled('div', {
 // Wrapper that reserves space beside/above a ScreenSample for an Arrow annotation
 export const AnnotatedSample = styled('div', {
   base: { position: 'relative' },
-  variants: {
-    space: {
-      left: { paddingLeft: '2rem' },
-      top:  { paddingTop: '2rem' },
-    },
-  },
 })
 
 // Absolutely-positioned slot for an Arrow, targeting a named feature

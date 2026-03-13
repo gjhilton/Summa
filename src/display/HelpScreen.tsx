@@ -3,7 +3,6 @@ import { ScreenHeader } from './shared/Header'
 import { ScreenFooter } from './shared/Footer'
 import { ScreenContainer } from './shared/ScreenContainer'
 import { PageWidth } from './shared/PageWidth'
-import { HelpIntro } from './help/HelpIntro'
 import { HelpGettingStarted } from './help/HelpGettingStarted'
 import { HelpHistoricalNote } from './help/HelpHistoricalNote'
 import { HelpOrganising } from './help/HelpOrganising'
@@ -12,6 +11,7 @@ import { HelpAdvanced } from './help/HelpAdvanced'
 import { HelpExtendedItems } from './help/HelpExtendedItems'
 import { HelpSubtotalItems } from './help/HelpSubtotalItems'
 import { HelpSaveLoad } from './help/HelpSaveLoad'
+import { HelpAbout } from './help/HelpAbout'
 
 interface Props {
   onBack?: () => void
@@ -28,7 +28,6 @@ export function HelpScreen({ onBack, showExplanation, onShowExplanationChange, a
         {onBack && <Button onClick={onBack}>← back</Button>}
       </ScreenHeader>
       <PageWidth>
-        <HelpIntro />
         <HelpGettingStarted />
         <HelpHistoricalNote />
         <HelpOrganising />
@@ -43,6 +42,7 @@ export function HelpScreen({ onBack, showExplanation, onShowExplanationChange, a
         <HelpExtendedItems />
         <HelpSubtotalItems />
         <HelpSaveLoad />
+        <HelpAbout />
       </PageWidth>
       <ScreenFooter />
     </ScreenContainer>

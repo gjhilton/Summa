@@ -3,6 +3,7 @@ import { arrayMove } from '@dnd-kit/sortable'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { Renderer } from '@/display/Renderer'
 import { HelpScreen } from '@/display/HelpScreen'
+import { SplashScreen } from '@/display/SplashScreen'
 import type { AnyLineState } from '@/types/calculation'
 import { isSubtotalItem } from '@/types/calculation'
 import {
@@ -22,12 +23,12 @@ import {
 } from '@/utils/calculationLogic'
 import type { IdPath } from '@/utils/calculationLogic'
 import { createSummaFile, parseSummaFile } from '@/utils/serialization'
-import { loadFromStorage, saveToStorage } from '@/utils/storage'
+import { loadFromStorage, saveToStorage, markWelcomeSeen } from '@/utils/storage'
 
-type Screen = 'main' | 'help'
+type Screen = 'welcome' | 'main' | 'help'
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('help')
+  const [screen, setScreen] = useState<Screen>('welcome')
   const [lines, setLines] = useState<AnyLineState[]>(() => loadFromStorage())
   const [navigationPath, setNavigationPath] = useState<IdPath>([])
   const [showExplanation, setShowExplanation] = useState(true)
@@ -187,6 +188,17 @@ export default function App() {
     setLines(prev => updateLinesAtPath(prev, parentPath, parentLines => updateTitle(parentLines, subtotalId, v)))
   }
 
+  function handleWelcomeGetStarted() {
+    markWelcomeSeen()
+    setScreen('main')
+  }
+
+  function handleWelcomeReadManual() {
+    markWelcomeSeen()
+    setScreen('help')
+  }
+
+  if (screen === 'welcome') return <SplashScreen onGetStarted={handleWelcomeGetStarted} onReadManual={handleWelcomeReadManual} />
   if (screen === 'help') return <HelpScreen onBack={() => setScreen('main')} showExplanation={showExplanation} onShowExplanationChange={setShowExplanation} advancedMode={advancedMode} onAdvancedModeChange={setAdvancedMode} />
 
   return (

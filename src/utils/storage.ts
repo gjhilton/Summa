@@ -3,7 +3,16 @@ import type { SavedAnyLine } from '@/types/savedCalculation';
 import { initialState } from '@/utils/calculationLogic';
 import { serializeLines, deserializeLines } from '@/utils/serialization';
 
-export const STORAGE_KEY = 'summa_calculation';
+export const STORAGE_KEY = 'summa_calculation'
+export const WELCOME_KEY = 'summa_welcomed'
+
+export function hasSeenWelcome(): boolean {
+  return !!(localStorage.getItem(WELCOME_KEY) || localStorage.getItem(STORAGE_KEY))
+}
+
+export function markWelcomeSeen(): void {
+  localStorage.setItem(WELCOME_KEY, '1')
+}
 
 export function loadFromStorage(): AnyLineState[] {
 	try {

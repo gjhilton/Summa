@@ -7,7 +7,7 @@ import {
   ExplanationRow,
   Toggle,
 } from '@/display/MainScreen'
-import { HelpSection, HelpHeading, HelpPara, ScreenSample, CentredRow } from './shared'
+import { HelpSection, HelpHeading, HelpPara, ScreenSample, ToggleRow } from './shared'
 import { MOCK_DRAG_CTX } from './mockDragCtx'
 
 interface Props {
@@ -51,14 +51,14 @@ export function HelpExplanations({ showExplanation, onShowExplanationChange }: P
       </HelpPara>
 
       <ScreenSample>
-        <CentredRow>
+        <ToggleRow>
           <Toggle
             id="help-explanation-toggle"
             label="show working"
             checked={showExplanation}
             onChange={onShowExplanationChange}
           />
-        </CentredRow>
+        </ToggleRow>
       </ScreenSample>
     </HelpSection>
   )

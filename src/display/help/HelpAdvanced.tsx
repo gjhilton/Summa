@@ -1,5 +1,5 @@
 import { Toggle, AddItemBar } from '@/display/MainScreen'
-import { HelpSection, HelpHeading, HelpPara, ScreenSample, CentredRow } from './shared'
+import { HelpSection, HelpHeading, HelpPara, ScreenSample, ToggleRow } from './shared'
 
 interface Props {
   advancedMode: boolean
@@ -22,14 +22,14 @@ export function HelpAdvanced({ advancedMode, onAdvancedModeChange }: Props) {
       </HelpPara>
 
       <ScreenSample>
-        <CentredRow>
+        <ToggleRow>
           <Toggle
             id="help-advanced-toggle"
             label="advanced"
             checked={advancedMode}
             onChange={onAdvancedModeChange}
           />
-        </CentredRow>
+        </ToggleRow>
       </ScreenSample>
 
       <HelpPara>
