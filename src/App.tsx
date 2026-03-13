@@ -187,7 +187,7 @@ export default function App() {
     setLines(prev => updateLinesAtPath(prev, parentPath, parentLines => updateTitle(parentLines, subtotalId, v)))
   }
 
-  if (screen === 'help') return <HelpScreen onBack={() => setScreen('main')} />
+  if (screen === 'help') return <HelpScreen onBack={() => setScreen('main')} showExplanation={showExplanation} onShowExplanationChange={setShowExplanation} advancedMode={advancedMode} onAdvancedModeChange={setAdvancedMode} />
 
   return (
     <Renderer

@@ -39,6 +39,14 @@ export const ScreenSample = styled('div', {
   },
 })
 
+export const CentredRow = styled('div', {
+  base: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    padding: '1rem 1.5rem',
+  },
+})
+
 // Wrapper that reserves space beside/above a ScreenSample for an Arrow annotation
 export const AnnotatedSample = styled('div', {
   base: { position: 'relative' },

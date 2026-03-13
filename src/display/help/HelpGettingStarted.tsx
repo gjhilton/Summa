@@ -4,8 +4,11 @@ import {
   BlockRow,
   BlockTitle,
   BlockCurrency,
+  AddItemBar,
 } from '@/display/MainScreen'
+import { Button } from '@/display/shared/Button'
 import { HelpSection, HelpHeading, HelpPara, ScreenSample } from './shared'
+import { ButtonRow } from './helpLayout'
 import { MOCK_DRAG_CTX } from './mockDragCtx'
 
 export function HelpGettingStarted() {
@@ -50,6 +53,36 @@ export function HelpGettingStarted() {
           </Item>
         </DragCtx.Provider>
       </ScreenSample>
+      <HelpPara>
+        To add a new line, tap the button at the bottom of the list.
+      </HelpPara>
+
+      <ScreenSample>
+        <AddItemBar
+          onAdd={() => {}}
+          onAddUnit={() => {}}
+          onAddExtended={() => {}}
+          onAddSubtotal={() => {}}
+        />
+      </ScreenSample>
+
+      <HelpPara>
+        Made a mistake? The <strong>undo</strong> button appears in the header
+        whenever there is something to undo. Each tap steps back one change.
+      </HelpPara>
+
+      <ScreenSample>
+        <ButtonRow>
+          <Button>undo</Button>
+        </ButtonRow>
+      </ScreenSample>
+
+      <HelpPara>
+        Your work is saved automatically in the browser as you type. If you
+        close the tab and come back later, Summa will restore exactly where you
+        left off. Use <strong>export</strong> if you want a portable backup or
+        need to share your calculation.
+      </HelpPara>
     </HelpSection>
   )
 }
