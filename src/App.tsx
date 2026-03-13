@@ -27,7 +27,7 @@ import { loadFromStorage, saveToStorage } from '@/utils/storage'
 type Screen = 'main' | 'help'
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('main')
+  const [screen, setScreen] = useState<Screen>('help')
   const [lines, setLines] = useState<AnyLineState[]>(() => loadFromStorage())
   const [navigationPath, setNavigationPath] = useState<IdPath>([])
   const [showExplanation, setShowExplanation] = useState(true)

@@ -440,7 +440,7 @@ const Block = styled('div', {
   },
 })
 
-const BlockRow = styled('div', {
+export const BlockRow = styled('div', {
   base: {
     display: { base: 'block', md: 'flex' },
     '& > *': { flex: '1' },
@@ -453,7 +453,7 @@ const BlockRow = styled('div', {
   },
 })
 
-const ExplanationRow = styled('div', {
+export const ExplanationRow = styled('div', {
   base: {
     textAlign: 'right',
     fontSize: '0.8em',
