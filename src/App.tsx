@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { arrayMove } from '@dnd-kit/sortable'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { Renderer } from '@/display/Renderer'
@@ -33,6 +33,7 @@ export default function App() {
   const [showExplanation, setShowExplanation] = useState(true)
   const [advancedMode, setAdvancedMode] = useState(false)
   const [undoStacks, setUndoStacks] = useState<Record<string, AnyLineState[][]>>({})
+  const lastCoalesceKeyRef = useRef<string | null>(null)
 
   useEffect(() => {
     saveToStorage(lines)
@@ -55,7 +56,9 @@ export default function App() {
     return item && isSubtotalItem(item) ? item.title : ''
   })()
 
-  function pushUndo(snapshot: AnyLineState[]) {
+  function pushUndo(snapshot: AnyLineState[], coalesceKey?: string) {
+    if (coalesceKey && coalesceKey === lastCoalesceKeyRef.current) return
+    lastCoalesceKeyRef.current = coalesceKey ?? null
     setUndoStacks(stacks => {
       const existing = stacks[pathKey] ?? []
       const trimmed = existing.length >= 25 ? existing.slice(1) : existing
@@ -63,16 +66,19 @@ export default function App() {
     })
   }
 
-  function mutate(updater: (lines: AnyLineState[]) => AnyLineState[]) {
-    pushUndo(lines)
+  function mutate(updater: (lines: AnyLineState[]) => AnyLineState[], coalesceKey?: string) {
+    pushUndo(lines, coalesceKey)
     setLines(prev => updateLinesAtPath(prev, navigationPath, updater))
   }
 
   function handleUndo() {
-    const stack = undoStacks[pathKey] ?? []
-    if (stack.length === 0) return
-    setLines(stack[stack.length - 1])
-    setUndoStacks(stacks => ({ ...stacks, [pathKey]: stacks[pathKey].slice(0, -1) }))
+    lastCoalesceKeyRef.current = null
+    setUndoStacks(stacks => {
+      const stack = stacks[pathKey] ?? []
+      if (stack.length === 0) return stacks
+      setLines(stack[stack.length - 1])
+      return { ...stacks, [pathKey]: stack.slice(0, -1) }
+    })
   }
 
   function handleDragEnd({ active, over }: DragEndEvent) {
@@ -86,15 +92,15 @@ export default function App() {
   }
 
   function handleFieldChange(id: string, field: 'l' | 's' | 'd', value: string) {
-    mutate(prev => processFieldUpdate(prev, id, field, value))
+    mutate(prev => processFieldUpdate(prev, id, field, value), `${pathKey}\0${id}\0${field}`)
   }
 
   function handleQuantityChange(id: string, value: string) {
-    mutate(prev => processQuantityUpdate(prev, id, value))
+    mutate(prev => processQuantityUpdate(prev, id, value), `${pathKey}\0qty\0${id}`)
   }
 
   function handleTitleChange(id: string, value: string) {
-    mutate(prev => updateTitle(prev, id, value))
+    mutate(prev => updateTitle(prev, id, value), `${pathKey}\0title\0${id}`)
   }
 
   function handleRemoveLine(id: string) {
@@ -159,19 +165,22 @@ export default function App() {
   }
 
   function handleNavigate(path: IdPath) {
+    lastCoalesceKeyRef.current = null
     setNavigationPath(path)
   }
 
   function handleDone() {
+    lastCoalesceKeyRef.current = null
     setNavigationPath(prev => prev.slice(0, -1))
   }
 
   function handleEditSubtotal(id: string) {
+    lastCoalesceKeyRef.current = null
     setNavigationPath(prev => [...prev, id])
   }
 
   function handleSubTitleChange(v: string) {
-    if (v === (subTitle ?? '')) return
+    if (v === (subTitle ?? '').trim()) return
     pushUndo(lines)
     const subtotalId = navigationPath[navigationPath.length - 1]
     const parentPath = navigationPath.slice(0, -1)
