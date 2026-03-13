@@ -34,6 +34,8 @@ interface Props {
   onDone?: () => void
   onEditSubtotal: (id: string) => void
   hasError?: boolean
+  onUndo: () => void
+  canUndo: boolean
 }
 
 export function Renderer({
@@ -66,6 +68,8 @@ export function Renderer({
   onDone,
   onEditSubtotal,
   hasError,
+  onUndo,
+  canUndo,
 }: Props) {
   const sensors = useSensors(useSensor(PointerSensor))
 
@@ -100,6 +104,8 @@ export function Renderer({
         onDone={onDone}
         onEditSubtotal={onEditSubtotal}
         hasError={hasError}
+        onUndo={onUndo}
+        canUndo={canUndo}
       />
     </DndContext>
   )

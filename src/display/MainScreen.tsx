@@ -1095,9 +1095,11 @@ interface SubHeaderEditProps {
   subTitle: string
   onSubTitleChange: (v: string) => void
   onDone: () => void
+  onUndo?: () => void
+  canUndo?: boolean
 }
 
-export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleChange, onDone }: SubHeaderEditProps) {
+export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleChange, onDone, onUndo, canUndo }: SubHeaderEditProps) {
   const [draft, setDraft] = React.useState(subTitle)
 
   React.useEffect(() => { setDraft(subTitle) }, [subTitle])
@@ -1122,6 +1124,7 @@ export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleCha
             autoComplete="off"
             spellCheck={false}
           />
+          {canUndo && <Button onClick={onUndo}>undo</Button>}
           <Button onClick={onDone}>done</Button>
         </SubHeaderActionRow>
       </PageWidth>
@@ -1129,11 +1132,12 @@ export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleCha
   )
 }
 
-export const HeaderEdit = ({ onClear, onSaveClick, onLoadClick, hasError }: { onClear?: () => void, onSaveClick?: () => void, onLoadClick?: () => void, hasError?: boolean }) =>
+export const HeaderEdit = ({ onClear, onSaveClick, onLoadClick, hasError, onUndo, canUndo }: { onClear?: () => void, onSaveClick?: () => void, onLoadClick?: () => void, hasError?: boolean, onUndo?: () => void, canUndo?: boolean }) =>
   <ScreenHeader>
     <Button variant="primary" onClick={onSaveClick} disabled={hasError}>export</Button>
     <Button onClick={onLoadClick}>load</Button>
     <HeaderSpacer />
+    {canUndo && <Button onClick={onUndo}>undo</Button>}
     <Button variant="danger" onClick={() => { if (window.confirm('Clear all items?')) onClear?.() }}>clear</Button>
   </ScreenHeader>
 
@@ -1444,9 +1448,11 @@ interface MainScreenProps {
   onDone?: () => void
   onEditSubtotal: (id: string) => void
   hasError?: boolean
+  onUndo: () => void
+  canUndo: boolean
 }
 
-export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange, onHelp, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onClear, onDuplicateLine, onClearItem, onSave, onLoad, breadcrumbs, navigationPath, subTitle, onSubTitleChange, onNavigate, onDone, onEditSubtotal, hasError }: MainScreenProps) {
+export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange, onHelp, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onClear, onDuplicateLine, onClearItem, onSave, onLoad, breadcrumbs, navigationPath, subTitle, onSubTitleChange, onNavigate, onDone, onEditSubtotal, hasError, onUndo, canUndo }: MainScreenProps) {
   const [saveOpen, setSaveOpen] = React.useState(false)
   const [loadOpen, setLoadOpen] = React.useState(false)
   const isSubLevel = navigationPath.length > 0
@@ -1460,8 +1466,10 @@ export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, o
             subTitle={subTitle ?? ''}
             onSubTitleChange={onSubTitleChange}
             onDone={onDone!}
+            onUndo={onUndo}
+            canUndo={canUndo}
           />
-        : <HeaderEdit onClear={onClear} onSaveClick={() => setSaveOpen(true)} onLoadClick={() => setLoadOpen(true)} hasError={hasError} />
+        : <HeaderEdit onClear={onClear} onSaveClick={() => setSaveOpen(true)} onLoadClick={() => setLoadOpen(true)} hasError={hasError} onUndo={onUndo} canUndo={canUndo} />
       }
       <ListOfItems
         lines={lines} totalDisplay={totalDisplay} totalPence={totalPence} advanced={advancedMode} showExplanation={showExplanation}

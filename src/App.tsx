@@ -32,10 +32,14 @@ export default function App() {
   const [navigationPath, setNavigationPath] = useState<IdPath>([])
   const [showExplanation, setShowExplanation] = useState(true)
   const [advancedMode, setAdvancedMode] = useState(false)
+  const [undoStacks, setUndoStacks] = useState<Record<string, AnyLineState[][]>>({})
 
   useEffect(() => {
     saveToStorage(lines)
   }, [lines])
+
+  const pathKey = navigationPath.join('/')
+  const canUndo = (undoStacks[pathKey]?.length ?? 0) > 0
 
   const visibleLines = getLinesAtPath(lines, navigationPath)
   const { totalPence, totalDisplay, hasError } = computeGrandTotal(visibleLines)
@@ -51,8 +55,24 @@ export default function App() {
     return item && isSubtotalItem(item) ? item.title : ''
   })()
 
+  function pushUndo(snapshot: AnyLineState[]) {
+    setUndoStacks(stacks => {
+      const existing = stacks[pathKey] ?? []
+      const trimmed = existing.length >= 25 ? existing.slice(1) : existing
+      return { ...stacks, [pathKey]: [...trimmed, snapshot] }
+    })
+  }
+
   function mutate(updater: (lines: AnyLineState[]) => AnyLineState[]) {
+    pushUndo(lines)
     setLines(prev => updateLinesAtPath(prev, navigationPath, updater))
+  }
+
+  function handleUndo() {
+    const stack = undoStacks[pathKey] ?? []
+    if (stack.length === 0) return
+    setLines(stack[stack.length - 1])
+    setUndoStacks(stacks => ({ ...stacks, [pathKey]: stacks[pathKey].slice(0, -1) }))
   }
 
   function handleDragEnd({ active, over }: DragEndEvent) {
@@ -95,6 +115,7 @@ export default function App() {
 
   function handleClear() {
     if (navigationPath.length === 0) {
+      pushUndo(lines)
       setLines(initialState().lines)
     } else {
       mutate(() => [emptyLine(), emptyLine()])
@@ -134,6 +155,7 @@ export default function App() {
     const state = parseSummaFile(json)
     setLines(state.lines)
     setNavigationPath([])
+    setUndoStacks({})
   }
 
   function handleNavigate(path: IdPath) {
@@ -149,6 +171,8 @@ export default function App() {
   }
 
   function handleSubTitleChange(v: string) {
+    if (v === (subTitle ?? '')) return
+    pushUndo(lines)
     const subtotalId = navigationPath[navigationPath.length - 1]
     const parentPath = navigationPath.slice(0, -1)
     setLines(prev => updateLinesAtPath(prev, parentPath, parentLines => updateTitle(parentLines, subtotalId, v)))
@@ -187,6 +211,8 @@ export default function App() {
       onDone={navigationPath.length > 0 ? handleDone : undefined}
       onEditSubtotal={handleEditSubtotal}
       hasError={hasError || undefined}
+      onUndo={handleUndo}
+      canUndo={canUndo}
     />
   )
 }
