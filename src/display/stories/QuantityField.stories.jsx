@@ -1,5 +1,5 @@
 import React from "react"
-import { QuantityField } from "../Prototype"
+import { QuantityField } from "../ScreenMain"
 
 const narrow = (Story) => (
   <div style={{ maxWidth: 480, margin: "2rem auto", fontFamily: "serif" }}>

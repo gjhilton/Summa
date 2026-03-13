@@ -1,5 +1,6 @@
 import React from "react"
-import { HeaderEdit, FooterEdit, ListOfItems, Renderer, AddItemBar, DUMMY_DATA } from "../Prototype"
+import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar, DUMMY_DATA } from "../ScreenMain"
+import { Renderer } from "../Renderer"
 
 export default {
   title: "Prototype/Screen",
@@ -82,7 +83,7 @@ export const Full = {
   name: "Renderer (full screen)",
   render: () => (
     <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
-      <Renderer />
+      <Renderer data={DUMMY_DATA} />
     </div>
   ),
 }

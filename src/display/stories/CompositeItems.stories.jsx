@@ -1,5 +1,5 @@
 import React from "react"
-import { ItemUnit, ItemExtended, ItemSubTotal, ItemTotal, SwipeProvider, DUMMY_DATA } from "../Prototype"
+import { ItemUnit, ItemExtended, ItemSubTotal, ItemTotal, SwipeProvider, DUMMY_DATA } from "../ScreenMain"
 
 // These use SwipeableItem internally so they need SwipeProvider
 const withSwipe = (Story) => (

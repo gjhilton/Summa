@@ -786,16 +786,3 @@ export const ScreenMain = ({ data, showCalculations, onShowCalculationsChange, a
     />
   </ScreenContainer>
 
-export function Renderer({ data = DUMMY_DATA }) {
-  const [showCalculations, setShowCalculations] = React.useState(false)
-  const [advancedMode, setAdvancedMode] = React.useState(false)
-  return (
-    <ScreenMain
-      data={data}
-      showCalculations={showCalculations}
-      onShowCalculationsChange={setShowCalculations}
-      advancedMode={advancedMode}
-      onAdvancedModeChange={setAdvancedMode}
-    />
-  )
-}

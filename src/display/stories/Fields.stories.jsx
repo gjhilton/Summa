@@ -1,5 +1,5 @@
 import React from "react"
-import { TextInput, TextField, QuantityField, CurrencyField, Currency } from "../Prototype"
+import { TextInput, TextField, QuantityField, CurrencyField, Currency } from "../ScreenMain"
 
 const narrow = (Story) => (
   <div style={{ maxWidth: 480, margin: "2rem auto", fontFamily: "serif" }}>

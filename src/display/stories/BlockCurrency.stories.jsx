@@ -1,5 +1,5 @@
 import React from "react"
-import { BlockCurrency } from "../Prototype"
+import { BlockCurrency } from "../ScreenMain"
 
 const narrow = (Story) => (
   <div style={{ maxWidth: 480, margin: "2rem auto", fontFamily: "serif" }}>

@@ -1,5 +1,5 @@
 import React from "react"
-import { Item, BlockTitle, BlockCurrency, QuantityField } from "../Prototype"
+import { Item, BlockTitle, BlockCurrency, QuantityField } from "../ScreenMain"
 
 const narrow = (Story) => (
   <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
