@@ -31,7 +31,8 @@ const markdownPlugin: Plugin = {
 
 export default defineConfig({
 	base: '/Summa/',
-	root: resolve(__dirname, '../..'),
+	root: resolve(__dirname, '..'),
+	envDir: __dirname,
 	plugins: [markdownPlugin, react()],
 	css: {
 		postcss: resolve(__dirname, 'postcss.config.cjs'),
