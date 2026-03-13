@@ -1,7 +1,7 @@
 import React from "react"
 import { DndContext } from "@dnd-kit/core"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
-import { ItemUnit, ItemExtended, ItemSubTotal, ItemTotal, SwipeProvider, DragCtx } from "@/display/ScreenMain"
+import { ItemUnit, ItemExtended, ItemSubTotal, ItemTotal, SwipeProvider, DragCtx } from "@/display/MainScreen"
 import { DUMMY_DATA } from "@/display/dummyData"
 
 // Wraps a single item as a sortable so DragHandle receives context

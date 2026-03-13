@@ -1,7 +1,7 @@
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import type { DragEndEvent } from '@dnd-kit/core'
 import type { AnyLineState, LsdStrings } from '@/types/calculation'
-import { ScreenMain } from './ScreenMain'
+import { MainScreen } from './MainScreen'
 
 interface Props {
   lines: AnyLineState[]
@@ -28,7 +28,7 @@ export function Renderer({
 
   return (
     <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-      <ScreenMain
+      <MainScreen
         lines={lines}
         totalDisplay={totalDisplay}
         totalPence={totalPence}

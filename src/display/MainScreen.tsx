@@ -1048,7 +1048,7 @@ const ScreenContainer = styled('main', {
   },
 })
 
-interface ScreenMainProps {
+interface MainScreenProps {
   lines: AnyLineState[]
   totalDisplay: LsdStrings
   totalPence: number
@@ -1058,7 +1058,7 @@ interface ScreenMainProps {
   onAdvancedModeChange: (value: boolean) => void
 }
 
-export const ScreenMain = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }: ScreenMainProps) =>
+export const MainScreen = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }: MainScreenProps) =>
   <ScreenContainer>
     <HeaderEdit />
     <ListOfItems lines={lines} totalDisplay={totalDisplay} totalPence={totalPence} advanced={advancedMode} showExplanation={showExplanation} />

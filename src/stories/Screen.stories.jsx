@@ -1,5 +1,5 @@
 import React from "react"
-import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar } from "@/display/ScreenMain"
+import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar } from "@/display/MainScreen"
 import { DUMMY_DATA } from "@/display/dummyData"
 import { Renderer } from "@/display/Renderer"
 import { DndContext } from "@dnd-kit/core"
