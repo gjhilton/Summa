@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
 	normalizeEarlyModernInput,
 	formatEarlyModernOutput,
-} from '../utils/earlyModern';
-import { integerToRoman } from '../utils/roman';
+} from '@/utils/earlyModern';
+import { integerToRoman } from '@/utils/roman';
 
 describe('normalizeEarlyModernInput', () => {
 	it('converts to lowercase', () => {

@@ -1,5 +1,5 @@
-import { css, cx } from '../generated/css';
-import { ExtendedItemView, BaseLineItemProps } from '../types/lineView';
+import { css, cx } from '@/generated/css';
+import { ExtendedItemView, BaseLineItemProps } from '@/types/lineView';
 import { lineError, lineHoverVars } from './LineItem.styles';
 import CurrencyFields from './CurrencyFields';
 import Field from './Field';

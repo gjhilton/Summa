@@ -9,15 +9,13 @@ import {
 	ItemType,
 	isExtendedItem,
 	isSubtotalItem,
-} from '../types/calculation';
+} from '@/types/calculation';
 import {
 	normalizeEarlyModernInput,
 	formatEarlyModernOutput,
-} from '../utils/earlyModern';
-import { isValidRoman, romanToInteger, integerToRoman } from '../utils/roman';
-import { penceToLsd } from '../utils/currency';
-
-const PENCE_MULTIPLIERS = { l: 240, s: 12, d: 1 } as const;
+} from '@/utils/earlyModern';
+import { isValidRoman, romanToInteger, integerToRoman } from '@/utils/roman';
+import { penceToLsd, LSD_MULTIPLIERS } from '@/utils/currency';
 
 function generateId(): string {
 	if (
@@ -201,7 +199,7 @@ export function computeLinePence(literals: LsdStrings): {
 		if (!isValidRoman(norm)) {
 			fieldErrors[field] = true;
 		} else {
-			totalPence += romanToInteger(norm) * PENCE_MULTIPLIERS[field];
+			totalPence += romanToInteger(norm) * LSD_MULTIPLIERS[field];
 		}
 	}
 	const error = fieldErrors.l || fieldErrors.s || fieldErrors.d;
@@ -334,7 +332,7 @@ export function computeFieldWorking(
 	const norm = normalizeEarlyModernInput(value);
 	if (!isValidRoman(norm)) return null;
 	const integer = romanToInteger(norm);
-	const multiplier = PENCE_MULTIPLIERS[field];
+	const multiplier = LSD_MULTIPLIERS[field];
 	const pence = integer * multiplier;
 	const prefix = multiplier === 1 ? '' : `${integer} × ${multiplier} = `;
 	return { prefix, pence };

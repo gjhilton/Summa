@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { css } from '../generated/css';
+import { css } from '@/generated/css';
 
 interface ModalProps {
 	isOpen: boolean;

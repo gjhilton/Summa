@@ -1,4 +1,4 @@
-import { css } from '../generated/css';
+import { css } from '@/generated/css';
 
 export const lineError = css({ bg: 'errorLineBg' });
 

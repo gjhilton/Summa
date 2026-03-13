@@ -3,7 +3,7 @@ import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
 import { Button } from "./Button"
 import { ItemType } from "@/types/calculation"
-import { computeLsdExplanation, computeExtendedExplanation } from "./explanation"
+import { explain, explainTotal } from "@/utils/explanation"
 import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
@@ -310,22 +310,24 @@ const SupD = () => <sup>d</sup>
 function renderExplanationTerms(terms) {
   const parts = terms.map((t, i) =>
     t.multiplier === 1
-      ? <React.Fragment key={i}>({t.pence}<SupD />)</React.Fragment>
+      ? <React.Fragment key={i}>{t.pence}<SupD /></React.Fragment>
       : <React.Fragment key={i}>({t.integer} × {t.multiplier}<SupD /> = {t.pence}<SupD />)</React.Fragment>
   )
   return parts.reduce((acc, el, i) => i === 0 ? [el] : [...acc, " + ", el], [])
 }
 
-function renderLsdExplanation(literals, totalPence, error) {
-  const result = computeLsdExplanation(literals, totalPence, error)
+function renderExplanation(line) {
+  const result = explain(line)
   if (!result) return null
-  return <>{renderExplanationTerms(result.terms)} = {result.totalPence}<SupD /></>
+  if (result.type === 'lsd')
+    return <>{renderExplanationTerms(result.terms)} = {result.totalPence}<SupD /></>
+  return <>{renderExplanationTerms(result.unitCostTerms)} = {result.basePence}<SupD /> unit cost × {result.quantity} = {result.totalPence}<SupD /></>
 }
 
-function renderExtendedExplanation(literals, quantity, basePence, totalPence, error) {
-  const result = computeExtendedExplanation(literals, quantity, basePence, totalPence, error)
+function renderTotalExplanation(totalDisplay, totalPence) {
+  const result = explainTotal(totalDisplay, totalPence)
   if (!result) return null
-  return <>({renderExplanationTerms(result.unitCostTerms)} = {result.basePence}<SupD /> unit cost) × {result.quantity} quantity = {result.totalPence}<SupD /></>
+  return <>{result.totalPence}<SupD /> = {renderExplanationTerms(result.terms)}</>
 }
 
 
@@ -876,23 +878,23 @@ function SortableLine({ id, children }) {
 
 // ─── List of items ────────────────────────────────────────────────────────────
 
-export function ListOfItems({ lines, totalDisplay, advanced, showExplanation }) {
+export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation }) {
   return (
     <SwipeProvider>
       <section>
         <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {lines.map(line => {
             if (line.itemType === ItemType.LINE_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} explanation={showExplanation ? renderLsdExplanation(line.literals, line.totalPence, line.error) : null} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} explanation={showExplanation ? renderExplanation(line) : null} /></SortableLine>
             if (line.itemType === ItemType.EXTENDED_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} explanation={showExplanation ? renderExtendedExplanation(line.literals, line.quantity, line.basePence, line.totalPence, line.error) : null} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} explanation={showExplanation ? renderExplanation(line) : null} /></SortableLine>
             if (line.itemType === ItemType.SUBTOTAL_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} explanation={showExplanation ? renderLsdExplanation(line.totalDisplay, line.totalPence, line.error) : null} /></SortableLine>
+              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} explanation={showExplanation ? renderExplanation(line) : null} /></SortableLine>
             return null
           })}
         </SortableContext>
         <AddItemBar advanced={advanced} onAdd={() => alert("add item")} onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
-        <ItemTotal totalDisplay={totalDisplay} />
+        <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} />
       </section>
     </SwipeProvider>
   )
@@ -906,10 +908,10 @@ const ScreenContainer = styled("main", {
   },
 })
 
-export const ScreenMain = ({ lines, totalDisplay, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }) =>
+export const ScreenMain = ({ lines, totalDisplay, totalPence, showExplanation, onShowExplanationChange, advancedMode, onAdvancedModeChange }) =>
   <ScreenContainer>
     <HeaderEdit />
-    <ListOfItems lines={lines} totalDisplay={totalDisplay} advanced={advancedMode} showExplanation={showExplanation} />
+    <ListOfItems lines={lines} totalDisplay={totalDisplay} totalPence={totalPence} advanced={advancedMode} showExplanation={showExplanation} />
     <FooterEdit
       onHelp={() => {}}
       showExplanation={showExplanation}

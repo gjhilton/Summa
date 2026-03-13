@@ -29,6 +29,7 @@ export function Renderer({ data }: Props) {
       <ScreenMain
         lines={lines}
         totalDisplay={data.totalDisplay}
+        totalPence={data.totalPence}
         showExplanation={showExplanation}
         onShowExplanationChange={setShowExplanation}
         advancedMode={advancedMode}

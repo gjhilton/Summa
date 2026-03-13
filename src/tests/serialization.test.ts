@@ -6,7 +6,7 @@ import {
 	deserializeLines,
 	createSummaFile,
 	parseSummaFile,
-} from '../state/serialization';
+} from '@/utils/serialization';
 import {
 	emptyLine,
 	emptyExtendedItem,
@@ -16,18 +16,18 @@ import {
 	computeGrandTotal,
 	recomputeSubtotal,
 	initialState,
-} from '../state/calculationLogic';
+} from '@/utils/calculationLogic';
 import {
 	ItemType,
 	AnyLineState,
 	isExtendedItem,
 	isSubtotalItem,
-} from '../types/calculation';
+} from '@/types/calculation';
 import {
 	SavedLine,
 	SavedExtendedItem,
 	SavedSubtotalItem,
-} from '../types/savedCalculation';
+} from '@/types/savedCalculation';
 
 // ─── serializeLine ────────────────────────────────────────────────────────────
 

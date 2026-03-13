@@ -1,6 +1,6 @@
-import { css } from '../generated/css';
-import { AnyLineState, ItemType, LsdStrings } from '../types/calculation';
-import { toLineView } from '../state/displayLogic';
+import { css } from '@/generated/css';
+import { AnyLineState, ItemType, LsdStrings } from '@/types/calculation';
+import { toLineView } from '@/utils/displayLogic';
 import LineItem from './LineItem';
 import ExtendedItem from './ExtendedItem';
 import SubtotalItem from './SubtotalItem';

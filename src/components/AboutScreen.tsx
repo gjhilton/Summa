@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { css, cx } from '../generated/css';
+import { css, cx } from '@/generated/css';
 import Button from './Button';
 import Footer from './Footer';
 import PageLayout from './PageLayout';
@@ -8,7 +8,7 @@ import LineItem from './LineItem';
 import ExtendedItem from './ExtendedItem';
 import SubtotalItem from './SubtotalItem';
 import Toggle from './Toggle';
-import noWorkingImg from '../assets/screenshot.jpg';
+import noWorkingImg from '@/assets/screenshot.jpg';
 import {
 	emptyLine,
 	emptyExtendedItem,
@@ -17,30 +17,30 @@ import {
 	recomputeSubtotal,
 	updateExtendedItemField,
 	updateExtendedItemQuantity,
-} from '../state/calculationLogic';
-import { toLineView } from '../state/displayLogic';
+} from '@/utils/calculationLogic';
+import { toLineView } from '@/utils/displayLogic';
 import {
 	AnyLineState,
 	LineState,
 	ExtendedItemState,
 	SubtotalItemState,
-} from '../types/calculation';
+} from '@/types/calculation';
 import {
 	LineItemView,
 	ExtendedItemView,
 	SubtotalItemView,
-} from '../types/lineView';
-import cookiesHtml from '../content/about/01-cookies.md';
-import introBeforeHtml from '../content/about/02-intro-before.md';
-import introAfterHtml from '../content/about/03-intro-after.md';
-import calculationHtml from '../content/about/04-calculation.md';
-import itemsBeforeHtml from '../content/about/05-items-before.md';
-import itemsAfterHtml from '../content/about/06-items-after.md';
-import showWorkingHtml from '../content/about/07-show-working.md';
-import advancedIntroHtml from '../content/about/08-advanced-intro.md';
-import extendedItemsHtml from '../content/about/09-extended-items.md';
-import subtotalItemsHtml from '../content/about/10-subtotal-items.md';
-import comingSoonHtml from '../content/about/11-coming-soon.md';
+} from '@/types/lineView';
+import cookiesHtml from '@/content/about/01-cookies.md';
+import introBeforeHtml from '@/content/about/02-intro-before.md';
+import introAfterHtml from '@/content/about/03-intro-after.md';
+import calculationHtml from '@/content/about/04-calculation.md';
+import itemsBeforeHtml from '@/content/about/05-items-before.md';
+import itemsAfterHtml from '@/content/about/06-items-after.md';
+import showWorkingHtml from '@/content/about/07-show-working.md';
+import advancedIntroHtml from '@/content/about/08-advanced-intro.md';
+import extendedItemsHtml from '@/content/about/09-extended-items.md';
+import subtotalItemsHtml from '@/content/about/10-subtotal-items.md';
+import comingSoonHtml from '@/content/about/11-coming-soon.md';
 
 interface AboutScreenProps {
 	onClose: () => void;

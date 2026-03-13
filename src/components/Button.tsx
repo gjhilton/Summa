@@ -1,4 +1,4 @@
-import { cva, cx } from '../generated/css';
+import { cva, cx } from '@/generated/css';
 import { focusRing } from './Button.styles';
 
 interface ButtonProps {

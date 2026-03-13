@@ -1,4 +1,4 @@
-import { css, cx } from '../generated/css';
+import { css, cx } from '@/generated/css';
 import Button from './Button';
 import Icon from './Icon';
 

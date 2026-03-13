@@ -1,4 +1,4 @@
-import { css, cx } from '../generated/css';
+import { css, cx } from '@/generated/css';
 import { focusRing } from './Button.styles';
 
 const titleInput = css({

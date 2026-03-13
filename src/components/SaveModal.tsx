@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { css } from '../generated/css';
+import { css } from '@/generated/css';
 import Modal from './Modal';
 import Button from './Button';
 

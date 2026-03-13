@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isValidRoman, romanToInteger, integerToRoman } from '../utils/roman';
+import { isValidRoman, romanToInteger, integerToRoman } from '@/utils/roman';
 
 describe('romanToInteger', () => {
 	it('converts i to 1', () => expect(romanToInteger('i')).toBe(1));

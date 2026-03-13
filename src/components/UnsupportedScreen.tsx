@@ -1,4 +1,4 @@
-import { css } from '../generated/css';
+import { css } from '@/generated/css';
 
 const wrapper = css({
 	display: 'flex',

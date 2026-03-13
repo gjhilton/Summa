@@ -1,3 +1,5 @@
+export const LSD_MULTIPLIERS = { l: 240, s: 12, d: 1 } as const
+
 /**
  * Convert total pence to pounds, shillings, pence.
  * Input must be a non-negative integer.

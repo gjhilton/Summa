@@ -1,5 +1,5 @@
-import { css, cx } from '../generated/css';
-import { LineItemView, BaseLineItemProps } from '../types/lineView';
+import { css, cx } from '@/generated/css';
+import { LineItemView, BaseLineItemProps } from '@/types/lineView';
 import { lineError, lineHoverVars } from './LineItem.styles';
 import TitleInput from './TitleInput';
 import RemoveButton from './RemoveButton';

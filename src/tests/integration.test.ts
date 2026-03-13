@@ -6,8 +6,8 @@ import {
 	processQuantityUpdate,
 	computeGrandTotal,
 	initialState,
-} from '../state/calculationLogic';
-import { AnyLineState, LineState, isExtendedItem } from '../types/calculation';
+} from '@/utils/calculationLogic';
+import { AnyLineState, LineState, isExtendedItem } from '@/types/calculation';
 
 function applyUpdates(
 	lines: AnyLineState[],

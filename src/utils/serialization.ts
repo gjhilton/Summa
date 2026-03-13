@@ -4,20 +4,20 @@ import {
 	CalculationState,
 	isExtendedItem,
 	isSubtotalItem,
-} from '../types/calculation';
+} from '@/types/calculation';
 import {
 	SavedAnyLine,
 	SavedLine,
 	SavedExtendedItem,
 	SavedSubtotalItem,
 	SummaFile,
-} from '../types/savedCalculation';
+} from '@/types/savedCalculation';
 import {
 	computeLinePence,
 	computeExtendedItemPence,
 	computeGrandTotal,
 	recomputeSubtotal,
-} from './calculationLogic';
+} from '@/utils/calculationLogic';
 
 export function serializeLine(line: AnyLineState): SavedAnyLine {
 	if (isSubtotalItem(line)) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { css } from '../generated/css';
-import { IdPath } from '../state/calculationLogic';
+import { css } from '@/generated/css';
+import { IdPath } from '@/utils/calculationLogic';
 import Button from './Button';
 
 interface CalculationHeaderProps {

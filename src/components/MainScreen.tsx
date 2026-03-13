@@ -1,4 +1,4 @@
-import CalculationData from '../state/CalculationData';
+import CalculationData from '@/utils/CalculationData';
 import Footer from './Footer';
 import PageLayout from './PageLayout';
 import PrintColophon from './PrintColophon';

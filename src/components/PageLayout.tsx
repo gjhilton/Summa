@@ -1,4 +1,4 @@
-import { css } from '../generated/css';
+import { css } from '@/generated/css';
 
 const page = css({
 	maxWidth: '90%',

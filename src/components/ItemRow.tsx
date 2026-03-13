@@ -1,4 +1,4 @@
-import { css, cx } from '../generated/css';
+import { css, cx } from '@/generated/css';
 import Icon from './Icon';
 import { useDragHandle } from './DragHandleContext';
 

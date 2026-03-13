@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { CalculationState, AnyLineState } from '../types/calculation';
+import { CalculationState, AnyLineState } from '@/types/calculation';
 import {
 	emptyLine,
 	emptyExtendedItem,
@@ -15,20 +15,20 @@ import {
 	updateTitle,
 	getBreadcrumbs,
 	IdPath,
-} from './calculationLogic';
+} from '@/utils/calculationLogic';
 import {
 	serializeLines,
 	deserializeLines,
 	createSummaFile,
 	parseSummaFile,
-} from './serialization';
-import { SavedAnyLine } from '../types/savedCalculation';
+} from '@/utils/serialization';
+import { SavedAnyLine } from '@/types/savedCalculation';
 import { arrayMove } from '@dnd-kit/sortable';
-import Calculation from '../components/Calculation';
-import CalculationHeader from '../components/CalculationHeader';
-import SaveModal from '../components/SaveModal';
-import LoadModal from '../components/LoadModal';
-import { FEATURES } from '../features';
+import Calculation from '@/components/Calculation';
+import CalculationHeader from '@/components/CalculationHeader';
+import SaveModal from '@/components/SaveModal';
+import LoadModal from '@/components/LoadModal';
+import { FEATURES } from '@/features';
 
 const STORAGE_KEY = 'summa_calculation';
 

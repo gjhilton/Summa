@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { penceToLsd } from '../utils/currency';
+import { penceToLsd } from '@/utils/currency';
 
 describe('penceToLsd', () => {
 	it('returns all zeros for 0', () => {

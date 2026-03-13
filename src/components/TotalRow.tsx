@@ -1,5 +1,5 @@
-import { css } from '../generated/css';
-import { LsdStrings } from '../types/calculation';
+import { css } from '@/generated/css';
+import { LsdStrings } from '@/types/calculation';
 import PenceWorkingRow from './PenceWorkingRow';
 import WorkingRow from './WorkingRow';
 import Logo from './Logo';

@@ -13,13 +13,13 @@ import {
 	formatComponent,
 	formatLsdDisplay,
 	computeFieldWorking,
-} from '../state/calculationLogic';
+} from '@/utils/calculationLogic';
 import {
 	AnyLineState,
 	ItemType,
 	SubtotalItemState,
 	isSubtotalItem,
-} from '../types/calculation';
+} from '@/types/calculation';
 
 describe('emptySubtotalItem', () => {
 	it('has correct shape', () => {

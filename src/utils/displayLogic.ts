@@ -1,13 +1,13 @@
-import { AnyLineState, ItemType } from '../types/calculation';
+import { AnyLineState, ItemType } from '@/types/calculation';
 import {
 	AnyLineView,
 	LineItemView,
 	ExtendedItemView,
 	SubtotalItemView,
-} from '../types/lineView';
-import { formatLsdDisplay } from './calculationLogic';
-import { normalizeEarlyModernInput } from '../utils/earlyModern';
-import { romanToInteger } from '../utils/roman';
+} from '@/types/lineView';
+import { formatLsdDisplay } from '@/utils/calculationLogic';
+import { normalizeEarlyModernInput } from '@/utils/earlyModern';
+import { romanToInteger } from '@/utils/roman';
 
 export function toLineView(line: AnyLineState): AnyLineView {
 	if (line.itemType === ItemType.SUBTOTAL_ITEM) {
