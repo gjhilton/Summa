@@ -64,7 +64,7 @@ const HelpButton = styled('button', {
     fontWeight: 'bold',
     fontStyle: 'normal',
     cursor: 'pointer',
-    textDecoration: 'underline',
+    textDecoration: 'none',
     color: 'blue',
     background: 'none',
     border: 'none',
