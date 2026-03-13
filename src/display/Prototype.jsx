@@ -109,14 +109,6 @@ const StyledItem = styled("div", {
   },
 })
 
-const LeftButtonWrapper = styled("div", {
-  base: {
-    position: "absolute",
-    left: 0,
-    top: "50%",
-    transform: "translateY(-50%)",
-  },
-})
 
 const ContentWrapper = styled("div", {
   base: {
@@ -178,7 +170,6 @@ const ContentWrapper = styled("div", {
 
 export function Item({
   borders,
-  leftButton,
   sideMargins = false,
   centerItems = false,
   showActions = false,
@@ -193,7 +184,6 @@ export function Item({
 }) {
   return (
     <StyledItem sideMargins={sideMargins || undefined} {...props}>
-      {leftButton && <LeftButtonWrapper>{leftButton}</LeftButtonWrapper>}
       {showActions && <ActionStrip onClose={onClose} desktopVisible={desktopVisible} />}
       <ContentWrapper
         borders={borders}
@@ -330,9 +320,6 @@ const inputRecipe = cva({
         borderBottomColor: "rgba(0,0,0,0.1)",
         _focus: { borderBottomColor: "black" },
       },
-      false: {
-        borderBottomColor: "transparent",
-      },
     },
     bold: {
       true: { fontWeight: "bold" },
@@ -340,8 +327,6 @@ const inputRecipe = cva({
   },
   defaultVariants: {
     align: "l",
-    editable: false,
-    bold: false,
   },
 })
 
@@ -538,6 +523,98 @@ export const AddItemBar = ({ advanced, onAdd, onAddUnit, onAddExtended, onAddSub
     )}
   </AddBar>
 
+// ─── Toggle switch ────────────────────────────────────────────────────────────
+
+const ToggleRow = styled("div", {
+  base: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.6rem",
+  },
+})
+
+const ToggleTrack = styled("button", {
+  base: {
+    position: "relative",
+    width: "44px",
+    height: "26px",
+    borderRadius: "999px",
+    borderWidth: 0,
+    cursor: "pointer",
+    flexShrink: 0,
+    transition: "background-color 0.25s ease-in-out",
+    _focusVisible: {
+      outlineWidth: "2px",
+      outlineStyle: "solid",
+      outlineColor: "black",
+      outlineOffset: "2px",
+    },
+    _active: { transform: "scale(0.96)" },
+    _disabled: { opacity: 0.4, cursor: "not-allowed" },
+  },
+  variants: {
+    checked: {
+      true:  { background: "#34c759" },
+      false: { background: "#c7c7cc" },
+    },
+  },
+  defaultVariants: { checked: false },
+})
+
+const ToggleKnob = styled("span", {
+  base: {
+    position: "absolute",
+    top: "2px",
+    width: "22px",
+    height: "22px",
+    borderRadius: "999px",
+    background: "white",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+    transition: "left 0.25s ease-in-out",
+  },
+  variants: {
+    checked: {
+      true:  { left: "20px" },
+      false: { left: "2px" },
+    },
+  },
+  defaultVariants: { checked: false },
+})
+
+const ToggleLabel = styled("label", {
+  base: {
+    fontStyle: "italic",
+    cursor: "pointer",
+  },
+  variants: {
+    disabled: {
+      true: { opacity: 0.4, cursor: "not-allowed" },
+    },
+  },
+})
+
+export function Toggle({ id, label, checked, onChange, disabled = false }) {
+  return (
+    <ToggleRow>
+      <ToggleTrack
+        type="button"
+        id={id}
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        disabled={disabled}
+        checked={checked}
+        onClick={() => onChange(!checked)}
+      >
+        <ToggleKnob checked={checked} />
+      </ToggleTrack>
+      <ToggleLabel htmlFor={id} disabled={disabled || undefined}>
+        {label}
+      </ToggleLabel>
+    </ToggleRow>
+  )
+}
+
 // ─── Screen components ────────────────────────────────────────────────────────
 
 const PageWidth = styled("div", {
@@ -547,10 +624,26 @@ const PageWidth = styled("div", {
 const FooterBar = styled("footer", {
   base: {
     display: "flex",
+    flexDirection: "column",
+    gap: "0.75rem",
+    margin: "auto 1.5rem 1.5rem",
+  },
+})
+
+const FooterControls = styled("div", {
+  base: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.4rem",
+  },
+})
+
+const FooterCredits = styled("div", {
+  base: {
+    display: "flex",
     alignItems: "baseline",
     justifyContent: "space-between",
     gap: "1rem",
-    margin: "auto 1.5rem 1.5rem",
   },
 })
 
@@ -584,15 +677,21 @@ const HelpButton = styled("button", {
 const GITHUB_URL = "https://github.com/gjhilton/Summa"
 const FUNERAL_GAMES_URL = "http://funeralgames.co.uk"
 
-export const FooterEdit = ({ onHelp }) =>
+export const FooterEdit = ({ onHelp, showCalculations, onShowCalculationsChange, advancedMode, onAdvancedModeChange }) =>
   <FooterBar>
-    <FooterText>
-      Summa v{__APP_VERSION__}. Concept, design and{" "}
-      <FooterLink href={GITHUB_URL} title="Summa on GitHub" target="_blank" rel="noopener noreferrer">code</FooterLink>
-      {" "}copyright ©2026 g.j.hilton /{" "}
-      <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games" target="_blank" rel="noopener noreferrer">funeral games</FooterLink>.
-    </FooterText>
-    {onHelp && <HelpButton type="button" onClick={onHelp}>help</HelpButton>}
+    <FooterControls>
+      <Toggle id="show-calculations" label="show calculations" checked={showCalculations} onChange={onShowCalculationsChange} />
+      <Toggle id="advanced-mode" label="advanced mode" checked={advancedMode} onChange={onAdvancedModeChange} />
+    </FooterControls>
+    <FooterCredits>
+      <FooterText>
+        Summa v{__APP_VERSION__}. Concept, design and{" "}
+        <FooterLink href={GITHUB_URL} title="Summa on GitHub" target="_blank" rel="noopener noreferrer">code</FooterLink>
+        {" "}copyright ©2026 g.j.hilton /{" "}
+        <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games" target="_blank" rel="noopener noreferrer">funeral games</FooterLink>.
+      </FooterText>
+      {onHelp && <HelpButton type="button" onClick={onHelp}>help</HelpButton>}
+    </FooterCredits>
   </FooterBar>
 
 const Header = styled("header", {
@@ -639,9 +738,20 @@ const ScreenContainer = styled("main", {
   },
 })
 
-export const ScreenMain = () =>
-  <ScreenContainer>
-    <HeaderEdit />
-    <ListOfItems />
-    <FooterEdit onHelp={() => {}} />
-  </ScreenContainer>
+export function ScreenMain() {
+  const [showCalculations, setShowCalculations] = React.useState(false)
+  const [advancedMode, setAdvancedMode] = React.useState(false)
+  return (
+    <ScreenContainer>
+      <HeaderEdit />
+      <ListOfItems />
+      <FooterEdit
+        onHelp={() => {}}
+        showCalculations={showCalculations}
+        onShowCalculationsChange={setShowCalculations}
+        advancedMode={advancedMode}
+        onAdvancedModeChange={setAdvancedMode}
+      />
+    </ScreenContainer>
+  )
+}
