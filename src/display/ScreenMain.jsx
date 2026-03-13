@@ -2,6 +2,9 @@ import React from "react"
 import { styled } from "../styled-system/jsx"
 import { cva } from "../styled-system/css"
 import { Button } from "./Button"
+import { ItemType } from "@/types/calculation"
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 // ─── Swipe context ────────────────────────────────────────────────────────────
 
@@ -16,6 +19,10 @@ export function SwipeProvider({ children }) {
     </SwipeContext.Provider>
   )
 }
+
+// ─── Drag context ─────────────────────────────────────────────────────────────
+
+export const DragCtx = React.createContext(null)
 
 // ─── Hover capability (evaluated once at module load) ─────────────────────────
 
@@ -97,13 +104,15 @@ const StyledItem = styled("div", {
   base: {
     position: "relative",
     overflow: "hidden",
+    display: "flex",
+    alignItems: "stretch",
     marginBottom: "0.25rem",
   },
   variants: {
     sideMargins: {
       true: {
-        marginLeft: { md: "1.5rem" },
-        marginRight: { md: "1.5rem" },
+        marginLeft: "1.5rem",
+        marginRight: "1.5rem",
       },
     },
   },
@@ -111,6 +120,8 @@ const StyledItem = styled("div", {
 
 const ContentWrapper = styled("div", {
   base: {
+    flex: 1,
+    minWidth: 0,
     position: "relative",
     zIndex: 2,
     display: { base: "block", md: "flex" },
@@ -146,8 +157,8 @@ const ContentWrapper = styled("div", {
     },
     sideMargins: {
       true: {
-        paddingLeft: { md: "0" },
-        paddingRight: { md: "0" },
+        paddingLeft: "0",
+        paddingRight: "0",
       },
     },
     borders: {
@@ -158,12 +169,56 @@ const ContentWrapper = styled("div", {
         borderBottomStyle: "double",
         borderTopColor: "black",
         borderBottomColor: "black",
+        paddingTop: { base: "0.25rem", md: "1rem" },
         paddingBottom: "1rem",
       },
     },
   },
   defaultVariants: { open: false },
 })
+
+// ─── Drag handle ──────────────────────────────────────────────────────────────
+
+const DragHandleButton = styled("button", {
+  base: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    width: "2rem",
+    border: "none",
+    background: "transparent",
+    cursor: "grab",
+    color: "rgba(0,0,0,0.2)",
+    touchAction: "none",
+    userSelect: "none",
+    padding: 0,
+    zIndex: 3,
+    _hover: { color: "rgba(0,0,0,0.5)" },
+    _active: { cursor: "grabbing" },
+  },
+})
+
+export const GripIcon = () => (
+  <svg viewBox="0 0 10 16" width="10" height="16" fill="currentColor" aria-hidden="true">
+    <circle cx="3" cy="3"  r="1.5" />
+    <circle cx="7" cy="3"  r="1.5" />
+    <circle cx="3" cy="8"  r="1.5" />
+    <circle cx="7" cy="8"  r="1.5" />
+    <circle cx="3" cy="13" r="1.5" />
+    <circle cx="7" cy="13" r="1.5" />
+  </svg>
+)
+
+export function DragHandle() {
+  const ctx = React.useContext(DragCtx)
+  if (!ctx) return null
+  return (
+    <DragHandleButton type="button" aria-label="Drag to reorder" {...ctx.listeners} {...ctx.attributes}>
+      <GripIcon />
+    </DragHandleButton>
+  )
+}
 
 // ─── Item — pure display component ───────────────────────────────────────────
 
@@ -184,6 +239,7 @@ export function Item({
   return (
     <StyledItem sideMargins={sideMargins || undefined} {...props}>
       {showActions && <ActionStrip onClose={onClose} desktopVisible={desktopVisible} />}
+      <DragHandle />
       <ContentWrapper
         borders={borders}
         open={isOpen}
@@ -292,6 +348,9 @@ const FieldAnnotation = styled("span", {
     sup: {
       true: { verticalAlign: "super", fontSize: "0.75em" },
     },
+    dim: {
+      true: { opacity: 0.2 },
+    },
   },
 })
 
@@ -362,8 +421,8 @@ export const QuantityField = ({ value, editable }) =>
 
 export const CurrencyField = ({ value, label, editable }) =>
   <Label>
-    <TextInput align="r" value={value} editable={editable} />
-    <FieldAnnotation sup>{label}</FieldAnnotation>
+    <TextInput align="r" value={value === "0" ? "" : value} editable={editable} />
+    <FieldAnnotation sup dim={value === "0" || undefined}>{label}</FieldAnnotation>
   </Label>
 
 export const Currency = ({ editable, values = { l: "x", s: "vj", d: "iij" } }) =>
@@ -505,6 +564,7 @@ const AddBar = styled("div", {
     display: "flex",
     gap: "0.5rem",
     padding: "0.25rem 1.5rem",
+    paddingBottom: { base: "1rem", md: "0.25rem" },
     justifyContent: { md: "flex-end" },
   },
 })
@@ -626,6 +686,7 @@ const FooterBar = styled("footer", {
     flexDirection: "column",
     gap: "0.75rem",
     margin: "auto 1.5rem 1.5rem",
+    paddingTop: { base: "4rem", md: "0" },
   },
 })
 
@@ -719,22 +780,53 @@ export const HeaderEdit = () =>
   </Header>
 
 
-export const ListOfItems = ({ lines, totalDisplay, advanced }) =>
-  <SwipeProvider>
-    <section>
-      {lines.map(line => {
-        if (line.itemType === ItemType.LINE_ITEM)
-          return <ItemUnit key={line.id} title={line.title} literals={line.literals} />
-        if (line.itemType === ItemType.EXTENDED_ITEM)
-          return <ItemExtended key={line.id} title={line.title} literals={line.literals} quantity={line.quantity} />
-        if (line.itemType === ItemType.SUBTOTAL_ITEM)
-          return <ItemSubTotal key={line.id} title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} />
-        return null
-      })}
-      <AddItemBar advanced={advanced} onAdd={() => alert("add item")} onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
-      <ItemTotal totalDisplay={totalDisplay} />
-    </section>
-  </SwipeProvider>
+// ─── Sortable line wrapper ────────────────────────────────────────────────────
+
+const SortableWrapper = styled("div", {
+  base: { position: "relative" },
+  variants: {
+    dragging: { true: { opacity: 0.4, zIndex: 1 } },
+  },
+})
+
+function SortableLine({ id, children }) {
+  const { listeners, attributes, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  return (
+    <DragCtx.Provider value={{ listeners, attributes }}>
+      <SortableWrapper
+        ref={setNodeRef}
+        dragging={isDragging || undefined}
+        style={{ transform: CSS.Transform.toString(transform), transition }}
+      >
+        {children}
+      </SortableWrapper>
+    </DragCtx.Provider>
+  )
+}
+
+// ─── List of items ────────────────────────────────────────────────────────────
+
+export function ListOfItems({ lines, totalDisplay, advanced }) {
+  return (
+    <SwipeProvider>
+      <section>
+        <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
+          {lines.map(line => {
+            if (line.itemType === ItemType.LINE_ITEM)
+              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} /></SortableLine>
+            if (line.itemType === ItemType.EXTENDED_ITEM)
+              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} /></SortableLine>
+            if (line.itemType === ItemType.SUBTOTAL_ITEM)
+              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} /></SortableLine>
+            return null
+          })}
+        </SortableContext>
+        <AddItemBar advanced={advanced} onAdd={() => alert("add item")} onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
+        <ItemTotal totalDisplay={totalDisplay} />
+      </section>
+    </SwipeProvider>
+  )
+}
 
 const ScreenContainer = styled("main", {
   base: {
@@ -744,10 +836,10 @@ const ScreenContainer = styled("main", {
   },
 })
 
-export const ScreenMain = ({ data, showCalculations, onShowCalculationsChange, advancedMode, onAdvancedModeChange }) =>
+export const ScreenMain = ({ lines, totalDisplay, showCalculations, onShowCalculationsChange, advancedMode, onAdvancedModeChange }) =>
   <ScreenContainer>
     <HeaderEdit />
-    <ListOfItems lines={data.lines} totalDisplay={data.totalDisplay} advanced={advancedMode} />
+    <ListOfItems lines={lines} totalDisplay={totalDisplay} advanced={advancedMode} />
     <FooterEdit
       onHelp={() => {}}
       showCalculations={showCalculations}

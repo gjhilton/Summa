@@ -1,5 +1,8 @@
 import { useState } from 'react'
-import type { CalculationState } from '@/types/calculation'
+import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
+import { arrayMove } from '@dnd-kit/sortable'
+import type { AnyLineState, CalculationState } from '@/types/calculation'
 import { ScreenMain } from './ScreenMain'
 
 interface Props {
@@ -7,15 +10,30 @@ interface Props {
 }
 
 export function Renderer({ data }: Props) {
+  const [lines, setLines] = useState<AnyLineState[]>(() => data.lines)
   const [showCalculations, setShowCalculations] = useState(false)
   const [advancedMode, setAdvancedMode] = useState(false)
+  const sensors = useSensors(useSensor(PointerSensor))
+
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return
+    setLines(prev => {
+      const oldIndex = prev.findIndex(l => l.id === active.id)
+      const newIndex = prev.findIndex(l => l.id === over.id)
+      return arrayMove(prev, oldIndex, newIndex)
+    })
+  }
+
   return (
-    <ScreenMain
-      data={data}
-      showCalculations={showCalculations}
-      onShowCalculationsChange={setShowCalculations}
-      advancedMode={advancedMode}
-      onAdvancedModeChange={setAdvancedMode}
-    />
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <ScreenMain
+        lines={lines}
+        totalDisplay={data.totalDisplay}
+        showCalculations={showCalculations}
+        onShowCalculationsChange={setShowCalculations}
+        advancedMode={advancedMode}
+        onAdvancedModeChange={setAdvancedMode}
+      />
+    </DndContext>
   )
 }

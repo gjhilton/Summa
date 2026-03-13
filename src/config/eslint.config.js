@@ -10,6 +10,7 @@ export default tseslint.config(
 			'dist',
 			'node_modules',
 			'dist/styled-system',
+			'src/styled-system',
 			'src/generated',
 			'src/e2e/fixtures/invalid.json',
 		],

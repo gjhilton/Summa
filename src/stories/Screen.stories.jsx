@@ -2,6 +2,7 @@ import React from "react"
 import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar } from "@/display/ScreenMain"
 import { DUMMY_DATA } from "@/display/dummyData"
 import { Renderer } from "@/display/Renderer"
+import { DndContext } from "@dnd-kit/core"
 
 export default {
   title: "Prototype/Screen",
@@ -24,9 +25,11 @@ export const List = {
   name: "ListOfItems (interactive)",
   decorators: [
     (Story) => (
-      <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
-        <Story />
-      </div>
+      <DndContext>
+        <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+          <Story />
+        </div>
+      </DndContext>
     ),
   ],
   render: () => <ListOfItems lines={DUMMY_DATA.lines} totalDisplay={DUMMY_DATA.totalDisplay} advanced={false} />,
