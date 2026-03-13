@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { ItemType } from '@/types/calculation'
 import type { LsdStrings } from '@/types/calculation'
-import { explain, explainTotal } from './explanation'
+import { explain, explainTotal } from '@/utils/explanation'
 
 // ─── Item factories ───────────────────────────────────────────────────────────
 
@@ -378,6 +378,33 @@ describe('explain() — SUBTOTAL_ITEM', () => {
       terms: [{ integer: 3, multiplier: 12, pence: 36 }, { integer: 6, multiplier: 1, pence: 6 }],
       totalPence: 42,
     })
+  })
+
+  it('l, s, and d total', () => {
+    expect(explain(subtotalItem({ l: 'j', s: 'v', d: 'iij' }, 303))).toEqual({
+      type: 'lsd',
+      terms: [
+        { integer: 1, multiplier: 240, pence: 240 },
+        { integer: 5, multiplier: 12, pence: 60 },
+        { integer: 3, multiplier: 1, pence: 3 },
+      ],
+      totalPence: 303,
+    })
+  })
+
+  it('returns terms in l → s → d order', () => {
+    const result = explain(subtotalItem({ l: 'j', s: 'j', d: 'j' }, 253))
+    expect(result?.type).toBe('lsd')
+    if (result?.type === 'lsd') expect(result.terms.map(t => t.multiplier)).toEqual([240, 12, 1])
+  })
+
+  it('skips zero fields, returns only non-zero terms', () => {
+    const result = explain(subtotalItem({ l: '0', s: 'v', d: '0' }, 60))
+    expect(result?.type).toBe('lsd')
+    if (result?.type === 'lsd') {
+      expect(result.terms).toHaveLength(1)
+      expect(result.terms[0]).toEqual({ integer: 5, multiplier: 12, pence: 60 })
+    }
   })
 
   it('preserves totalPence as passed', () => {

@@ -36,7 +36,6 @@ export type Explanation = LsdExplanation | ExtendedExplanation | TotalExplanatio
 
 // ─── Private helpers ──────────────────────────────────────────────────────────
 
-
 function buildTerms(literals: LsdStrings): ExplanationTerm[] {
   return (['l', 's', 'd'] as const).flatMap(f => {
     const norm = normalizeEarlyModernInput(literals[f])
@@ -77,18 +76,19 @@ function extendedExplanation(
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 export function explainTotal(totalDisplay: LsdStrings, totalPence: number): TotalExplanation | null {
-  if (!totalPence) return null
+  if (totalPence === 0) return null
   const terms = buildTerms(totalDisplay)
   if (!terms.length) return null
   return { type: 'total', terms, totalPence }
 }
 
 export function explain(item: AnyLineState): Explanation | null {
-  if (item.itemType === ItemType.LINE_ITEM)
-    return lsdExplanation(item.literals, item.totalPence, item.error)
-  if (item.itemType === ItemType.EXTENDED_ITEM)
-    return extendedExplanation(item.literals, item.quantity, item.basePence, item.totalPence, item.error)
-  if (item.itemType === ItemType.SUBTOTAL_ITEM)
-    return lsdExplanation(item.totalDisplay, item.totalPence, item.error)
-  return null
+  switch (item.itemType) {
+    case ItemType.LINE_ITEM:
+      return lsdExplanation(item.literals, item.totalPence, item.error)
+    case ItemType.EXTENDED_ITEM:
+      return extendedExplanation(item.literals, item.quantity, item.basePence, item.totalPence, item.error)
+    case ItemType.SUBTOTAL_ITEM:
+      return lsdExplanation(item.totalDisplay, item.totalPence, item.error)
+  }
 }

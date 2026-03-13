@@ -308,20 +308,23 @@ export function SwipeableItem({ children, ...props }) {
 const SupD = () => <sup>d</sup>
 
 function renderExplanationTerms(terms) {
-  const parts = terms.map((t, i) =>
-    t.multiplier === 1
-      ? <React.Fragment key={i}>{t.pence}<SupD /></React.Fragment>
-      : <React.Fragment key={i}>({t.integer} × {t.multiplier}<SupD /> = {t.pence}<SupD />)</React.Fragment>
-  )
-  return parts.reduce((acc, el, i) => i === 0 ? [el] : [...acc, " + ", el], [])
+  return terms.flatMap((t, i) => {
+    const term = t.multiplier === 1
+      ? <React.Fragment key={t.multiplier}>{t.pence}<SupD /></React.Fragment>
+      : <React.Fragment key={t.multiplier}>({t.integer} × {t.multiplier}<SupD /> = {t.pence}<SupD />)</React.Fragment>
+    return i === 0 ? [term] : [" + ", term]
+  })
 }
 
 function renderExplanation(line) {
   const result = explain(line)
   if (!result) return null
-  if (result.type === 'lsd')
-    return <>{renderExplanationTerms(result.terms)} = {result.totalPence}<SupD /></>
-  return <>{renderExplanationTerms(result.unitCostTerms)} = {result.basePence}<SupD /> unit cost × {result.quantity} = {result.totalPence}<SupD /></>
+  switch (result.type) {
+    case 'lsd':
+      return <>{renderExplanationTerms(result.terms)} = {result.totalPence}<SupD /></>
+    case 'extended':
+      return <>{renderExplanationTerms(result.unitCostTerms)} = {result.basePence}<SupD /> unit cost × {result.quantity} = {result.totalPence}<SupD /></>
+  }
 }
 
 function renderTotalExplanation(totalDisplay, totalPence) {
@@ -329,7 +332,6 @@ function renderTotalExplanation(totalDisplay, totalPence) {
   if (!result) return null
   return <>{result.totalPence}<SupD /> = {renderExplanationTerms(result.terms)}</>
 }
-
 
 // ─── Field primitives ─────────────────────────────────────────────────────────
 
@@ -366,7 +368,7 @@ const BlockRow = styled("div", {
   },
 })
 
-const WorkingRow = styled("div", {
+const ExplanationRow = styled("div", {
   base: {
     textAlign: "right",
     fontSize: "0.8em",
@@ -452,7 +454,7 @@ const StyledInput = styled("input", inputRecipe)
 export function TextInput({ editable, numeric, value, onChange, ...props }) {
   return (
     <StyledInput
-      editable={editable ? "true" : "false"}
+      editable={editable || undefined}
       numeric={numeric || undefined}
       value={value}
       onChange={editable ? onChange : undefined}
@@ -589,7 +591,7 @@ export const ItemUnit = ({ title, literals, explanation }) =>
       <BlockTitle title={title} editable />
       <BlockCurrency editable values={literals} />
     </BlockRow>
-    {explanation && <WorkingRow>{explanation}</WorkingRow>}
+    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 export const ItemExtended = ({ title, literals, quantity, explanation }) =>
@@ -601,7 +603,7 @@ export const ItemExtended = ({ title, literals, quantity, explanation }) =>
       <BlockCurrency editable values={literals} />
       <BlockCurrency />
     </BlockRow>
-    {explanation && <WorkingRow>{explanation}</WorkingRow>}
+    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanation }) =>
@@ -615,7 +617,7 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, explanati
       </Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {explanation && <WorkingRow>{explanation}</WorkingRow>}
+    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 export const ItemTotal = ({ totalDisplay, explanation }) =>
@@ -624,7 +626,7 @@ export const ItemTotal = ({ totalDisplay, explanation }) =>
       <Block indented><Logo size="s" /></Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {explanation && <WorkingRow>{explanation}</WorkingRow>}
+    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </Item>
 
 // ─── Add item bar ─────────────────────────────────────────────────────────────
@@ -884,13 +886,15 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
       <section>
         <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {lines.map(line => {
-            if (line.itemType === ItemType.LINE_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} explanation={showExplanation ? renderExplanation(line) : null} /></SortableLine>
-            if (line.itemType === ItemType.EXTENDED_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} explanation={showExplanation ? renderExplanation(line) : null} /></SortableLine>
-            if (line.itemType === ItemType.SUBTOTAL_ITEM)
-              return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} explanation={showExplanation ? renderExplanation(line) : null} /></SortableLine>
-            return null
+            const explanation = showExplanation ? renderExplanation(line) : null
+            switch (line.itemType) {
+              case ItemType.LINE_ITEM:
+                return <SortableLine key={line.id} id={line.id}><ItemUnit title={line.title} literals={line.literals} explanation={explanation} /></SortableLine>
+              case ItemType.EXTENDED_ITEM:
+                return <SortableLine key={line.id} id={line.id}><ItemExtended title={line.title} literals={line.literals} quantity={line.quantity} explanation={explanation} /></SortableLine>
+              case ItemType.SUBTOTAL_ITEM:
+                return <SortableLine key={line.id} id={line.id}><ItemSubTotal title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} onEdit={() => {}} explanation={explanation} /></SortableLine>
+            }
           })}
         </SortableContext>
         <AddItemBar advanced={advanced} onAdd={() => alert("add item")} onAddUnit={() => alert("unit")} onAddExtended={() => alert("extended")} onAddSubtotal={() => alert("subtotal")} />
