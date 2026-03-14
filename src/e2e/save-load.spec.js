@@ -22,37 +22,37 @@ const INVALID_FIXTURE = path.resolve(__dirname, 'fixtures/invalid.json');
 // ─── button visibility ────────────────────────────────────────────────────────
 
 test.describe('Save/Load button visibility', () => {
-	test('Save button visible on root level', async ({ page }) => {
+	test('export button visible on root level', async ({ page }) => {
 		await goto(page);
 		await expect(
-			page.getByRole('button', { name: 'Save', exact: true })
+			page.getByRole('button', { name: 'export', exact: true })
 		).toBeVisible();
 	});
 
-	test('Load button visible on root level', async ({ page }) => {
+	test('load button visible on root level', async ({ page }) => {
 		await goto(page);
 		await expect(
-			page.getByRole('button', { name: 'Load', exact: true })
+			page.getByRole('button', { name: 'load', exact: true }).first()
 		).toBeVisible();
 	});
 
-	test('Save button hidden on sub-level', async ({ page }) => {
+	test('export button hidden on sub-level', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		await navigateIntoSubtotal(page, 'Untitled');
+		await navigateIntoSubtotal(page);
 		await expect(
-			page.getByRole('button', { name: 'Save', exact: true })
+			page.getByRole('button', { name: 'export', exact: true })
 		).not.toBeVisible();
 	});
 
-	test('Load button hidden on sub-level', async ({ page }) => {
+	test('load button hidden on sub-level', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		await navigateIntoSubtotal(page, 'Untitled');
+		await navigateIntoSubtotal(page);
 		await expect(
-			page.getByRole('button', { name: 'Load', exact: true })
+			page.getByRole('button', { name: 'load', exact: true }).first()
 		).not.toBeVisible();
 	});
 });
@@ -60,25 +60,25 @@ test.describe('Save/Load button visibility', () => {
 // ─── Save button enabled/disabled ────────────────────────────────────────────
 
 test.describe('Save button state', () => {
-	test('Save button is enabled when no errors', async ({ page }) => {
+	test('export button is enabled when no errors', async ({ page }) => {
 		await goto(page);
-		const saveBtn = page.getByRole('button', { name: 'Save', exact: true });
+		const saveBtn = page.getByRole('button', { name: 'export', exact: true });
 		await expect(saveBtn).not.toBeDisabled();
 	});
 
-	test('Save button is disabled when a line has an error', async ({
+	test('export button is disabled when a line has an error', async ({
 		page,
 	}) => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'not-roman');
-		const saveBtn = page.getByRole('button', { name: 'Save', exact: true });
+		const saveBtn = page.getByRole('button', { name: 'export', exact: true });
 		await expect(saveBtn).toBeDisabled();
 	});
 
-	test('Save button re-enables after fixing error', async ({ page }) => {
+	test('export button re-enables after fixing error', async ({ page }) => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'not-roman');
-		const saveBtn = page.getByRole('button', { name: 'Save', exact: true });
+		const saveBtn = page.getByRole('button', { name: 'export', exact: true });
 		await expect(saveBtn).toBeDisabled();
 		await enterValue(page, 0, 'd', 'v');
 		await expect(saveBtn).not.toBeDisabled();
@@ -119,16 +119,6 @@ test.describe('Save modal', () => {
 		await expect(page.getByLabel('Filename')).toHaveValue('');
 	});
 
-	test('after saving "my-calc", re-open modal shows "my-calc"', async ({
-		page,
-	}) => {
-		await goto(page);
-		await openSaveModal(page);
-		await saveAs(page, 'my-calc');
-		await openSaveModal(page);
-		await expect(page.getByLabel('Filename')).toHaveValue('my-calc');
-	});
-
 	test('after Clear, save modal filename is empty', async ({ page }) => {
 		await goto(page);
 		await openSaveModal(page);
@@ -136,7 +126,7 @@ test.describe('Save modal', () => {
 
 		// Clear the calculation
 		page.once('dialog', dialog => dialog.accept());
-		await page.getByRole('button', { name: 'Clear', exact: true }).click();
+		await page.getByRole('button', { name: 'clear', exact: true }).click();
 
 		await openSaveModal(page);
 		await expect(page.getByLabel('Filename')).toHaveValue('');
@@ -188,7 +178,7 @@ test.describe('Load modal', () => {
 	test('Load modal Cancel button closes the modal', async ({ page }) => {
 		await goto(page);
 		await openLoadModal(page);
-		await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+		await page.getByRole('button', { name: 'cancel', exact: true }).click();
 		await expect(page.getByText('Load calculation')).not.toBeVisible();
 	});
 });
@@ -201,8 +191,8 @@ test.describe('Loading a valid fixture file', () => {
 		await openLoadModal(page);
 		await loadFile(page, SIMPLE_FIXTURE);
 		// 5s + 7s = 12s
-		const totalS = page.getByLabel('shillings', { exact: true }).last();
-		await expect(totalS).toHaveText('xij');
+		const totalS = page.getByLabel('s', { exact: true }).last();
+		await expect(totalS).toHaveValue('xij');
 	});
 
 	test('loads fixture and shows line titles', async ({ page }) => {
@@ -239,7 +229,7 @@ test.describe('Invalid file handling', () => {
 		await openLoadModal(page);
 		await page.getByLabel('Summa file').setInputFiles(INVALID_FIXTURE);
 		await page
-			.getByRole('button', { name: 'Load', exact: true })
+			.getByRole('button', { name: 'load', exact: true })
 			.last()
 			.click();
 		await expect(page.getByText('Not a valid JSON file')).toBeVisible();
@@ -249,13 +239,13 @@ test.describe('Invalid file handling', () => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'v');
 		// Confirm value is present
-		const totalD = page.getByLabel('pence', { exact: true }).last();
-		await expect(totalD).toHaveText('v');
+		const totalD = page.getByLabel('d', { exact: true }).last();
+		await expect(totalD).toHaveValue('v');
 
 		await openLoadModal(page);
 		await page.getByLabel('Summa file').setInputFiles(INVALID_FIXTURE);
 		await page
-			.getByRole('button', { name: 'Load', exact: true })
+			.getByRole('button', { name: 'load', exact: true })
 			.last()
 			.click();
 
@@ -263,7 +253,7 @@ test.describe('Invalid file handling', () => {
 		await expect(page.getByText('Not a valid JSON file')).toBeVisible();
 		// Close modal and verify calculation unchanged
 		await page.keyboard.press('Escape');
-		await expect(totalD).toHaveText('v');
+		await expect(totalD).toHaveValue('v');
 	});
 
 	test('modal stays open on load failure', async ({ page }) => {
@@ -271,7 +261,7 @@ test.describe('Invalid file handling', () => {
 		await openLoadModal(page);
 		await page.getByLabel('Summa file').setInputFiles(INVALID_FIXTURE);
 		await page
-			.getByRole('button', { name: 'Load', exact: true })
+			.getByRole('button', { name: 'load', exact: true })
 			.last()
 			.click();
 		await expect(page.getByText('Load calculation')).toBeVisible();

@@ -51,7 +51,7 @@ const ActionStripWrapper = styled('div', {
     bottom: 0,
     width: '240px',
     display: 'flex',
-    zIndex: 1,
+    zIndex: 3,
     overflow: 'hidden',
     background: '#e8e8e8',
     boxShadow: 'inset 8px 0 16px -4px rgba(0,0,0,0.25)',
@@ -101,15 +101,15 @@ function ActionStrip({ onClose, desktopVisible, onRemove, onDuplicate, onClearIt
   const visible = !canHover || desktopVisible
   return (
     <ActionStripWrapper visible={visible}>
-      <ActionButton onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
+      <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
         <ActionButtonIcon>🗑</ActionButtonIcon>
         Delete
       </ActionButton>
-      <ActionButton onClick={() => { onDuplicate?.(); onClose() }} aria-label="Duplicate row">
+      <ActionButton tabIndex={-1} onClick={() => { onDuplicate?.(); onClose() }} aria-label="Duplicate row">
         <ActionButtonIcon>⧉</ActionButtonIcon>
         Duplicate
       </ActionButton>
-      <ActionButton onClick={() => { if (window.confirm('Clear this item?')) { onClearItem?.(); onClose() } }} aria-label="Clear item">
+      <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Clear this item?')) { onClearItem?.(); onClose() } }} aria-label="Clear item">
         <ActionButtonIcon>✕</ActionButtonIcon>
         Clear
       </ActionButton>
@@ -233,7 +233,7 @@ export function DragHandle() {
   const ctx = React.useContext(DragCtx)
   if (!ctx) return null
   return (
-    <DragHandleButton type="button" aria-label="Drag to reorder" {...ctx.listeners} {...ctx.attributes}>
+    <DragHandleButton type="button" aria-label="Drag to reorder" {...ctx.listeners} {...ctx.attributes} tabIndex={-1}>
       <GripIcon />
     </DragHandleButton>
   )
@@ -551,9 +551,10 @@ interface TextInputProps {
   align?: 'l' | 'r'
   bold?: boolean
   error?: boolean
+  ariaLabel?: string
 }
 
-export function TextInput({ editable, numeric, value, onChange, align, bold, error }: TextInputProps) {
+export function TextInput({ editable, numeric, value, onChange, align, bold, error, ariaLabel }: TextInputProps) {
   return (
     <StyledInput
       editable={editable || undefined}
@@ -568,6 +569,7 @@ export function TextInput({ editable, numeric, value, onChange, align, bold, err
       autoComplete="off"
       autoCorrect="off"
       spellCheck={false}
+      aria-label={ariaLabel}
     />
   )
 }
@@ -578,13 +580,14 @@ interface TextFieldProps {
   editable?: boolean
   align?: 'l' | 'r'
   onChange?: (v: string) => void
+  ariaLabel?: string
 }
 
-export const TextField = ({ value, label, editable, align, onChange }: TextFieldProps) =>
+export const TextField = ({ value, label, editable, align, onChange, ariaLabel }: TextFieldProps) =>
   <TextFieldBox>
     <Label>
       {label}
-      <TextInput value={value} editable={editable} align={align} bold onChange={e => onChange?.(e.target.value)} />
+      <TextInput value={value} editable={editable} align={align} bold onChange={e => onChange?.(e.target.value)} ariaLabel={ariaLabel} />
     </Label>
   </TextFieldBox>
 
@@ -598,7 +601,7 @@ interface QuantityFieldProps {
 export const QuantityField = ({ value, editable, onChange, error }: QuantityFieldProps) =>
   <Label>
     <FieldAnnotation large>✕</FieldAnnotation>
-    <TextInput align="r" numeric value={value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} />
+    <TextInput align="r" numeric value={value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} ariaLabel="quantity" />
     <FieldAnnotation>@</FieldAnnotation>
   </Label>
 
@@ -635,12 +638,13 @@ interface BlockTitleProps {
   editable?: boolean
   children?: React.ReactNode
   onChange?: (v: string) => void
+  ariaLabel?: string
 }
 
-export const BlockTitle = ({ title, children, editable, onChange }: BlockTitleProps) =>
+export const BlockTitle = ({ title, children, editable, onChange, ariaLabel }: BlockTitleProps) =>
   <Block>
     <Equally>
-      <TextField value={title} editable={editable} onChange={onChange} />
+      <TextField value={title} editable={editable} onChange={onChange} ariaLabel={ariaLabel} />
       {children}
     </Equally>
   </Block>
@@ -774,7 +778,7 @@ interface ItemUnitProps {
 export const ItemUnit = ({ title, literals, explanation, explanationIsError, onTitleChange, onFieldChange, onRemove, onDuplicate, onClearItem, fieldErrors, error }: ItemUnitProps) =>
   <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow>
-      <BlockTitle title={title} editable onChange={onTitleChange} />
+      <BlockTitle title={title} editable onChange={onTitleChange} ariaLabel="Line title" />
       <BlockCurrency editable values={literals} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
     </BlockRow>
     {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
@@ -801,7 +805,7 @@ interface ItemExtendedProps {
 export const ItemExtended = ({ title, literals, quantity, explanation, explanationIsError, onTitleChange, onFieldChange, onQuantityChange, onRemove, onDuplicate, onClearItem, fieldErrors, quantityError, resultDisplay, error }: ItemExtendedProps) =>
   <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow>
-      <BlockTitle title={title} editable onChange={onTitleChange}>
+      <BlockTitle title={title} editable onChange={onTitleChange} ariaLabel="Item title">
         <QuantityField editable value={quantity} onChange={onQuantityChange} error={quantityError || undefined} />
       </BlockTitle>
       <BlockCurrency editable values={literals} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
@@ -842,14 +846,16 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, onRemove,
 interface ItemTotalProps {
   totalDisplay: LsdStrings
   explanation?: React.ReactNode
+  itemCount?: number
 }
 
-export const ItemTotal = ({ totalDisplay, explanation }: ItemTotalProps) =>
+export const ItemTotal = ({ totalDisplay, explanation, itemCount }: ItemTotalProps) =>
   <Item borders="total" sideMargins>
     <BlockRow centerItems>
       <Block indented><Logo size="s" /></Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
+    {itemCount !== undefined && <ExplanationRow>Items: {itemCount}</ExplanationRow>}
     {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
   </Item>
 
@@ -1250,7 +1256,7 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
           onAddExtended={onAddExtended}
           onAddSubtotal={onAddSubtotal}
         />
-        <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} />
+        <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} itemCount={showExplanation ? lines.length : undefined} />
       </section>
     </SwipeProvider>
   )
@@ -1366,6 +1372,7 @@ function SaveModalUI({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: ()
           autoCorrect="off"
           autoComplete="off"
           spellCheck={false}
+          aria-label="Filename"
         />
         <FilenameSuffix>.summa.json</FilenameSuffix>
       </FilenameRow>
@@ -1408,7 +1415,7 @@ function LoadModalUI({ isOpen, onClose, onLoad }: { isOpen: boolean, onClose: ()
   return (
     <SummaDialog isOpen={isOpen} onClose={handleClose} title="Load calculation">
       <div>
-        <input ref={inputRef} type="file" accept=".json" onChange={() => setError('')} />
+        <input ref={inputRef} type="file" accept=".json" onChange={() => setError('')} aria-label="Summa file" />
         {error && <ModalErrorText>{error}</ModalErrorText>}
       </div>
       <DialogButtonRow>

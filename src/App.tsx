@@ -23,12 +23,12 @@ import {
 } from '@/utils/calculationLogic'
 import type { IdPath } from '@/utils/calculationLogic'
 import { createSummaFile, parseSummaFile } from '@/utils/serialization'
-import { loadFromStorage, saveToStorage, markWelcomeSeen } from '@/utils/storage'
+import { loadFromStorage, saveToStorage, hasSeenWelcome, markWelcomeSeen } from '@/utils/storage'
 
 type Screen = 'welcome' | 'main' | 'help'
 
 export default function App() {
-  const [screen, setScreen] = useState<Screen>('welcome')
+  const [screen, setScreen] = useState<Screen>(() => hasSeenWelcome() ? 'main' : 'welcome')
   const [lines, setLines] = useState<AnyLineState[]>(() => loadFromStorage())
   const [navigationPath, setNavigationPath] = useState<IdPath>([])
   const [showExplanation, setShowExplanation] = useState(true)

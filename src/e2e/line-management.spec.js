@@ -3,6 +3,8 @@ import {
 	goto,
 	enableShowWorking,
 	getItemsCount,
+	revealRowActions,
+	clickDeleteRow,
 } from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('line management', () => {
@@ -15,38 +17,24 @@ test.describe('line management', () => {
 	test('can add a new line item', async ({ page }) => {
 		await goto(page);
 		await enableShowWorking(page);
-		await page.getByRole('button', { name: /new line item/i }).click();
+		await page.getByRole('button', { name: '+ item' }).click();
 		await expect(getItemsCount(page)).toHaveText('Items: 3');
 	});
 
-	test('remove buttons are hidden when only 2 lines remain', async ({
-		page,
-	}) => {
+	test('delete button is revealed on hover', async ({ page }) => {
 		await goto(page);
-		const removeButtons = page.getByRole('button', {
-			name: /remove line/i,
-		});
-		await expect(removeButtons.first()).toBeHidden();
+		await revealRowActions(page, 0);
+		await expect(
+			page.getByRole('button', { name: 'Delete row' }).first()
+		).toBeVisible();
 	});
 
-	test('remove button appears when more than 2 lines', async ({ page }) => {
-		await goto(page);
-		await page.getByRole('button', { name: /new line item/i }).click();
-		const removeButtons = page.getByRole('button', {
-			name: /remove line/i,
-		});
-		await expect(removeButtons.first()).toBeVisible();
-	});
-
-	test('removing a line updates the count', async ({ page }) => {
+	test('deleting a line updates the count', async ({ page }) => {
 		await goto(page);
 		await enableShowWorking(page);
-		await page.getByRole('button', { name: /new line item/i }).click();
+		await page.getByRole('button', { name: '+ item' }).click();
 		await expect(getItemsCount(page)).toHaveText('Items: 3');
-		const removeButton = page
-			.getByRole('button', { name: /remove line/i })
-			.first();
-		await removeButton.click();
+		await clickDeleteRow(page, 0);
 		await expect(getItemsCount(page)).toHaveText('Items: 2');
 	});
 

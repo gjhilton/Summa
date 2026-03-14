@@ -35,7 +35,7 @@ test.describe('item titles', () => {
 	test('extended items have a title input', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
-		await page.getByRole('button', { name: /new extended item/i }).click();
+		await page.getByRole('button', { name: /extended/i }).click();
 		const titleInputs = page.getByLabel('Item title');
 		await expect(titleInputs.first()).toBeVisible();
 	});
@@ -43,7 +43,7 @@ test.describe('item titles', () => {
 	test('can type a title on an extended item', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
-		await page.getByRole('button', { name: /new extended item/i }).click();
+		await page.getByRole('button', { name: /extended/i }).click();
 		const titleInput = page.getByLabel('Item title').first();
 		await titleInput.fill('Cloth goods');
 		await expect(titleInput).toHaveValue('Cloth goods');

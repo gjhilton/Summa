@@ -7,9 +7,9 @@ import {
 } from '../config/playwright/helpers/test-helpers.js';
 
 test.describe('show working', () => {
-	test('show working toggle is present', async ({ page }) => {
+	test('explain calculations toggle is present', async ({ page }) => {
 		await goto(page);
-		const toggle = page.getByRole('switch', { name: /show working/i });
+		const toggle = page.getByRole('switch', { name: /explain calculations/i });
 		await expect(toggle).toBeVisible();
 	});
 
@@ -27,7 +27,7 @@ test.describe('show working', () => {
 	}) => {
 		await goto(page);
 		await enterValue(page, 0, 's', 'v');
-		const toggle = page.getByRole('switch', { name: /show working/i });
+		const toggle = page.getByRole('switch', { name: /explain calculations/i });
 		await toggle.click(); // enable
 		await toggle.click(); // disable
 		await expect(page.getByText('60')).not.toBeVisible();
@@ -49,8 +49,8 @@ test.describe('show working', () => {
 	test('item count reflects current line count', async ({ page }) => {
 		await goto(page);
 		await enableShowWorking(page);
-		await page.getByRole('button', { name: /new line item/i }).click();
-		await page.getByRole('button', { name: /new line item/i }).click();
+		await page.getByRole('button', { name: '+ item' }).click();
+		await page.getByRole('button', { name: '+ item' }).click();
 		await expect(getItemsCount(page)).toHaveText('Items: 4');
 	});
 });
