@@ -1030,8 +1030,7 @@ const SubHeaderNavRow = styled('nav', {
     alignItems: 'center',
     gap: '0.25rem',
     fontSize: '0.8em',
-    opacity: 0.55,
-    marginBottom: '0.65rem',
+    marginBottom: '0.5rem',
     flexWrap: 'wrap',
   },
 })
@@ -1043,7 +1042,8 @@ const BreadcrumbBtn = styled('button', {
     fontFamily: 'inherit',
     fontSize: 'inherit',
     cursor: 'pointer',
-    textDecoration: 'underline',
+    textDecoration: 'none',
+    color: 'blue',
     padding: 0,
     _hover: { opacity: 0.7 },
   },
@@ -1051,6 +1051,10 @@ const BreadcrumbBtn = styled('button', {
 
 const BreadcrumbSep = styled('span', {
   base: { userSelect: 'none', paddingLeft: '0.1rem', paddingRight: '0.1rem' },
+})
+
+const SubHeaderTopRow = styled('div', {
+  base: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.65rem' },
 })
 
 const SubHeaderActionRow = styled('div', {
@@ -1126,6 +1130,12 @@ export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleCha
   return (
     <SubHeaderEl>
       <PageWidth>
+        <SubHeaderTopRow>
+          <Button variant="primary" onClick={onDone}>done</Button>
+          <HeaderSpacer />
+          {canUndo && <Button onClick={onUndo}>undo</Button>}
+          <Button variant="danger" onClick={() => { if (window.confirm('Clear all items?')) onClear?.() }}>clear</Button>
+        </SubHeaderTopRow>
         <BreadcrumbNav breadcrumbs={breadcrumbs} onNavigate={onNavigate} />
         <SubHeaderActionRow>
           <SubTitleInput
@@ -1139,9 +1149,6 @@ export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleCha
             autoComplete="off"
             spellCheck={false}
           />
-          {canUndo && <Button onClick={onUndo}>undo</Button>}
-          <Button variant="danger" onClick={() => { if (window.confirm('Clear all items?')) onClear?.() }}>clear</Button>
-          <Button onClick={onDone}>done</Button>
         </SubHeaderActionRow>
       </PageWidth>
     </SubHeaderEl>

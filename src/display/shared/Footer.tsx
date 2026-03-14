@@ -2,20 +2,6 @@ import type { ReactNode } from 'react'
 import { styled } from '@/styled-system/jsx'
 import { PageWidth } from './PageWidth'
 
-const HelpIconSvg = styled('svg', {
-  base: {
-    display: 'inline',
-    verticalAlign: '-1px',
-    marginRight: '3px',
-  },
-})
-
-const HelpIcon = () => (
-  <HelpIconSvg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true">
-    <circle cx="8" cy="8" r="7.5" fill="none" stroke="currentColor" strokeWidth="1" />
-    <text x="8" y="12" textAnchor="middle" fontSize="10" fontWeight="bold" fontFamily="serif">?</text>
-  </HelpIconSvg>
-)
 
 const FooterBar = styled('footer', {
   base: {
@@ -93,7 +79,7 @@ export function ScreenFooter({ controls, onHelp }: ScreenFooterProps) {
             {' '}copyright ©2026 g.j.hilton /{' '}
             <FooterLink href={FUNERAL_GAMES_URL} title="Funeral Games" target="_blank" rel="noopener noreferrer">funeral games</FooterLink>.
           </FooterText>
-          {onHelp && <HelpButton type="button" onClick={onHelp}><HelpIcon />help</HelpButton>}
+          {onHelp && <HelpButton type="button" onClick={onHelp}>help</HelpButton>}
         </FooterCredits>
       </PageWidth>
     </FooterBar>
