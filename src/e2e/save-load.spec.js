@@ -140,6 +140,50 @@ test.describe('Save modal', () => {
 		expect(download.suggestedFilename()).toBe('test-calc.summa.json');
 	});
 
+	test('empty filename saves as "summa.summa.json"', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		// Leave filename blank → should default to "summa"
+		const [download] = await Promise.all([
+			page.waitForEvent('download'),
+			page.getByRole('button', { name: 'save', exact: true }).last().click(),
+		]);
+		expect(download.suggestedFilename()).toBe('summa.summa.json');
+	});
+
+	test('Enter key in filename input triggers save', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		await page.getByLabel('Filename').fill('enter-test');
+		const [download] = await Promise.all([
+			page.waitForEvent('download'),
+			page.getByLabel('Filename').press('Enter'),
+		]);
+		expect(download.suggestedFilename()).toBe('enter-test.summa.json');
+	});
+
+	test('Cancel button closes Save modal', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		await page.getByRole('button', { name: 'cancel', exact: true }).click();
+		await expect(page.getByText('Save calculation')).not.toBeVisible();
+	});
+
+	test('backdrop click closes Save modal', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		// Dispatch a click on the open dialog at coordinates guaranteed to be outside
+		// its content box (negative values are always < rect.left).
+		await page.evaluate(() => {
+			const dialog = document.querySelector('dialog[open]');
+			if (dialog)
+				dialog.dispatchEvent(
+					new MouseEvent('click', { bubbles: true, cancelable: true, clientX: -999, clientY: -999 })
+				);
+		});
+		await expect(page.getByText('Save calculation')).not.toBeVisible();
+	});
+
 	test('saved file is valid JSON with summa metadata', async ({ page }) => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'v');
@@ -197,6 +241,29 @@ test.describe('Load modal', () => {
 		await goto(page);
 		await openLoadModal(page);
 		await page.getByRole('button', { name: 'cancel', exact: true }).click();
+		await expect(page.getByText('Load calculation')).not.toBeVisible();
+	});
+
+	test('clicking Load without selecting a file shows "Please select a file." error', async ({
+		page,
+	}) => {
+		await goto(page);
+		await openLoadModal(page);
+		// Click load without setting any file
+		await page.getByRole('button', { name: 'load', exact: true }).last().click();
+		await expect(page.getByText('Please select a file.')).toBeVisible();
+	});
+
+	test('backdrop click closes Load modal', async ({ page }) => {
+		await goto(page);
+		await openLoadModal(page);
+		await page.evaluate(() => {
+			const dialog = document.querySelector('dialog[open]');
+			if (dialog)
+				dialog.dispatchEvent(
+					new MouseEvent('click', { bubbles: true, cancelable: true, clientX: -999, clientY: -999 })
+				);
+		});
 		await expect(page.getByText('Load calculation')).not.toBeVisible();
 	});
 });
