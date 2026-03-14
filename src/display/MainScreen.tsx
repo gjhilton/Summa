@@ -425,6 +425,11 @@ const Equally = styled('div', {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(0, 1fr))',
   },
+  variants: {
+    displayOnly: {
+      true: { pointerEvents: 'none' },
+    },
+  },
 })
 
 const TextFieldBox = styled('div', {
@@ -506,6 +511,7 @@ const inputRecipe = cva({
     minWidth: '0',
     outline: 'none',
     transition: 'all 0.2s',
+    pointerEvents: 'none',
   },
   variants: {
     align: {
@@ -514,6 +520,7 @@ const inputRecipe = cva({
     },
     editable: {
       true: {
+        pointerEvents: 'auto',
         bg: 'transparent',
         borderBottomColor: 'rgba(0,0,0,0.1)',
         _focus: { borderBottomColor: 'black' },
@@ -627,7 +634,7 @@ interface CurrencyProps {
 }
 
 export const Currency = ({ editable, values = { l: 'x', s: 'vj', d: 'iij' }, onFieldChange, fieldErrors }: CurrencyProps) =>
-  <Equally>
+  <Equally displayOnly={!editable || undefined}>
     <CurrencyField label="li" editable={editable} value={values.l} onChange={v => onFieldChange?.('l', v)} error={fieldErrors?.l || undefined} />
     <CurrencyField label="s"  editable={editable} value={values.s} onChange={v => onFieldChange?.('s', v)} error={fieldErrors?.s || undefined} />
     <CurrencyField label="d"  editable={editable} value={values.d} onChange={v => onFieldChange?.('d', v)} error={fieldErrors?.d || undefined} />
@@ -1101,11 +1108,12 @@ interface SubHeaderEditProps {
   subTitle: string
   onSubTitleChange: (v: string) => void
   onDone: () => void
+  onClear?: () => void
   onUndo?: () => void
   canUndo?: boolean
 }
 
-export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleChange, onDone, onUndo, canUndo }: SubHeaderEditProps) {
+export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleChange, onDone, onClear, onUndo, canUndo }: SubHeaderEditProps) {
   const [draft, setDraft] = React.useState(subTitle)
 
   React.useEffect(() => { setDraft(subTitle) }, [subTitle])
@@ -1131,6 +1139,7 @@ export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleCha
             spellCheck={false}
           />
           {canUndo && <Button onClick={onUndo}>undo</Button>}
+          <Button variant="danger" onClick={() => { if (window.confirm('Clear all items?')) onClear?.() }}>clear</Button>
           <Button onClick={onDone}>done</Button>
         </SubHeaderActionRow>
       </PageWidth>
@@ -1473,6 +1482,7 @@ export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, o
             subTitle={subTitle ?? ''}
             onSubTitleChange={onSubTitleChange}
             onDone={onDone!}
+            onClear={onClear}
             onUndo={onUndo}
             canUndo={canUndo}
           />

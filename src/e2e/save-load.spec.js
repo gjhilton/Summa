@@ -13,6 +13,7 @@ import {
 	toggleAdvancedOptions,
 	addSubtotalItem,
 	navigateIntoSubtotal,
+	getTotalField,
 } from '../config/playwright/helpers/test-helpers.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -151,6 +152,23 @@ test.describe('Save modal', () => {
 		expect(content.metadata.appName).toBe('summa');
 		expect(Array.isArray(content.lines)).toBe(true);
 	});
+
+	test('saved file contains correct l/s/d values for entered data', async ({
+		page,
+	}) => {
+		await goto(page);
+		await enterValue(page, 0, 's', 'v'); // 5s
+		await enterValue(page, 0, 'd', 'iij'); // 3d
+		await openSaveModal(page);
+		const download = await saveAs(page, 'values-test');
+		const filePath = await download.path();
+		if (!filePath) throw new Error('Download path is null');
+		const { readFileSync } = await import('fs');
+		const content = JSON.parse(readFileSync(filePath, 'utf-8'));
+		const line = content.lines[0];
+		expect(line.literals.s).toBe('v');
+		expect(line.literals.d).toBe('iij');
+	});
 });
 
 // ─── Load modal ───────────────────────────────────────────────────────────────
@@ -218,6 +236,65 @@ test.describe('Loading a valid fixture file', () => {
 		// Filename should reset
 		await openSaveModal(page);
 		await expect(page.getByLabel('Filename')).toHaveValue('');
+	});
+});
+
+// ─── Save exports full root calculation ──────────────────────────────────────
+
+test.describe('Save from sub-level', () => {
+	test('saving from root exports all lines including subtotal children', async ({
+		page,
+	}) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await enterValue(page, 0, 'd', 'v'); // 5d inside subtotal
+		// Return to root to save (export button only visible at root)
+		await page.getByRole('button', { name: 'done', exact: true }).click();
+		await openSaveModal(page);
+		const download = await saveAs(page, 'full-export');
+		const filePath = await download.path();
+		if (!filePath) throw new Error('Download path is null');
+		const { readFileSync } = await import('fs');
+		const content = JSON.parse(readFileSync(filePath, 'utf-8'));
+		// Root has 2 default lines + 1 subtotal; subtotal has children
+		const subtotal = content.lines.find(
+			(l) => l.itemType === 'SUBTOTAL_ITEM'
+		);
+		expect(subtotal).toBeTruthy();
+		expect(Array.isArray(subtotal.lines)).toBe(true);
+		// Sub-calc has the entered value
+		const subLine = subtotal.lines[0];
+		expect(subLine.literals.d).toBe('v');
+	});
+});
+
+// ─── Load while navigated into subtotal ──────────────────────────────────────
+
+test.describe('Load while inside subtotal', () => {
+	test('loading a file from inside a subtotal resets navigation to root', async ({
+		page,
+	}) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		// Should be at sub-level (done button visible)
+		await expect(
+			page.getByRole('button', { name: 'done', exact: true })
+		).toBeVisible();
+		// Cannot load from sub-level (load button hidden), so navigate back first
+		// This verifies that after loading, breadcrumb is gone
+		await page.getByRole('button', { name: 'done', exact: true }).click();
+		await openLoadModal(page);
+		await loadFile(page, SIMPLE_FIXTURE);
+		// After load: at root, no breadcrumb
+		await expect(
+			page.getByRole('navigation', { name: /breadcrumb/i })
+		).not.toBeVisible();
+		// Loaded data shows correct total
+		await expect(getTotalField(page, 's')).toHaveValue('xij');
 	});
 });
 

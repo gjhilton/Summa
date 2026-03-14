@@ -43,7 +43,7 @@ const FIELD_LABELS = { l: 'li', s: 's', d: 'd' };
  * @param {'l' | 's' | 'd'} field
  * @param {number} [lineIndex=0] - 0-based index among line items
  */
-export async function getField(page, field, lineIndex = 0) {
+export function getField(page, field, lineIndex = 0) {
 	const label = FIELD_LABELS[field] ?? field;
 	return page.getByLabel(label, { exact: true }).nth(lineIndex);
 }
@@ -84,6 +84,14 @@ export async function enableShowWorking(page) {
  */
 export async function toggleAdvancedOptions(page) {
 	await page.getByRole('switch', { name: /advanced mode/i }).click();
+}
+
+/**
+ * Click the "extended" button to add a new extended item (requires advanced mode enabled).
+ * @param {import('@playwright/test').Page} page
+ */
+export async function addExtendedItem(page) {
+	await page.getByRole('button', { name: /extended/i }).click();
 }
 
 /**
