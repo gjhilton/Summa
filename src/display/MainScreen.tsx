@@ -91,14 +91,15 @@ const ActionButtonIcon = styled('span', {
 interface ActionStripProps {
   onClose: () => void
   desktopVisible: boolean
+  isOpen?: boolean
   onRemove?: () => void
   onDuplicate?: () => void
   onClearItem?: () => void
 }
 
-function ActionStrip({ onClose, desktopVisible, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
-  // Touch: always visible. Desktop: fades in/out on row hover.
-  const visible = !canHover || desktopVisible
+function ActionStrip({ onClose, desktopVisible, isOpen, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
+  // Desktop hover: visible when row is hovered. Touch: visible only when swiped open.
+  const visible = canHover ? desktopVisible : (isOpen ?? false)
   return (
     <ActionStripWrapper visible={visible}>
       <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
@@ -281,7 +282,7 @@ export function Item({
   const bg = error ? 'error' : isOpen ? 'open' : 'default'
   return (
     <StyledItem sideMargins={sideMargins || undefined} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      {showActions && <ActionStrip onClose={onClose!} desktopVisible={desktopVisible} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
+      {showActions && <ActionStrip onClose={onClose!} desktopVisible={desktopVisible} isOpen={isOpen} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
       <DragHandle />
       <ContentWrapper
         borders={borders}
