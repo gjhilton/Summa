@@ -1,7 +1,8 @@
 import React from "react"
 import { DndContext } from "@dnd-kit/core"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
-import { DragHandle, DragCtx, GripIcon } from "@/display/MainScreen"
+import { DragHandle, GripIcon } from "@/display/MainScreen"
+import { DragCtx } from "@/display/DragCtx"
 
 export default {
   title: "Prototype/Drag Handle",
