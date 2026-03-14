@@ -5,10 +5,12 @@ import {
 	enableShowWorking,
 	getItemsCount,
 	getField,
+	getTotalField,
 	clickDeleteRow,
 	clickUndo,
 	toggleAdvancedOptions,
 	addSubtotalItem,
+	addExtendedItem,
 	navigateIntoSubtotal,
 	navigateViaBreadcrumb,
 	openLoadModal,
@@ -202,6 +204,119 @@ test.describe('undo', () => {
 		// Navigate back to root and verify root line unchanged
 		await navigateViaBreadcrumb(page, 'Summa totalis');
 		await expect(getField(page, 'd', 0)).toHaveValue('x');
+	});
+
+	test('add extended item then undo removes it', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await enableShowWorking(page);
+		await addExtendedItem(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 3');
+		await clickUndo(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 2');
+	});
+
+	test('add subtotal item then undo removes it', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await enableShowWorking(page);
+		await addSubtotalItem(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 3');
+		await clickUndo(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 2');
+	});
+
+	test('quantity change on extended item then undo reverts quantity', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addExtendedItem(page);
+		await page.getByLabel('quantity').first().fill('iij'); // 3
+		await clickUndo(page);
+		await expect(page.getByLabel('quantity').first()).toHaveValue('j'); // back to default 1
+	});
+
+	test('line title change then undo reverts title', async ({ page }) => {
+		await goto(page);
+		await page.getByLabel('Line title').first().fill('Wages');
+		await page.getByLabel('Line title').first().press('Tab');
+		await clickUndo(page);
+		await expect(page.getByLabel('Line title').first()).toHaveValue('');
+	});
+
+	test('line title coalesces: multiple chars to same field produce one undo entry', async ({
+		page,
+	}) => {
+		await goto(page);
+		const titleInput = page.getByLabel('Line title').first();
+		await titleInput.focus();
+		await page.keyboard.type('W');
+		await page.keyboard.type('a');
+		await page.keyboard.type('g');
+		await page.keyboard.type('e');
+		// One undo reverts to empty
+		await clickUndo(page);
+		await expect(titleInput).toHaveValue('');
+		// Stack empty — only one coalesced entry was pushed
+		await expect(
+			page.getByRole('button', { name: 'undo', exact: true })
+		).not.toBeVisible();
+	});
+
+	test('sub-level add line then undo removes it at sub-level', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await enableShowWorking(page);
+		await page.getByRole('button', { name: '+ item' }).click();
+		await expect(getItemsCount(page)).toHaveText('Items: 3');
+		await clickUndo(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 2');
+	});
+
+	test('sub-level delete then undo restores row at sub-level', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await enableShowWorking(page);
+		// Add a third row so we can delete
+		await page.getByRole('button', { name: '+ item' }).click();
+		await clickDeleteRow(page, 0);
+		await expect(getItemsCount(page)).toHaveText('Items: 2');
+		await clickUndo(page);
+		await expect(getItemsCount(page)).toHaveText('Items: 3');
+	});
+
+	test('subtotal title change then undo reverts title', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		const titleInput = page.getByLabel('Sub-calculation title');
+		await titleInput.fill('My sub');
+		await titleInput.press('Tab'); // blur to push undo
+		await clickUndo(page);
+		await expect(titleInput).toHaveValue('');
+	});
+
+	test('clear subtotal item (row action) then undo restores its children', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await enterValue(page, 0, 'd', 'v'); // 5d inside
+		await navigateViaBreadcrumb(page, 'Summa totalis');
+		// Total should be v
+		await expect(getTotalField(page, 'd')).toHaveValue('v');
+		// Clear the subtotal item from parent
+		await page.getByRole('button', { name: 'Drag to reorder' }).nth(2).hover();
+		page.once('dialog', d => d.accept());
+		await page.getByRole('button', { name: 'Clear item' }).nth(2).click();
+		await expect(getTotalField(page, 'd')).toHaveValue('');
+		// Undo restores the 5d inside
+		await clickUndo(page);
+		await expect(getTotalField(page, 'd')).toHaveValue('v');
 	});
 
 	test('subtotal title re-blur without change does not push extra undo entry', async ({

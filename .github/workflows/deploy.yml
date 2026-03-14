@@ -63,6 +63,9 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
+            - name: Generate Panda CSS
+              run: npx panda codegen --config src/config/panda.config.mjs
+
             - name: Build Storybook
               run: npm run storybook:build
 
