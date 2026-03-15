@@ -165,6 +165,19 @@ test.describe('subtotal items', () => {
 		await expect(getTotalField(page, 'd')).toHaveValue('v');
 	});
 
+	test('sub-level total row shows "paginæ" after the Summa logo', async ({ page }) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await expect(page.getByText('paginæ')).toBeVisible();
+	});
+
+	test('root total row does not show "paginæ"', async ({ page }) => {
+		await goto(page);
+		await expect(page.getByText('paginæ')).not.toBeVisible();
+	});
+
 	test('duplicate subtotal copies its children', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
