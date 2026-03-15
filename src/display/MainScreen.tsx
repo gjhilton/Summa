@@ -501,6 +501,7 @@ const Block = styled('div', {
 export const BlockRow = styled('div', {
   base: {
     display: { base: 'block', md: 'flex' },
+    alignItems: { md: 'baseline' },
     '& > *': { flex: '1' },
     '& > *:last-child': { flex: '0 0 33.333%' },
   },
@@ -585,6 +586,9 @@ const inputRecipe = cva({
     bold: {
       true: { fontWeight: 'bold' },
     },
+    title: {
+      true: { fontSize: '1.4rem' },
+    },
     numeric: {
       true: {
         fontSize: '2rem',
@@ -611,12 +615,13 @@ interface TextInputProps {
   onChange?: React.ChangeEventHandler<HTMLInputElement>
   align?: 'l' | 'r'
   bold?: boolean
+  title?: boolean
   error?: boolean
   ariaLabel?: string
   placeholder?: string
 }
 
-export function TextInput({ editable, numeric, value, onChange, align, bold, error, ariaLabel, placeholder }: TextInputProps) {
+export function TextInput({ editable, numeric, value, onChange, align, bold, title, error, ariaLabel, placeholder }: TextInputProps) {
   return (
     <StyledInput
       editable={editable || undefined}
@@ -626,6 +631,7 @@ export function TextInput({ editable, numeric, value, onChange, align, bold, err
       readOnly={!editable}
       align={align}
       bold={bold || undefined}
+      title={title || undefined}
       error={error || undefined}
       autoCapitalize="off"
       autoComplete="off"
@@ -650,7 +656,7 @@ export const TextField = ({ value, label, editable, align, onChange, ariaLabel }
   <TextFieldBox>
     <Label>
       {label}
-      <TextInput value={value} editable={editable} align={align} bold onChange={e => onChange?.(e.target.value)} ariaLabel={ariaLabel} />
+      <TextInput value={value} editable={editable} align={align} bold title onChange={e => onChange?.(e.target.value)} ariaLabel={ariaLabel} />
     </Label>
   </TextFieldBox>
 
@@ -664,7 +670,7 @@ interface QuantityFieldProps {
 export const QuantityField = ({ value, editable, onChange, error }: QuantityFieldProps) =>
   <Label>
     <FieldAnnotation large>✕</FieldAnnotation>
-    <TextInput align="r" numeric value={value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} ariaLabel="quantity" />
+    <TextInput align="r" title value={value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} ariaLabel="quantity" />
     <FieldAnnotation>@</FieldAnnotation>
   </Label>
 
@@ -797,7 +803,7 @@ const SubtotalTitleRow = styled('div', {
 })
 
 const SubtotalTitleText = styled('span', {
-  base: { fontWeight: 'bold' },
+  base: { fontWeight: 'bold', fontSize: '1.4rem' },
 })
 
 const EditLinkButton = styled('button', {
@@ -1088,7 +1094,7 @@ const SubHeaderNavRow = styled('nav', {
     display: 'flex',
     alignItems: 'center',
     gap: '0.25rem',
-    fontSize: '0.8em',
+    fontSize: '1.2rem',
     marginBottom: '0.5rem',
     flexWrap: 'wrap',
   },
@@ -1116,23 +1122,17 @@ const SubHeaderTopRow = styled('div', {
   base: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.65rem' },
 })
 
-const SubHeaderActionRow = styled('div', {
-  base: { display: 'flex', alignItems: 'center', gap: '0.5rem' },
-})
 
 const SubTitleInput = styled('input', {
   base: {
     flex: 1,
     background: 'transparent',
-    borderWidth: '0',
-    borderBottomWidth: '1px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: 'rgba(0,0,0,0.15)',
+    border: 'none',
     outline: 'none',
     fontFamily: 'inherit',
-    fontSize: '1.1em',
-    paddingBottom: '0.2rem',
-    _focus: { borderBottomColor: 'black' },
+    fontSize: '1.4rem',
+    fontWeight: 'bold',
+    paddingBottom: '0',
     _placeholder: { opacity: 0.3 },
   },
 })
@@ -1169,23 +1169,13 @@ export function BreadcrumbNav({ breadcrumbs, onNavigate }: BreadcrumbNavProps) {
 interface SubHeaderEditProps {
   breadcrumbs: BreadcrumbItem[]
   onNavigate: (path: IdPath) => void
-  subTitle: string
-  onSubTitleChange: (v: string) => void
   onDone: () => void
   onClear?: () => void
   onUndo?: () => void
   canUndo?: boolean
 }
 
-export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleChange, onDone, onClear, onUndo, canUndo }: SubHeaderEditProps) {
-  const [draft, setDraft] = React.useState(subTitle)
-
-  React.useEffect(() => { setDraft(subTitle) }, [subTitle])
-
-  function handleBlur() {
-    onSubTitleChange(draft.trim())
-  }
-
+export function SubHeaderEdit({ breadcrumbs, onNavigate, onDone, onClear, onUndo, canUndo }: SubHeaderEditProps) {
   return (
     <SubHeaderEl data-no-print>
       <PageWidth>
@@ -1196,21 +1186,27 @@ export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleCha
           <Button variant="danger" onClick={() => { if (window.confirm('Clear all items?')) onClear?.() }}>clear</Button>
         </SubHeaderTopRow>
         <BreadcrumbNav breadcrumbs={breadcrumbs} onNavigate={onNavigate} />
-        <SubHeaderActionRow>
-          <SubTitleInput
-            value={draft}
-            placeholder="Untitled sub-calculation"
-            onChange={e => setDraft(e.target.value)}
-            onBlur={handleBlur}
-            aria-label="Sub-calculation title"
-            autoCapitalize="off"
-            autoCorrect="off"
-            autoComplete="off"
-            spellCheck={false}
-          />
-        </SubHeaderActionRow>
       </PageWidth>
     </SubHeaderEl>
+  )
+}
+
+function SubTitleField({ value, onChange }: { value: string, onChange: (v: string) => void }) {
+  const [draft, setDraft] = React.useState(value)
+  React.useEffect(() => { setDraft(value) }, [value])
+  function handleBlur() { onChange(draft.trim()) }
+  return (
+    <SubTitleInput
+      value={draft}
+      placeholder="Untitled sub-calculation"
+      onChange={e => setDraft(e.target.value)}
+      onBlur={handleBlur}
+      aria-label="Sub-calculation title"
+      autoCapitalize="off"
+      autoCorrect="off"
+      autoComplete="off"
+      spellCheck={false}
+    />
   )
 }
 
@@ -1236,6 +1232,17 @@ const ItemListTopBorder = styled('div', {
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
     borderTopColor: 'black',
+    paddingBottom: '0.75rem',
+  },
+})
+
+const ItemListHeading = styled('div', {
+  base: {
+    marginLeft: '1.5rem',
+    marginRight: '1.5rem',
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: 'black',
     paddingBottom: '0.75rem',
   },
 })
@@ -1285,13 +1292,14 @@ interface ListOfItemsProps {
   onDuplicateLine: (id: string) => void
   onClearItem: (id: string) => void
   onEditSubtotal: (id: string) => void
+  heading?: React.ReactNode
 }
 
-export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onDuplicateLine, onClearItem, onEditSubtotal }: ListOfItemsProps) {
+export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onDuplicateLine, onClearItem, onEditSubtotal, heading }: ListOfItemsProps) {
   return (
     <SwipeProvider>
       <ItemListSection>
-        <ItemListTopBorder />
+        {heading ? <ItemListHeading>{heading}</ItemListHeading> : <ItemListTopBorder />}
         <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {lines.map(line => {
             const errorExplanation = showExplanation ? renderErrorExplanation(line) : null
@@ -1567,8 +1575,6 @@ export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, o
         ? <SubHeaderEdit
             breadcrumbs={breadcrumbs}
             onNavigate={onNavigate}
-            subTitle={subTitle ?? ''}
-            onSubTitleChange={onSubTitleChange}
             onDone={onDone!}
             onClear={onClear}
             onUndo={onUndo}
@@ -1588,6 +1594,7 @@ export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, o
         onDuplicateLine={onDuplicateLine}
         onClearItem={onClearItem}
         onEditSubtotal={onEditSubtotal}
+        heading={isSubLevel ? <SubTitleField value={subTitle ?? ''} onChange={onSubTitleChange} /> : undefined}
       />
       <FooterEdit
         onHelp={onHelp}
