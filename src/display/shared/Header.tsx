@@ -20,7 +20,7 @@ export const HeaderSpacer = styled('div', {
 
 export function ScreenHeader({ children }: { children?: ReactNode }) {
   return (
-    <Header>
+    <Header data-no-print>
       <PageWidth>
         <HeaderBar>
           {children}

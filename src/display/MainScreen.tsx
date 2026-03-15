@@ -101,7 +101,7 @@ function ActionStrip({ onClose, desktopVisible, isOpen, onRemove, onDuplicate, o
   // Desktop hover: visible when row is hovered. Touch: visible only when swiped open.
   const visible = canHover ? desktopVisible : (isOpen ?? false)
   return (
-    <ActionStripWrapper visible={visible}>
+    <ActionStripWrapper visible={visible} data-no-print>
       <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
         <ActionButtonIcon>🗑</ActionButtonIcon>
         Delete
@@ -234,7 +234,7 @@ export function DragHandle() {
   const ctx = React.useContext(DragCtx)
   if (!ctx) return null
   return (
-    <DragHandleButton type="button" aria-label="Drag to reorder" {...ctx.listeners} {...ctx.attributes} tabIndex={-1}>
+    <DragHandleButton type="button" aria-label="Drag to reorder" data-no-print {...ctx.listeners} {...ctx.attributes} tabIndex={-1}>
       <GripIcon />
     </DragHandleButton>
   )
@@ -281,10 +281,11 @@ export function Item({
 }: ItemProps) {
   const bg = error ? 'error' : isOpen ? 'open' : 'default'
   return (
-    <StyledItem sideMargins={sideMargins || undefined} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <StyledItem data-item sideMargins={sideMargins || undefined} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
       {showActions && <ActionStrip onClose={onClose!} desktopVisible={desktopVisible} isOpen={isOpen} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
       <DragHandle />
       <ContentWrapper
+        data-item-content
         borders={borders}
         open={isOpen}
         bg={bg}
@@ -560,9 +561,10 @@ interface TextInputProps {
   bold?: boolean
   error?: boolean
   ariaLabel?: string
+  placeholder?: string
 }
 
-export function TextInput({ editable, numeric, value, onChange, align, bold, error, ariaLabel }: TextInputProps) {
+export function TextInput({ editable, numeric, value, onChange, align, bold, error, ariaLabel, placeholder }: TextInputProps) {
   return (
     <StyledInput
       editable={editable || undefined}
@@ -578,6 +580,7 @@ export function TextInput({ editable, numeric, value, onChange, align, bold, err
       autoCorrect="off"
       spellCheck={false}
       aria-label={ariaLabel}
+      placeholder={placeholder}
     />
   )
 }
@@ -622,8 +625,8 @@ interface CurrencyFieldProps {
 }
 
 export const CurrencyField = ({ value, label, editable, onChange, error }: CurrencyFieldProps) =>
-  <Label>
-    <TextInput align="r" numeric value={value === '0' ? '' : value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} />
+  <Label data-currency-field>
+    <TextInput align="r" numeric placeholder=" " value={value === '0' ? '' : value} editable={editable} onChange={e => onChange?.(e.target.value)} error={error || undefined} />
     <FieldAnnotation sup dim={value === '0' || undefined}>{label}</FieldAnnotation>
   </Label>
 
@@ -635,7 +638,7 @@ interface CurrencyProps {
 }
 
 export const Currency = ({ editable, values = { l: 'x', s: 'vj', d: 'iij' }, onFieldChange, fieldErrors }: CurrencyProps) =>
-  <Equally displayOnly={!editable || undefined}>
+  <Equally data-currency displayOnly={!editable || undefined}>
     <CurrencyField label="li" editable={editable} value={values.l} onChange={v => onFieldChange?.('l', v)} error={fieldErrors?.l || undefined} />
     <CurrencyField label="s"  editable={editable} value={values.s} onChange={v => onFieldChange?.('s', v)} error={fieldErrors?.s || undefined} />
     <CurrencyField label="d"  editable={editable} value={values.d} onChange={v => onFieldChange?.('d', v)} error={fieldErrors?.d || undefined} />
@@ -650,7 +653,7 @@ interface BlockTitleProps {
 }
 
 export const BlockTitle = ({ title, children, editable, onChange, ariaLabel }: BlockTitleProps) =>
-  <Block>
+  <Block data-block-title>
     <Equally>
       <TextField value={title} editable={editable} onChange={onChange} ariaLabel={ariaLabel} />
       {children}
@@ -665,7 +668,7 @@ interface BlockCurrencyProps {
 }
 
 export const BlockCurrency = ({ editable, values, onFieldChange, fieldErrors }: BlockCurrencyProps) =>
-  <Block>
+  <Block data-block-currency>
     <Currency editable={editable} values={values} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
   </Block>
 
@@ -785,11 +788,11 @@ interface ItemUnitProps {
 
 export const ItemUnit = ({ title, literals, explanation, explanationIsError, onTitleChange, onFieldChange, onRemove, onDuplicate, onClearItem, fieldErrors, error }: ItemUnitProps) =>
   <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
-    <BlockRow>
+    <BlockRow data-block-row>
       <BlockTitle title={title} editable onChange={onTitleChange} ariaLabel="Line title" />
       <BlockCurrency editable values={literals} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
     </BlockRow>
-    {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
+    {explanation && <ExplanationRow data-no-print isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 interface ItemExtendedProps {
@@ -812,14 +815,14 @@ interface ItemExtendedProps {
 
 export const ItemExtended = ({ title, literals, quantity, explanation, explanationIsError, onTitleChange, onFieldChange, onQuantityChange, onRemove, onDuplicate, onClearItem, fieldErrors, quantityError, resultDisplay, error }: ItemExtendedProps) =>
   <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
-    <BlockRow>
+    <BlockRow data-block-row>
       <BlockTitle title={title} editable onChange={onTitleChange} ariaLabel="Item title">
         <QuantityField editable value={quantity} onChange={onQuantityChange} error={quantityError || undefined} />
       </BlockTitle>
       <BlockCurrency editable values={literals} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
       <BlockCurrency values={resultDisplay} />
     </BlockRow>
-    {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
+    {explanation && <ExplanationRow data-no-print isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 interface ItemSubTotalProps {
@@ -837,7 +840,7 @@ interface ItemSubTotalProps {
 
 export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, onRemove, onDuplicate, onClearItem, explanation, explanationIsError, error }: ItemSubTotalProps) =>
   <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
-    <BlockRow>
+    <BlockRow data-block-row>
       <Block>
         <SubtotalTitleRow>
           <SubtotalTitleText>{title} ({count} items)</SubtotalTitleText>
@@ -848,7 +851,7 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, onRemove,
         <Currency values={totalDisplay} />
       </Block>
     </BlockRow>
-    {explanation && <ExplanationRow isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
+    {explanation && <ExplanationRow data-no-print isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
 interface ItemTotalProps {
@@ -859,12 +862,12 @@ interface ItemTotalProps {
 
 export const ItemTotal = ({ totalDisplay, explanation, itemCount }: ItemTotalProps) =>
   <Item borders="total" sideMargins>
-    <BlockRow centerItems>
-      <Block indented><Logo size="s" /></Block>
+    <BlockRow data-block-row centerItems>
+      <Block data-total-logo indented><Logo size="s" /></Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {itemCount !== undefined && <ExplanationRow>Items: {itemCount}</ExplanationRow>}
-    {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
+    {itemCount !== undefined && <ExplanationRow data-no-print>Items: {itemCount}</ExplanationRow>}
+    {explanation && <ExplanationRow data-no-print>{explanation}</ExplanationRow>}
   </Item>
 
 // ─── Add item bar ─────────────────────────────────────────────────────────────
@@ -892,7 +895,7 @@ interface AddItemBarProps {
 }
 
 export const AddItemBar = ({ advanced, onAdd, onAddUnit, onAddExtended, onAddSubtotal }: AddItemBarProps) =>
-  <AddBar>
+  <AddBar data-no-print>
     {advanced ? <>
       <Button icon={PlusIcon} onClick={onAddUnit}>item</Button>
       <Button icon={PlusIcon} onClick={onAddExtended}>extended</Button>
@@ -1128,7 +1131,7 @@ export function SubHeaderEdit({ breadcrumbs, onNavigate, subTitle, onSubTitleCha
   }
 
   return (
-    <SubHeaderEl>
+    <SubHeaderEl data-no-print>
       <PageWidth>
         <SubHeaderTopRow>
           <Button variant="primary" onClick={onDone}>done</Button>

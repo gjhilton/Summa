@@ -1,92 +1,123 @@
 @layer reset, base, tokens, recipes, utilities;
 
 @page {
-	margin: 1cm;
+	margin: 1.5cm 1.5cm 2cm;
 }
 
-/* ── Print colophon: hidden on screen, shown at print time ───────────────── */
+/* ── Print colophon: screen-only hidden ──────────────────────────────────── */
 #print-colophon {
 	display: none;
 }
 
 @media print {
-	/* ── Containers explicitly marked screen-only ────────────────────────── */
-	[data-no-print] {
-		display: none;
-	}
-
-	/* ── Structural chrome ───────────────────────────────────────────────── */
-	footer {
-		display: none;
-	}
+	/* ── Hide all UI chrome ───────────────────────────────────────────────── */
+	[data-no-print],
 	dialog {
 		display: none !important;
-	}
-
-	/* ── Font sizes ─────────────────────────────────────────────────────── */
-	:root {
-		font-size: 10pt;
-	}
-	[data-field] {
-		font-size: 14pt;
-		padding-top: 0.75rem;
-		padding-bottom: 0.75rem;
-	}
-	[data-page-layout] {
-		max-width: 100%;
-		margin-left: 0;
-		margin-right: 0;
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	[data-working] {
-		font-size: 10px;
-	}
-
-	/* ── Collapse drag-handle and remove columns; leave others intact ───── */
-	[data-item-row] {
-		grid-template-columns: 0 0 1em 1fr auto 20% 20% 20% 1em;
-	}
-	[data-item-row] > [data-drag-handle],
-	[data-item-row] > [data-remove-button] {
-		overflow: hidden;
-		visibility: hidden;
-	}
-
-	/* ── Summa logo ──────────────────────────────────────────────────────── */
-	svg[aria-label='Summa'] {
-		visibility: hidden;
-	}
-
-	/* ── Subtotal item rows ─────────────────────────────────────────────── */
-	[data-item-row]:has([data-subtotal-title]) {
-		border-top: 1px solid black;
-		border-bottom: 1px solid black;
-	}
-	[data-subtotal-title] {
-		color: black;
-		text-decoration: none;
-	}
-
-	/* ── Placeholders ───────────────────────────────────────────────────── */
-	input::placeholder {
-		color: transparent;
-	}
-
-	/* ── Field borders ───────────────────────────────────────────────────── */
-	input {
-		border-bottom-color: transparent !important;
-		background: transparent !important;
 	}
 
 	/* ── Print colophon ──────────────────────────────────────────────────── */
 	#print-colophon {
 		display: block;
-		margin-top: 3rem;
-		font-size: 0.75em;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		text-align: center;
+		font-size: 8pt;
 		font-style: italic;
-		opacity: 0.6;
+		opacity: 0.5;
+		padding-bottom: 0.5cm;
+	}
+
+	/* ── Reset page layout ───────────────────────────────────────────────── */
+	:root {
+		font-size: 11pt;
+		background: white !important;
+	}
+
+	/* ── Clean up inputs — no borders, no backgrounds ────────────────────── */
+	input {
+		border: none !important;
+		outline: none !important;
+		background: transparent !important;
+		box-shadow: none !important;
+	}
+	input::placeholder {
+		color: transparent !important;
+	}
+
+	/* ── Compact item rows ───────────────────────────────────────────────── */
+	[data-item] {
+		margin-bottom: 0 !important;
+		overflow: visible !important;
+	}
+	[data-item-content] {
+		padding-top: 0.15rem !important;
+		padding-bottom: 0.15rem !important;
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		border: none !important;
+		transform: none !important;
+		box-shadow: none !important;
+	}
+
+	/* Single row: title left, currency right, baseline-aligned */
+	[data-block-row] {
+		display: flex !important;
+		align-items: baseline !important;
+	}
+	[data-block-row] > * {
+		margin-top: 0 !important;
+	}
+	[data-block-title] {
+		flex: 1 !important;
+	}
+	[data-block-currency] {
+		flex: 0 0 auto !important;
+	}
+
+	/* l/s/d fields: tight inline row */
+	[data-currency] {
+		display: flex !important;
+		gap: 0.3em !important;
+		width: auto !important;
+	}
+
+	/* Each field: shrink to content */
+	[data-currency-field] {
+		width: auto !important;
+		flex: 0 0 auto !important;
+	}
+	[data-currency-field] input {
+		width: 3.5ch !important;
+		flex: none !important;
+		min-width: 0 !important;
+		text-align: right !important;
+	}
+
+	/* Hide empty fields (label hidden via :placeholder-shown) */
+	[data-currency-field]:has(input:placeholder-shown) {
+		display: none !important;
+	}
+
+	/* No borders on regular items */
+	[data-item-content] {
+		border: none !important;
+	}
+
+	/* Single thick border above total row only */
+	[data-item]:last-child [data-item-content] {
+		border-top: 2px solid black !important;
+		padding-top: 0.3rem !important;
+	}
+
+	/* Logo aligned with total: baseline, no indent */
+	[data-total-logo] {
+		padding-left: 0 !important;
+		margin-top: 0 !important;
+		display: flex !important;
+		align-items: baseline !important;
 	}
 }
 

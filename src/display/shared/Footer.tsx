@@ -69,7 +69,7 @@ interface ScreenFooterProps {
 
 export function ScreenFooter({ controls, onHelp }: ScreenFooterProps) {
   return (
-    <FooterBar>
+    <FooterBar data-no-print>
       <PageWidth>
         {controls && <FooterControls>{controls}</FooterControls>}
         <FooterCredits>

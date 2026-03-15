@@ -202,6 +202,8 @@ export default function App() {
   if (screen === 'help') return <HelpScreen onBack={() => setScreen('main')} showExplanation={showExplanation} onShowExplanationChange={setShowExplanation} advancedMode={advancedMode} onAdvancedModeChange={setAdvancedMode} />
 
   return (
+    <>
+    <div id="print-colophon">Made with Summa — https://gjhilton.github.io/Summa/</div>
     <Renderer
       lines={visibleLines}
       totalDisplay={totalDisplay}
@@ -235,5 +237,6 @@ export default function App() {
       onUndo={handleUndo}
       canUndo={canUndo}
     />
+    </>
   )
 }
