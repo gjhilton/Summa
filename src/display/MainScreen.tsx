@@ -912,16 +912,42 @@ export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, onRemove,
     {explanation && <ExplanationRow data-no-print isError={explanationIsError || undefined}>{explanation}</ExplanationRow>}
   </SwipeableItem>
 
+const PaginaeText = styled('span', {
+  base: {
+    fontFamily: "joscelyn",
+    fontSize: '1.8rem',
+    marginLeft: '0.4em',
+    lineHeight: 1,
+  },
+})
+
+const LogoOffset = styled('div', {
+  base: { transform: 'translateY(1rem)' },
+})
+
+const LogoWithPaginae = styled('div', {
+  base: {
+    display: 'inline-flex',
+    alignItems: 'flex-end',
+  },
+})
+
 interface ItemTotalProps {
   totalDisplay: LsdStrings
   explanation?: React.ReactNode
   itemCount?: number
+  subLevel?: boolean
 }
 
-export const ItemTotal = ({ totalDisplay, explanation, itemCount }: ItemTotalProps) =>
+export const ItemTotal = ({ totalDisplay, explanation, itemCount, subLevel }: ItemTotalProps) =>
   <Item borders="total" sideMargins>
     <BlockRow data-block-row centerItems>
-      <Block data-total-logo indented rightAlign><Logo size="s" /></Block>
+      <Block data-total-logo indented rightAlign>
+        <LogoWithPaginae>
+          <LogoOffset><Logo size="s" /></LogoOffset>
+          {subLevel && <PaginaeText>paginæ</PaginaeText>}
+        </LogoWithPaginae>
+      </Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
     {explanation && (
@@ -1199,7 +1225,7 @@ function SubTitleField({ value, onChange }: { value: string, onChange: (v: strin
     <SubTitleInput
       value={draft}
       placeholder="Untitled sub-calculation"
-      onChange={e => setDraft(e.target.value)}
+      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}
       onBlur={handleBlur}
       aria-label="Sub-calculation title"
       autoCapitalize="off"
@@ -1293,9 +1319,10 @@ interface ListOfItemsProps {
   onClearItem: (id: string) => void
   onEditSubtotal: (id: string) => void
   heading?: React.ReactNode
+  subLevel?: boolean
 }
 
-export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onDuplicateLine, onClearItem, onEditSubtotal, heading }: ListOfItemsProps) {
+export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onDuplicateLine, onClearItem, onEditSubtotal, heading, subLevel }: ListOfItemsProps) {
   return (
     <SwipeProvider>
       <ItemListSection>
@@ -1356,7 +1383,7 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
           onAddExtended={onAddExtended}
           onAddSubtotal={onAddSubtotal}
         />
-        <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} itemCount={showExplanation ? lines.length : undefined} />
+        <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} itemCount={showExplanation ? lines.length : undefined} subLevel={subLevel || undefined} />
       </ItemListSection>
     </SwipeProvider>
   )
@@ -1468,8 +1495,8 @@ export function SaveModalUI({ isOpen, onClose, onSave }: { isOpen: boolean, onCl
         <FilenameInput
           type="text"
           value={filename}
-          onChange={e => setFilename(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleSave()}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilename(e.target.value)}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSave()}
           placeholder="summa"
           autoFocus
           autoCapitalize="off"
@@ -1595,6 +1622,7 @@ export function MainScreen({ lines, totalDisplay, totalPence, showExplanation, o
         onClearItem={onClearItem}
         onEditSubtotal={onEditSubtotal}
         heading={isSubLevel ? <SubTitleField value={subTitle ?? ''} onChange={onSubTitleChange} /> : undefined}
+        subLevel={isSubLevel || undefined}
       />
       <FooterEdit
         onHelp={onHelp}

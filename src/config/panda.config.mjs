@@ -6,6 +6,15 @@ export default defineConfig({
 	exclude: [],
 	jsxFramework: 'react',
 	outdir: 'src/styled-system',
+	theme: {
+		extend: {
+			tokens: {
+				fonts: {
+					joscelyn: { value: 'Joscelyn, serif' },
+				},
+			},
+		},
+	},
 	globalCss: {
 		body: {
 			fontFamily: "'Libre Caslon Text', serif",

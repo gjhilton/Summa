@@ -1,3 +1,11 @@
+@font-face {
+	font-family: 'Joscelyn';
+	src: url('/Joscelyn/Joscelyn.woff2') format('woff2'),
+	     url('/Joscelyn/Joscelyn.otf') format('opentype');
+	font-weight: normal;
+	font-style: normal;
+}
+
 @layer reset, base, tokens, recipes, utilities;
 
 @page {
@@ -122,6 +130,7 @@
 }
 
 :root {
+	--font-joscelyn: Joscelyn, serif;
 	margin: 0 auto;
 	padding: 0;
 	font-family: 'Libre Caslon Text', serif;
