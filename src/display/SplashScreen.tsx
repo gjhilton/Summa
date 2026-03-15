@@ -53,13 +53,11 @@ export function SplashScreen({ onGetStarted, onReadManual }: Props) {
           </LogoWrapper>
           <Intro>
             Summa is a calculator for historians working with Early Modern
-            British accounts. Enter pounds, shillings and pence in Roman
-            numerals — exactly as they appear in period documents — and Summa
-            totals the column for you.
+            British accounts. Enter line items in pounds, shillings and pence in Roman numerals, and Summa totals will total them up.
           </Intro>
           <Intro>
             Summa is free software provided without warranty of correctness. It
-            is beta software and almost certainly contains defects — you are
+            is beta quality and almost certainly contains defects — you are
             strongly advised to check any results against the source documents.
           </Intro>
           <Intro>

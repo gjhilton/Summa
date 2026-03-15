@@ -546,7 +546,7 @@ const FieldAnnotation = styled('span', {
       true: { fontSize: '1.1em' },
     },
     sup: {
-      true: { verticalAlign: 'super', fontSize: '0.75em' },
+      true: { verticalAlign: 'super', fontSize: '1rem' },
     },
     dim: {
       true: { opacity: 0.2 },

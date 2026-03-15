@@ -38,7 +38,7 @@ export function HelpOrganising() {
 
       {canHover ? (
         <HelpPara>
-          Hover over a row to reveal the Delete, Duplicate and Clear buttons on
+          Tap the chevron button at the  extreme righ thad margin of a  row to reveal the Delete, Duplicate and Clear buttons on
           the right-hand side.
         </HelpPara>
       ) : (

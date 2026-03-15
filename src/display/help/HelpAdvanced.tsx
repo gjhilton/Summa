@@ -33,7 +33,7 @@ export function HelpAdvanced({ advancedMode, onAdvancedModeChange }: Props) {
       </ScreenSample>
 
       <HelpPara>
-        When enabled, this allows you to create two new kinds of item: extended
+        Enabling advanced features allows you to create two new kinds of item: extended
         items and subtotal items.
       </HelpPara>
 

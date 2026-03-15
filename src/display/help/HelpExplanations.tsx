@@ -21,7 +21,7 @@ export function HelpExplanations({ showExplanation, onShowExplanationChange }: P
       <HelpHeading>Explanations</HelpHeading>
 
       <HelpPara>
-        Use the <strong>show working</strong> toggle in the footer to show or
+        Use the <strong>show explanations</strong> toggle in the footer to show or
         hide a step-by-step breakdown of each calculation. Each line displays
         how its value was converted to pence — useful for checking your figures
         against the source document.

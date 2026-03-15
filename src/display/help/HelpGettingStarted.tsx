@@ -35,7 +35,7 @@ export function HelpGettingStarted() {
       </ScreenSample>
 
       <HelpPara>
-        If you type anything that is not a valid Roman numeral the field turns
+        If you type anything that is not a valid Roman numeral into the currency fields, the field turns
         red and the line shows an error message. Remove the invalid characters
         to clear it.
       </HelpPara>
@@ -78,10 +78,10 @@ export function HelpGettingStarted() {
       </ScreenSample>
 
       <HelpPara>
-        Your work is saved automatically in the browser as you type. If you
+        Your work is saved automatically in the browser's local storage as you type. If you
         close the tab and come back later, Summa will restore exactly where you
         left off. Use <strong>export</strong> if you want a portable backup or
-        need to share your calculation.
+        need to share your calculation. Notice that local storage can be unreliable, so you are strongly advised to use the 'export' fuctionality to save iportnat work bewteen sessions. The docuemnt is saved as a simple JSON file which should be easy to import and parse in any other software you're using. 
       </HelpPara>
     </HelpSection>
   )

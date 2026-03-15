@@ -28,6 +28,13 @@ export const HelpPara = styled('p', {
   },
 })
 
+export const Roman = styled('span', {
+  base: {
+    fontSize: '1.15em',
+    fontWeight: '900',
+  },
+})
+
 export const ScreenSample = styled('div', {
   base: {
     background: 'white',

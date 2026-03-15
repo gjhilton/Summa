@@ -19,5 +19,8 @@ export default defineConfig({
 		body: {
 			fontFamily: "'Libre Caslon Text', serif",
 		},
+		button: {
+			cursor: 'pointer',
+		},
 	},
 });

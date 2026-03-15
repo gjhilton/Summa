@@ -31,7 +31,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>(() => hasSeenWelcome() ? 'main' : 'welcome')
   const [lines, setLines] = useState<AnyLineState[]>(() => loadFromStorage())
   const [navigationPath, setNavigationPath] = useState<IdPath>([])
-  const [showExplanation, setShowExplanation] = useState(true)
+  const [showExplanation, setShowExplanation] = useState(false)
   const [advancedMode, setAdvancedMode] = useState(false)
   const [undoStacks, setUndoStacks] = useState<Record<string, AnyLineState[][]>>({})
   const lastCoalesceKeyRef = useRef<string | null>(null)
