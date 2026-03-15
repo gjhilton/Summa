@@ -467,6 +467,25 @@ const TextFieldBox = styled('div', {
   base: { paddingRight: '1.5rem' },
 })
 
+const TotalAnnotationRow = styled('div', {
+  base: {
+    display: 'flex',
+    '& > *:last-child': { flex: '0 0 33.333%' },
+  },
+})
+
+
+const TotalItemCount = styled('div', {
+  base: {
+    flex: '1',
+    fontSize: '0.8em',
+    opacity: 0.65,
+    fontStyle: 'italic',
+    paddingTop: '0.25rem',
+    textAlign: 'right',
+  },
+})
+
 const Block = styled('div', {
   base: { marginTop: '1rem' },
   variants: {
@@ -568,7 +587,7 @@ const inputRecipe = cva({
     },
     numeric: {
       true: {
-        fontSize: '1.4em',
+        fontSize: '2rem',
         fontWeight: '900',
         paddingTop: '0',
         paddingBottom: '0',
@@ -899,8 +918,12 @@ export const ItemTotal = ({ totalDisplay, explanation, itemCount }: ItemTotalPro
       <Block data-total-logo indented rightAlign><Logo size="s" /></Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {itemCount !== undefined && <ExplanationRow data-no-print>Items: {itemCount}</ExplanationRow>}
-    {explanation && <ExplanationRow data-no-print>{explanation}</ExplanationRow>}
+    {explanation && (
+      <TotalAnnotationRow data-no-print>
+        <TotalItemCount>{itemCount !== undefined ? `${itemCount} items` : ''}</TotalItemCount>
+        <ExplanationRow>{explanation}</ExplanationRow>
+      </TotalAnnotationRow>
+    )}
   </Item>
 
 // ─── Add item bar ─────────────────────────────────────────────────────────────

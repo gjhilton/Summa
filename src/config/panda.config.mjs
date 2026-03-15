@@ -8,7 +8,7 @@ export default defineConfig({
 	outdir: 'src/styled-system',
 	globalCss: {
 		body: {
-			fontFamily: "'Libre Baskerville', serif",
+			fontFamily: "'Libre Caslon Text', serif",
 		},
 	},
 });
