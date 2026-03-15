@@ -244,14 +244,21 @@ test.describe('Load modal', () => {
 		await expect(page.getByText('Load calculation')).not.toBeVisible();
 	});
 
-	test('clicking Load without selecting a file shows "Please select a file." error', async ({
-		page,
-	}) => {
+	test('load button is disabled when no file selected', async ({ page }) => {
 		await goto(page);
 		await openLoadModal(page);
-		// Click load without setting any file
-		await page.getByRole('button', { name: 'load', exact: true }).last().click();
-		await expect(page.getByText('Please select a file.')).toBeVisible();
+		await expect(
+			page.getByRole('button', { name: 'load', exact: true }).last()
+		).toBeDisabled();
+	});
+
+	test('load button is enabled after selecting a file', async ({ page }) => {
+		await goto(page);
+		await openLoadModal(page);
+		await page.getByLabel('Summa file').setInputFiles(SIMPLE_FIXTURE);
+		await expect(
+			page.getByRole('button', { name: 'load', exact: true }).last()
+		).not.toBeDisabled();
 	});
 
 	test('backdrop click closes Load modal', async ({ page }) => {

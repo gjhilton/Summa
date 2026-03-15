@@ -9,6 +9,7 @@ export default tseslint.config(
 		ignores: [
 			'dist',
 			'node_modules',
+			'storybook-static',
 			'dist/styled-system',
 			'src/styled-system',
 			'src/generated',

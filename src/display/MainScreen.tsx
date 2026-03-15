@@ -62,6 +62,9 @@ const ActionStripWrapper = styled('div', {
       true:  { opacity: 1, transform: 'translateX(0)',    pointerEvents: 'auto' },
       false: { opacity: 0, transform: 'translateX(12px)', pointerEvents: 'none' },
     },
+    hasRevealButton: {
+      true: { right: '2rem' },
+    },
   },
 })
 
@@ -98,10 +101,10 @@ interface ActionStripProps {
 }
 
 function ActionStrip({ onClose, desktopVisible, isOpen, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
-  // Desktop hover: visible when row is hovered. Touch: visible only when swiped open.
-  const visible = canHover ? desktopVisible : (isOpen ?? false)
+  // Desktop: visible when hovered or when open via button. Touch: visible only when swiped open.
+  const visible = canHover ? (desktopVisible || (isOpen ?? false)) : (isOpen ?? false)
   return (
-    <ActionStripWrapper visible={visible} data-no-print>
+    <ActionStripWrapper visible={visible} hasRevealButton={canHover || undefined} data-no-print>
       <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
         <ActionButtonIcon>🗑</ActionButtonIcon>
         Delete
@@ -184,12 +187,9 @@ const ContentWrapper = styled('div', {
     borders: {
       total: {
         borderTopWidth: '3px',
-        borderBottomWidth: '3px',
-        borderTopStyle: 'double',
-        borderBottomStyle: 'double',
+        borderTopStyle: 'solid',
         borderTopColor: 'black',
-        borderBottomColor: 'black',
-        paddingTop: { base: '0.25rem', md: '1rem' },
+        paddingTop: { base: '0.15rem', md: '0.5rem' },
         paddingBottom: '1rem',
       },
     },
@@ -216,6 +216,26 @@ const DragHandleButton = styled('button', {
     zIndex: 3,
     _hover: { color: 'rgba(0,0,0,0.5)' },
     _active: { cursor: 'grabbing' },
+  },
+})
+
+const RevealButton = styled('button', {
+  base: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    width: '2rem',
+    border: 'none',
+    background: 'rgba(0,0,0,0.06)',
+    cursor: 'pointer',
+    color: 'rgba(0,0,0,0.5)',
+    padding: 0,
+    zIndex: 4,
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    userSelect: 'none',
+    _hover: { background: 'rgba(0,0,0,0.12)', color: 'black' },
   },
 })
 
@@ -250,6 +270,7 @@ interface ItemProps {
   error?: boolean
   desktopVisible?: boolean
   onClose?: () => void
+  onReveal?: () => void
   onRemove?: () => void
   onDuplicate?: () => void
   onClearItem?: () => void
@@ -269,6 +290,7 @@ export function Item({
   error = false,
   desktopVisible = false,
   onClose,
+  onReveal,
   onRemove,
   onDuplicate,
   onClearItem,
@@ -297,6 +319,17 @@ export function Item({
       >
         {children}
       </ContentWrapper>
+      {showActions && canHover && (
+        <RevealButton
+          type="button"
+          data-no-print
+          tabIndex={-1}
+          aria-label={isOpen ? 'Close actions' : 'Open actions'}
+          onClick={isOpen ? onClose : onReveal}
+        >
+          {isOpen ? '›' : '‹'}
+        </RevealButton>
+      )}
     </StyledItem>
   )
 }
@@ -307,7 +340,6 @@ export function SwipeableItem({ children, onRemove, onDuplicate, onClearItem, er
   const id = React.useId()
   const { openId, setOpenId } = useSwipeContext()
   const isOpen = openId === id
-  const [hovered, setHovered] = React.useState(false)
   const startX = React.useRef<number | null>(null)
   const startY = React.useRef<number | null>(null)
   const isVertical = React.useRef(false)
@@ -332,26 +364,23 @@ export function SwipeableItem({ children, onRemove, onDuplicate, onClearItem, er
     else if (dx > 20) setOpenId(null)
   }
 
-  function onClose() {
-    setOpenId(null)
-    setHovered(false)
-  }
+  function onClose() { setOpenId(null) }
+  function onReveal() { setOpenId(id) }
 
   return (
     <Item
       showActions
       isOpen={isOpen}
       error={error}
-      desktopVisible={canHover && hovered}
+      desktopVisible={false}
       onClose={onClose}
+      onReveal={onReveal}
       onRemove={onRemove}
       onDuplicate={onDuplicate}
       onClearItem={onClearItem}
-      onMouseEnter={canHover ? () => setHovered(true) : undefined}
-      onMouseLeave={canHover ? () => setHovered(false) : undefined}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
+      onTouchStart={!canHover ? onTouchStart : undefined}
+      onTouchMove={!canHover ? onTouchMove : undefined}
+      onTouchEnd={!canHover ? onTouchEnd : undefined}
     >
       {children}
     </Item>
@@ -443,6 +472,9 @@ const Block = styled('div', {
   variants: {
     indented: {
       true: { paddingLeft: '2rem' },
+    },
+    rightAlign: {
+      true: { display: { md: 'flex' }, justifyContent: { md: 'flex-end' } },
     },
   },
 })
@@ -863,7 +895,7 @@ interface ItemTotalProps {
 export const ItemTotal = ({ totalDisplay, explanation, itemCount }: ItemTotalProps) =>
   <Item borders="total" sideMargins>
     <BlockRow data-block-row centerItems>
-      <Block data-total-logo indented><Logo size="s" /></Block>
+      <Block data-total-logo indented rightAlign><Logo size="s" /></Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
     {itemCount !== undefined && <ExplanationRow data-no-print>Items: {itemCount}</ExplanationRow>}
@@ -1304,6 +1336,10 @@ const DialogTitle = styled('div', {
   base: { fontWeight: 'bold', marginBottom: '1rem', fontSize: '1.05em' },
 })
 
+const FileInputWrapper = styled('div', {
+  base: { width: '100%', overflow: 'hidden' },
+})
+
 const DialogButtonRow = styled('div', {
   base: {
     display: 'flex',
@@ -1368,7 +1404,7 @@ function SummaDialog({ isOpen, onClose, title, children }: { isOpen: boolean, on
   )
 }
 
-function SaveModalUI({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () => void, onSave: (filename: string) => void }) {
+export function SaveModalUI({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: () => void, onSave: (filename: string) => void }) {
   const [filename, setFilename] = React.useState('')
 
   React.useEffect(() => { if (isOpen) setFilename('') }, [isOpen])
@@ -1404,14 +1440,15 @@ function SaveModalUI({ isOpen, onClose, onSave }: { isOpen: boolean, onClose: ()
   )
 }
 
-function LoadModalUI({ isOpen, onClose, onLoad }: { isOpen: boolean, onClose: () => void, onLoad: (file: File) => Promise<void> }) {
+export function LoadModalUI({ isOpen, onClose, onLoad }: { isOpen: boolean, onClose: () => void, onLoad: (file: File) => Promise<void> }) {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [error, setError] = React.useState('')
   const [loading, setLoading] = React.useState(false)
+  const [hasFile, setHasFile] = React.useState(false)
 
   React.useEffect(() => {
     if (isOpen && inputRef.current) inputRef.current.value = ''
-    if (isOpen) setError('')
+    if (isOpen) { setError(''); setHasFile(false) }
   }, [isOpen])
 
   async function handleLoad() {
@@ -1434,13 +1471,13 @@ function LoadModalUI({ isOpen, onClose, onLoad }: { isOpen: boolean, onClose: ()
 
   return (
     <SummaDialog isOpen={isOpen} onClose={handleClose} title="Load calculation">
-      <div>
-        <input ref={inputRef} type="file" accept=".json" onChange={() => setError('')} aria-label="Summa file" />
+      <FileInputWrapper>
+        <input ref={inputRef} type="file" accept=".json" onChange={e => { setError(''); setHasFile(!!e.target.files?.length) }} aria-label="Summa file" />
         {error && <ModalErrorText>{error}</ModalErrorText>}
-      </div>
+      </FileInputWrapper>
       <DialogButtonRow>
         <Button onClick={handleClose}>cancel</Button>
-        <Button variant="primary" onClick={handleLoad} disabled={loading}>load</Button>
+        <Button variant="primary" onClick={handleLoad} disabled={loading || !hasFile}>load</Button>
       </DialogButtonRow>
     </SummaDialog>
   )
