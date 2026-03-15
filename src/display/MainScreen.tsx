@@ -569,6 +569,7 @@ const inputRecipe = cva({
     numeric: {
       true: {
         fontSize: '1.4em',
+        fontWeight: '900',
         paddingTop: '0',
         paddingBottom: '0',
         lineHeight: '1',
@@ -1201,6 +1202,21 @@ export const HeaderEdit = ({ onClear, onSaveClick, onLoadClick, hasError, onUndo
 
 // ─── Sortable line wrapper ────────────────────────────────────────────────────
 
+const ItemListSection = styled('section', {
+  base: {},
+})
+
+const ItemListTopBorder = styled('div', {
+  base: {
+    marginLeft: '1.5rem',
+    marginRight: '1.5rem',
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: 'black',
+    paddingBottom: '0.75rem',
+  },
+})
+
 const SortableWrapper = styled('div', {
   base: { position: 'relative' },
   variants: {
@@ -1251,7 +1267,8 @@ interface ListOfItemsProps {
 export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExplanation, onFieldChange, onQuantityChange, onTitleChange, onRemoveLine, onAddLine, onAddExtended, onAddSubtotal, onDuplicateLine, onClearItem, onEditSubtotal }: ListOfItemsProps) {
   return (
     <SwipeProvider>
-      <section>
+      <ItemListSection>
+        <ItemListTopBorder />
         <SortableContext items={lines.map(l => l.id)} strategy={verticalListSortingStrategy}>
           {lines.map(line => {
             const errorExplanation = showExplanation ? renderErrorExplanation(line) : null
@@ -1309,7 +1326,7 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
           onAddSubtotal={onAddSubtotal}
         />
         <ItemTotal totalDisplay={totalDisplay} explanation={showExplanation ? renderTotalExplanation(totalDisplay, totalPence) : null} itemCount={showExplanation ? lines.length : undefined} />
-      </section>
+      </ItemListSection>
     </SwipeProvider>
   )
 }
