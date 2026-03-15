@@ -3,24 +3,39 @@
  */
 
 /**
- * Navigate to the Summa app base URL.
+ * Navigate to the Summa app base URL, bypassing the splash screen.
+ * Sets summa_welcomed so the app starts on the main screen.
  * @param {import('@playwright/test').Page} page
  */
 export async function goto(page) {
-	// Load the page, clear all storage, reload to dismiss the first-visit
-	// help screen, then click Clear to reset the default demo state so every
-	// test starts with two empty lines.
+	// Load the page, clear all storage, set the welcome key so the app
+	// starts on the main screen on reload. localStorage.clear() is enough
+	// to reset state — no need to click Clear (which would pollute the undo stack).
 	await page.goto('/');
 	await page.evaluate(() => {
 		localStorage.clear();
-		localStorage.setItem('summa_visited', '1');
+		localStorage.setItem('summa_welcomed', '1');
 	});
 	await page.reload();
-	page.once('dialog', dialog => dialog.accept());
-	await page.getByRole('button', { name: 'Clear', exact: true }).click();
+	// showExplanation defaults to true; disable it so tests start with show working OFF
+	const explainToggle = page.getByRole('switch', { name: /explain calculations/i });
+	if ((await explainToggle.getAttribute('aria-checked')) === 'true') {
+		await explainToggle.click();
+	}
 }
 
-const FIELD_LABELS = { l: 'pounds', s: 'shillings', d: 'pence' };
+/**
+ * Navigate to the Summa app on first visit (splash screen shown).
+ * Does NOT set the welcome key, so the splash screen is shown.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function gotoSplash(page) {
+	await page.goto('/');
+	await page.evaluate(() => localStorage.clear());
+	await page.reload();
+}
+
+const FIELD_LABELS = { l: 'li', s: 's', d: 'd' };
 
 /**
  * Get an l/s/d input field by label for a given line index.
@@ -28,7 +43,7 @@ const FIELD_LABELS = { l: 'pounds', s: 'shillings', d: 'pence' };
  * @param {'l' | 's' | 'd'} field
  * @param {number} [lineIndex=0] - 0-based index among line items
  */
-export async function getField(page, field, lineIndex = 0) {
+export function getField(page, field, lineIndex = 0) {
 	const label = FIELD_LABELS[field] ?? field;
 	return page.getByLabel(label, { exact: true }).nth(lineIndex);
 }
@@ -56,37 +71,44 @@ export async function enterValue(page, lineIndex, field, value) {
 }
 
 /**
- * Enable show working toggle.
+ * Enable explain calculations (show working) toggle.
  * @param {import('@playwright/test').Page} page
  */
 export async function enableShowWorking(page) {
-	await page.getByRole('switch', { name: /show working/i }).click();
+	await page.getByRole('switch', { name: /explain calculations/i }).click();
 }
 
 /**
- * Click the Advanced options toggle to enable it.
+ * Click the Advanced mode toggle to enable it.
  * @param {import('@playwright/test').Page} page
  */
 export async function toggleAdvancedOptions(page) {
-	await page.getByRole('switch', { name: /advanced options/i }).click();
+	await page.getByRole('switch', { name: /advanced mode/i }).click();
 }
 
 /**
- * Click the "New subtotal item" button (requires advanced options enabled).
+ * Click the "extended" button to add a new extended item (requires advanced mode enabled).
+ * @param {import('@playwright/test').Page} page
+ */
+export async function addExtendedItem(page) {
+	await page.getByRole('button', { name: /extended/i }).click();
+}
+
+/**
+ * Click the "subtotal" button to add a new subtotal item (requires advanced mode enabled).
  * @param {import('@playwright/test').Page} page
  */
 export async function addSubtotalItem(page) {
-	await page.getByRole('button', { name: /new subtotal item/i }).click();
+	await page.getByRole('button', { name: /subtotal/i }).click();
 }
 
 /**
- * Click the subtotal title link to navigate into it.
- * The title defaults to "Untitled" for a freshly added subtotal.
+ * Click the "edit" link to navigate into a subtotal.
  * @param {import('@playwright/test').Page} page
- * @param {string} [title='Untitled']
+ * @param {string} [title='Untitled'] - unused, kept for API compatibility
  */
 export async function navigateIntoSubtotal(page, title = 'Untitled') {
-	await page.getByRole('button', { name: title }).first().click();
+	await page.getByRole('button', { name: 'edit' }).first().click();
 }
 
 /**
@@ -107,19 +129,19 @@ export function getItemsCount(page) {
 }
 
 /**
- * Click the Save button to open the save modal.
+ * Click the export button to open the save modal.
  * @param {import('@playwright/test').Page} page
  */
 export async function openSaveModal(page) {
-	await page.getByRole('button', { name: 'Save', exact: true }).click();
+	await page.getByRole('button', { name: 'export', exact: true }).click();
 }
 
 /**
- * Click the Load button to open the load modal.
+ * Click the load button to open the load modal.
  * @param {import('@playwright/test').Page} page
  */
 export async function openLoadModal(page) {
-	await page.getByRole('button', { name: 'Load', exact: true }).click();
+	await page.getByRole('button', { name: 'load', exact: true }).first().click();
 }
 
 /**
@@ -148,9 +170,9 @@ export async function saveAs(page, filename) {
 	await page.getByLabel('Filename').fill(filename);
 	const [download] = await Promise.all([
 		page.waitForEvent('download'),
-		// .last() because there are two "Save" buttons in the DOM: one in the
-		// header and one inside the modal. The modal's button comes last.
-		page.getByRole('button', { name: 'Save', exact: true }).last().click(),
+		// .last() because there may be multiple "save" buttons in the DOM.
+		// The modal's button comes last.
+		page.getByRole('button', { name: 'save', exact: true }).last().click(),
 	]);
 	return download;
 }
@@ -162,10 +184,59 @@ export async function saveAs(page, filename) {
  */
 export async function loadFile(page, filePath) {
 	await page.getByLabel('Summa file').setInputFiles(filePath);
-	// .last() because there are two "Load" buttons in the DOM: one in the
+	// .last() because there are two "load" buttons in the DOM: one in the
 	// header and one inside the modal. The modal's button comes last.
 	await page
-		.getByRole('button', { name: 'Load', exact: true })
+		.getByRole('button', { name: 'load', exact: true })
 		.last()
 		.click();
+}
+
+/**
+ * Hover over a row to reveal the action buttons (delete/duplicate/clear).
+ * @param {import('@playwright/test').Page} page
+ * @param {number} [rowIndex=0] - 0-based index among line items
+ */
+export async function revealRowActions(page, rowIndex = 0) {
+	await page.getByLabel('li', { exact: true }).nth(rowIndex).hover();
+}
+
+/**
+ * Click the Delete row button for a given row (confirms the dialog).
+ * @param {import('@playwright/test').Page} page
+ * @param {number} [rowIndex=0]
+ */
+export async function clickDeleteRow(page, rowIndex = 0) {
+	await revealRowActions(page, rowIndex);
+	page.once('dialog', d => d.accept());
+	await page.getByRole('button', { name: 'Delete row' }).nth(rowIndex).click();
+}
+
+/**
+ * Click the Duplicate row button for a given row.
+ * @param {import('@playwright/test').Page} page
+ * @param {number} [rowIndex=0]
+ */
+export async function clickDuplicateRow(page, rowIndex = 0) {
+	await revealRowActions(page, rowIndex);
+	await page.getByRole('button', { name: 'Duplicate row' }).nth(rowIndex).click();
+}
+
+/**
+ * Click the Clear item button for a given row (confirms the dialog).
+ * @param {import('@playwright/test').Page} page
+ * @param {number} [rowIndex=0]
+ */
+export async function clickClearRow(page, rowIndex = 0) {
+	await revealRowActions(page, rowIndex);
+	page.once('dialog', d => d.accept());
+	await page.getByRole('button', { name: 'Clear item' }).nth(rowIndex).click();
+}
+
+/**
+ * Click the undo button in the header.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function clickUndo(page) {
+	await page.getByRole('button', { name: 'undo', exact: true }).click();
 }

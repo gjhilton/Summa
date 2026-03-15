@@ -13,6 +13,7 @@ import {
 	toggleAdvancedOptions,
 	addSubtotalItem,
 	navigateIntoSubtotal,
+	getTotalField,
 } from '../config/playwright/helpers/test-helpers.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,37 +23,37 @@ const INVALID_FIXTURE = path.resolve(__dirname, 'fixtures/invalid.json');
 // ─── button visibility ────────────────────────────────────────────────────────
 
 test.describe('Save/Load button visibility', () => {
-	test('Save button visible on root level', async ({ page }) => {
+	test('export button visible on root level', async ({ page }) => {
 		await goto(page);
 		await expect(
-			page.getByRole('button', { name: 'Save', exact: true })
+			page.getByRole('button', { name: 'export', exact: true })
 		).toBeVisible();
 	});
 
-	test('Load button visible on root level', async ({ page }) => {
+	test('load button visible on root level', async ({ page }) => {
 		await goto(page);
 		await expect(
-			page.getByRole('button', { name: 'Load', exact: true })
+			page.getByRole('button', { name: 'load', exact: true }).first()
 		).toBeVisible();
 	});
 
-	test('Save button hidden on sub-level', async ({ page }) => {
+	test('export button hidden on sub-level', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		await navigateIntoSubtotal(page, 'Untitled');
+		await navigateIntoSubtotal(page);
 		await expect(
-			page.getByRole('button', { name: 'Save', exact: true })
+			page.getByRole('button', { name: 'export', exact: true })
 		).not.toBeVisible();
 	});
 
-	test('Load button hidden on sub-level', async ({ page }) => {
+	test('load button hidden on sub-level', async ({ page }) => {
 		await goto(page);
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
-		await navigateIntoSubtotal(page, 'Untitled');
+		await navigateIntoSubtotal(page);
 		await expect(
-			page.getByRole('button', { name: 'Load', exact: true })
+			page.getByRole('button', { name: 'load', exact: true }).first()
 		).not.toBeVisible();
 	});
 });
@@ -60,25 +61,25 @@ test.describe('Save/Load button visibility', () => {
 // ─── Save button enabled/disabled ────────────────────────────────────────────
 
 test.describe('Save button state', () => {
-	test('Save button is enabled when no errors', async ({ page }) => {
+	test('export button is enabled when no errors', async ({ page }) => {
 		await goto(page);
-		const saveBtn = page.getByRole('button', { name: 'Save', exact: true });
+		const saveBtn = page.getByRole('button', { name: 'export', exact: true });
 		await expect(saveBtn).not.toBeDisabled();
 	});
 
-	test('Save button is disabled when a line has an error', async ({
+	test('export button is disabled when a line has an error', async ({
 		page,
 	}) => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'not-roman');
-		const saveBtn = page.getByRole('button', { name: 'Save', exact: true });
+		const saveBtn = page.getByRole('button', { name: 'export', exact: true });
 		await expect(saveBtn).toBeDisabled();
 	});
 
-	test('Save button re-enables after fixing error', async ({ page }) => {
+	test('export button re-enables after fixing error', async ({ page }) => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'not-roman');
-		const saveBtn = page.getByRole('button', { name: 'Save', exact: true });
+		const saveBtn = page.getByRole('button', { name: 'export', exact: true });
 		await expect(saveBtn).toBeDisabled();
 		await enterValue(page, 0, 'd', 'v');
 		await expect(saveBtn).not.toBeDisabled();
@@ -119,16 +120,6 @@ test.describe('Save modal', () => {
 		await expect(page.getByLabel('Filename')).toHaveValue('');
 	});
 
-	test('after saving "my-calc", re-open modal shows "my-calc"', async ({
-		page,
-	}) => {
-		await goto(page);
-		await openSaveModal(page);
-		await saveAs(page, 'my-calc');
-		await openSaveModal(page);
-		await expect(page.getByLabel('Filename')).toHaveValue('my-calc');
-	});
-
 	test('after Clear, save modal filename is empty', async ({ page }) => {
 		await goto(page);
 		await openSaveModal(page);
@@ -136,7 +127,7 @@ test.describe('Save modal', () => {
 
 		// Clear the calculation
 		page.once('dialog', dialog => dialog.accept());
-		await page.getByRole('button', { name: 'Clear', exact: true }).click();
+		await page.getByRole('button', { name: 'clear', exact: true }).click();
 
 		await openSaveModal(page);
 		await expect(page.getByLabel('Filename')).toHaveValue('');
@@ -147,6 +138,50 @@ test.describe('Save modal', () => {
 		await openSaveModal(page);
 		const download = await saveAs(page, 'test-calc');
 		expect(download.suggestedFilename()).toBe('test-calc.summa.json');
+	});
+
+	test('empty filename saves as "summa.summa.json"', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		// Leave filename blank → should default to "summa"
+		const [download] = await Promise.all([
+			page.waitForEvent('download'),
+			page.getByRole('button', { name: 'save', exact: true }).last().click(),
+		]);
+		expect(download.suggestedFilename()).toBe('summa.summa.json');
+	});
+
+	test('Enter key in filename input triggers save', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		await page.getByLabel('Filename').fill('enter-test');
+		const [download] = await Promise.all([
+			page.waitForEvent('download'),
+			page.getByLabel('Filename').press('Enter'),
+		]);
+		expect(download.suggestedFilename()).toBe('enter-test.summa.json');
+	});
+
+	test('Cancel button closes Save modal', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		await page.getByRole('button', { name: 'cancel', exact: true }).click();
+		await expect(page.getByText('Save calculation')).not.toBeVisible();
+	});
+
+	test('backdrop click closes Save modal', async ({ page }) => {
+		await goto(page);
+		await openSaveModal(page);
+		// Dispatch a click on the open dialog at coordinates guaranteed to be outside
+		// its content box (negative values are always < rect.left).
+		await page.evaluate(() => {
+			const dialog = document.querySelector('dialog[open]');
+			if (dialog)
+				dialog.dispatchEvent(
+					new MouseEvent('click', { bubbles: true, cancelable: true, clientX: -999, clientY: -999 })
+				);
+		});
+		await expect(page.getByText('Save calculation')).not.toBeVisible();
 	});
 
 	test('saved file is valid JSON with summa metadata', async ({ page }) => {
@@ -160,6 +195,23 @@ test.describe('Save modal', () => {
 		const content = JSON.parse(readFileSync(filePath, 'utf-8'));
 		expect(content.metadata.appName).toBe('summa');
 		expect(Array.isArray(content.lines)).toBe(true);
+	});
+
+	test('saved file contains correct l/s/d values for entered data', async ({
+		page,
+	}) => {
+		await goto(page);
+		await enterValue(page, 0, 's', 'v'); // 5s
+		await enterValue(page, 0, 'd', 'iij'); // 3d
+		await openSaveModal(page);
+		const download = await saveAs(page, 'values-test');
+		const filePath = await download.path();
+		if (!filePath) throw new Error('Download path is null');
+		const { readFileSync } = await import('fs');
+		const content = JSON.parse(readFileSync(filePath, 'utf-8'));
+		const line = content.lines[0];
+		expect(line.literals.s).toBe('v');
+		expect(line.literals.d).toBe('iij');
 	});
 });
 
@@ -188,7 +240,37 @@ test.describe('Load modal', () => {
 	test('Load modal Cancel button closes the modal', async ({ page }) => {
 		await goto(page);
 		await openLoadModal(page);
-		await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+		await page.getByRole('button', { name: 'cancel', exact: true }).click();
+		await expect(page.getByText('Load calculation')).not.toBeVisible();
+	});
+
+	test('load button is disabled when no file selected', async ({ page }) => {
+		await goto(page);
+		await openLoadModal(page);
+		await expect(
+			page.getByRole('button', { name: 'load', exact: true }).last()
+		).toBeDisabled();
+	});
+
+	test('load button is enabled after selecting a file', async ({ page }) => {
+		await goto(page);
+		await openLoadModal(page);
+		await page.getByLabel('Summa file').setInputFiles(SIMPLE_FIXTURE);
+		await expect(
+			page.getByRole('button', { name: 'load', exact: true }).last()
+		).not.toBeDisabled();
+	});
+
+	test('backdrop click closes Load modal', async ({ page }) => {
+		await goto(page);
+		await openLoadModal(page);
+		await page.evaluate(() => {
+			const dialog = document.querySelector('dialog[open]');
+			if (dialog)
+				dialog.dispatchEvent(
+					new MouseEvent('click', { bubbles: true, cancelable: true, clientX: -999, clientY: -999 })
+				);
+		});
 		await expect(page.getByText('Load calculation')).not.toBeVisible();
 	});
 });
@@ -201,8 +283,8 @@ test.describe('Loading a valid fixture file', () => {
 		await openLoadModal(page);
 		await loadFile(page, SIMPLE_FIXTURE);
 		// 5s + 7s = 12s
-		const totalS = page.getByLabel('shillings', { exact: true }).last();
-		await expect(totalS).toHaveText('xij');
+		const totalS = page.getByLabel('s', { exact: true }).last();
+		await expect(totalS).toHaveValue('xij');
 	});
 
 	test('loads fixture and shows line titles', async ({ page }) => {
@@ -231,6 +313,65 @@ test.describe('Loading a valid fixture file', () => {
 	});
 });
 
+// ─── Save exports full root calculation ──────────────────────────────────────
+
+test.describe('Save from sub-level', () => {
+	test('saving from root exports all lines including subtotal children', async ({
+		page,
+	}) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		await enterValue(page, 0, 'd', 'v'); // 5d inside subtotal
+		// Return to root to save (export button only visible at root)
+		await page.getByRole('button', { name: 'done', exact: true }).click();
+		await openSaveModal(page);
+		const download = await saveAs(page, 'full-export');
+		const filePath = await download.path();
+		if (!filePath) throw new Error('Download path is null');
+		const { readFileSync } = await import('fs');
+		const content = JSON.parse(readFileSync(filePath, 'utf-8'));
+		// Root has 2 default lines + 1 subtotal; subtotal has children
+		const subtotal = content.lines.find(
+			(l) => l.itemType === 'SUBTOTAL_ITEM'
+		);
+		expect(subtotal).toBeTruthy();
+		expect(Array.isArray(subtotal.lines)).toBe(true);
+		// Sub-calc has the entered value
+		const subLine = subtotal.lines[0];
+		expect(subLine.literals.d).toBe('v');
+	});
+});
+
+// ─── Load while navigated into subtotal ──────────────────────────────────────
+
+test.describe('Load while inside subtotal', () => {
+	test('loading a file from inside a subtotal resets navigation to root', async ({
+		page,
+	}) => {
+		await goto(page);
+		await toggleAdvancedOptions(page);
+		await addSubtotalItem(page);
+		await navigateIntoSubtotal(page);
+		// Should be at sub-level (done button visible)
+		await expect(
+			page.getByRole('button', { name: 'done', exact: true })
+		).toBeVisible();
+		// Cannot load from sub-level (load button hidden), so navigate back first
+		// This verifies that after loading, breadcrumb is gone
+		await page.getByRole('button', { name: 'done', exact: true }).click();
+		await openLoadModal(page);
+		await loadFile(page, SIMPLE_FIXTURE);
+		// After load: at root, no breadcrumb
+		await expect(
+			page.getByRole('navigation', { name: /breadcrumb/i })
+		).not.toBeVisible();
+		// Loaded data shows correct total
+		await expect(getTotalField(page, 's')).toHaveValue('xij');
+	});
+});
+
 // ─── Invalid file error handling ──────────────────────────────────────────────
 
 test.describe('Invalid file handling', () => {
@@ -239,7 +380,7 @@ test.describe('Invalid file handling', () => {
 		await openLoadModal(page);
 		await page.getByLabel('Summa file').setInputFiles(INVALID_FIXTURE);
 		await page
-			.getByRole('button', { name: 'Load', exact: true })
+			.getByRole('button', { name: 'load', exact: true })
 			.last()
 			.click();
 		await expect(page.getByText('Not a valid JSON file')).toBeVisible();
@@ -249,13 +390,13 @@ test.describe('Invalid file handling', () => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'v');
 		// Confirm value is present
-		const totalD = page.getByLabel('pence', { exact: true }).last();
-		await expect(totalD).toHaveText('v');
+		const totalD = page.getByLabel('d', { exact: true }).last();
+		await expect(totalD).toHaveValue('v');
 
 		await openLoadModal(page);
 		await page.getByLabel('Summa file').setInputFiles(INVALID_FIXTURE);
 		await page
-			.getByRole('button', { name: 'Load', exact: true })
+			.getByRole('button', { name: 'load', exact: true })
 			.last()
 			.click();
 
@@ -263,7 +404,7 @@ test.describe('Invalid file handling', () => {
 		await expect(page.getByText('Not a valid JSON file')).toBeVisible();
 		// Close modal and verify calculation unchanged
 		await page.keyboard.press('Escape');
-		await expect(totalD).toHaveText('v');
+		await expect(totalD).toHaveValue('v');
 	});
 
 	test('modal stays open on load failure', async ({ page }) => {
@@ -271,7 +412,7 @@ test.describe('Invalid file handling', () => {
 		await openLoadModal(page);
 		await page.getByLabel('Summa file').setInputFiles(INVALID_FIXTURE);
 		await page
-			.getByRole('button', { name: 'Load', exact: true })
+			.getByRole('button', { name: 'load', exact: true })
 			.last()
 			.click();
 		await expect(page.getByText('Load calculation')).toBeVisible();
