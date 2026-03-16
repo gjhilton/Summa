@@ -1,1 +1,0 @@
-For clerks of the era, summing columns of figures expressed as pounds, shillings and pence in Roman numerals was second nature. For modern users the calculations can be error-prone, and in large quantities quickly become tedious. Summa automates the calculation.

@@ -1,106 +1,136 @@
+@font-face {
+	font-family: 'Joscelyn';
+	src: url('/Joscelyn/Joscelyn.woff2') format('woff2'),
+	     url('/Joscelyn/Joscelyn.otf') format('opentype');
+	font-weight: normal;
+	font-style: normal;
+}
+
 @layer reset, base, tokens, recipes, utilities;
 
 @page {
-	margin: 1cm;
+	margin: 1.5cm 1.5cm 2cm;
 }
 
-/* ── Print colophon: hidden on screen, shown at print time ───────────────── */
+/* ── Print colophon: screen-only hidden ──────────────────────────────────── */
 #print-colophon {
 	display: none;
 }
 
 @media print {
-	/* ── Containers explicitly marked screen-only ────────────────────────── */
-	[data-no-print] {
-		display: none;
-	}
-
-	/* ── Structural chrome ───────────────────────────────────────────────── */
-	footer {
-		display: none;
-	}
+	/* ── Hide all UI chrome ───────────────────────────────────────────────── */
+	[data-no-print],
 	dialog {
 		display: none !important;
-	}
-
-	/* ── Font sizes ─────────────────────────────────────────────────────── */
-	:root {
-		font-size: 10pt;
-	}
-	[data-field] {
-		font-size: 14pt;
-		padding-top: 0.75rem;
-		padding-bottom: 0.75rem;
-	}
-	[data-page-layout] {
-		max-width: 100%;
-		margin-left: 0;
-		margin-right: 0;
-		padding-left: 0;
-		padding-right: 0;
-	}
-
-	[data-working] {
-		font-size: 10px;
-	}
-
-	/* ── Collapse drag-handle and remove columns; leave others intact ───── */
-	[data-item-row] {
-		grid-template-columns: 0 0 1em 1fr auto 20% 20% 20% 1em;
-	}
-	[data-item-row] > :nth-child(1),
-	[data-item-row] > :nth-child(2) {
-		overflow: hidden;
-		visibility: hidden;
-	}
-
-	/* ── Summa logo ──────────────────────────────────────────────────────── */
-	svg[aria-label='Summa'] {
-		visibility: hidden;
-	}
-
-	/* ── Subtotal item rows ─────────────────────────────────────────────── */
-	[data-item-row]:has([data-subtotal-title]) {
-		border-top: 1px solid black;
-		border-bottom: 1px solid black;
-	}
-	[data-subtotal-title] {
-		color: black;
-		text-decoration: none;
-	}
-
-	/* ── Placeholders ───────────────────────────────────────────────────── */
-	input::placeholder {
-		color: transparent;
-	}
-
-	/* ── Field borders ───────────────────────────────────────────────────── */
-	input {
-		border-bottom-color: transparent !important;
-		background: transparent !important;
 	}
 
 	/* ── Print colophon ──────────────────────────────────────────────────── */
 	#print-colophon {
 		display: block;
-		margin-top: 3rem;
-		font-size: 0.75em;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		text-align: center;
+		font-size: 8pt;
 		font-style: italic;
-		opacity: 0.6;
+		opacity: 0.5;
+		padding-bottom: 0.5cm;
+	}
+
+	/* ── Reset page layout ───────────────────────────────────────────────── */
+	:root {
+		font-size: 11pt;
+		background: white !important;
+	}
+
+	/* ── Clean up inputs — no borders, no backgrounds ────────────────────── */
+	input {
+		border: none !important;
+		outline: none !important;
+		background: transparent !important;
+		box-shadow: none !important;
+	}
+	input::placeholder {
+		color: transparent !important;
+	}
+
+	/* ── Compact item rows ───────────────────────────────────────────────── */
+	[data-item] {
+		margin-bottom: 0 !important;
+		overflow: visible !important;
+	}
+	[data-item-content] {
+		padding-top: 0.15rem !important;
+		padding-bottom: 0.15rem !important;
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		border: none !important;
+		transform: none !important;
+		box-shadow: none !important;
+	}
+
+	/* Single row: title left, currency right, baseline-aligned */
+	[data-block-row] {
+		display: flex !important;
+		align-items: baseline !important;
+	}
+	[data-block-row] > * {
+		margin-top: 0 !important;
+	}
+	[data-block-title] {
+		flex: 1 !important;
+	}
+	[data-block-currency] {
+		flex: 0 0 auto !important;
+	}
+
+	/* l/s/d fields: tight inline row */
+	[data-currency] {
+		display: flex !important;
+		gap: 0.3em !important;
+		width: auto !important;
+	}
+
+	/* Each field: shrink to content */
+	[data-currency-field] {
+		width: auto !important;
+		flex: 0 0 auto !important;
+	}
+	[data-currency-field] input {
+		width: 3.5ch !important;
+		flex: none !important;
+		min-width: 0 !important;
+		text-align: right !important;
+	}
+
+	/* Hide empty fields (label hidden via :placeholder-shown) */
+	[data-currency-field]:has(input:placeholder-shown) {
+		display: none !important;
+	}
+
+	/* No borders on regular items */
+	[data-item-content] {
+		border: none !important;
+	}
+
+	/* Single thick border above total row only */
+	[data-item]:last-child [data-item-content] {
+		border-top: 2px solid black !important;
+		padding-top: 0.3rem !important;
+	}
+
+	/* Logo aligned with total: baseline, no indent */
+	[data-total-logo] {
+		padding-left: 0 !important;
+		margin-top: 0 !important;
+		display: flex !important;
+		align-items: baseline !important;
 	}
 }
 
-@font-face {
-	font-family: 'Joscelyn';
-	src:
-		url('/fonts/Joscelyn/Joscelyn.woff2') format('woff2'),
-		url('/fonts/Joscelyn/Joscelyn.otf') format('opentype');
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
-}
-
 :root {
+	--font-joscelyn: Joscelyn, serif;
 	margin: 0 auto;
 	padding: 0;
 	font-family: 'Libre Caslon Text', serif;
@@ -109,6 +139,165 @@
 	text-rendering: optimizeLegibility;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Mobile portrait ─────────────────────────────────────────────────────── */
+@media screen and (max-width: 859px) {
+	/* Page: full viewport width, pad sides, footer pinned to bottom */
+	[data-page-layout] {
+		max-width: 100%;
+		margin-left: 0;
+		margin-right: 0;
+		padding-left: 1rem;
+		padding-right: 1rem;
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+	[data-page-layout] > footer { margin-top: auto; }
+
+	/* Item rows: 4-column grid; col 1 extends into page-margin as drag handle */
+	[data-item-row] {
+		grid-template-columns: 1rem 1fr 1fr 1fr;
+		grid-auto-rows: 2.5rem;
+		margin-left: -1rem;
+		width: calc(100% + 1rem);
+		padding: 0;
+		margin-bottom: 2.5rem;
+	}
+
+	/* Hide desktop chrome — span placeholders take no space */
+	[data-item-row] > :is([data-left-bracket], [data-operator], [data-right-bracket]),
+	[data-item-row] > span[data-drag-handle],
+	[data-item-row] > span[data-remove-button] {
+		display: none;
+	}
+
+	/* Drag handle: fills col 1, row 1 */
+	[data-item-row] > button[data-drag-handle] {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		grid-column: 1;
+		grid-row: 1;
+		background: rgba(0, 0, 0, 0.08);
+		color: rgba(0, 0, 0, 0.85);
+		opacity: 1;
+	}
+
+	/* Title cells: grid placement + left indent */
+	[data-item-row] > :is([data-title-col], [data-subtotal-title], [data-summa-col]) {
+		grid-column: 2 / -1;
+		grid-row: 1;
+		padding-left: 0.4rem;
+		justify-content: center;
+	}
+	/* Subtotal title is a button — needs flex-row centering, not flex-column */
+	[data-item-row] > [data-subtotal-title] {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		padding-top: 0;
+		padding-bottom: 0;
+		font-weight: bold;
+		text-decoration: none;
+	}
+
+	/* l / s / d: cols 2–4, row 2 */
+	[data-item-row] > [data-field-key="l"] { grid-column: 2; grid-row: 2; }
+	[data-item-row] > [data-field-key="s"] { grid-column: 3; grid-row: 2; }
+	[data-item-row] > [data-field-key="d"] { grid-column: 4; grid-row: 2; }
+
+	/* All field cells: vertically center their flex content */
+	[data-field-key] { align-items: center; }
+	[data-field-label] {
+		font-size: 0.8rem;
+		font-style: italic;
+		align-self: center;
+		padding: 0 0 0 0.05rem;
+	}
+
+	/* Remove button: always red, col 1 row 2; invisible when disabled */
+	[data-item-row] { --rm-color: var(--colors-error); --rm-opacity: 1; }
+	[data-item-row] > button[data-remove-button] {
+		grid-column: 1;
+		grid-row: 2;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+		visibility: visible;
+	}
+	[data-item-row] > button[data-remove-button][disabled] { display: none; }
+
+	/* Field + input sizing */
+	[data-field] {
+		font-size: 1.25rem;
+		padding-top: 0.125rem;
+		padding-bottom: 0.125rem;
+	}
+	[data-item-row] input { border-bottom-color: rgba(0, 0, 0, 0.1); }
+	:is([data-title-col], [data-ext-title]) input {
+		font-size: 1.1rem;
+		font-weight: bold;
+		padding: 0;
+	}
+
+	/* Header + controls */
+	[data-calc-header] { border-bottom-width: 0; }
+	[data-bottom-bar] div:has(> #show-working) { display: none; }
+
+	/* Add buttons: full-width stacked column */
+	[data-add-bar] {
+		flex-direction: column;
+		margin-top: 0;
+		margin-bottom: 0.75rem;
+		gap: 0.75rem;
+	}
+	[data-add-bar] button {
+		width: 100%;
+		padding-top: 0.75rem;
+		padding-bottom: 0.75rem;
+		margin-bottom: 0;
+	}
+
+	/* Logo: left-aligned, contained within row height */
+	[data-summa-col] { align-items: flex-start; }
+	[data-logo] { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+	[data-logo] svg { height: 2rem !important; width: auto !important; }
+
+	/* ── Extended item: 3-row layout ─────────────────────────────────────── */
+	/* Same 4-column grid as [data-item-row]. Both inner item-rows dissolve  */
+	/* via display:contents, so drag handle + remove button land in col 1    */
+	/* via the standard rules above — no special cases needed for them.      */
+	[data-ext-item] {
+		display: grid;
+		grid-template-columns: 1rem 1fr 1fr 1fr;
+		grid-auto-rows: 2.5rem;
+		margin-left: -1rem;
+		width: calc(100% + 1rem);
+		margin-bottom: 2.5rem;
+	}
+	[data-ext-ann] { display: none; }
+	[data-ext-item] > [data-item-row] { display: contents; }
+
+	/* Row 1: title (col 2) | qty (cols 3–4) */
+	[data-ext-title] { grid-column: 2;    grid-row: 1; padding-left: 0.4rem; font-style: normal; justify-content: center; }
+	[data-ext-qty]   { grid-column: 3/-1; grid-row: 1; flex-direction: row; align-items: center; font-style: normal; font-weight: normal; }
+
+	/* Row 2: unit cost l/s/d; Row 3: extended cost l/s/d */
+	[data-item-row]:has([data-ext-qty])   > [data-field-key="l"] { grid-column: 2; grid-row: 2; }
+	[data-item-row]:has([data-ext-qty])   > [data-field-key="s"] { grid-column: 3; grid-row: 2; }
+	[data-item-row]:has([data-ext-qty])   > [data-field-key="d"] { grid-column: 4; grid-row: 2; }
+	[data-item-row]:has([data-ext-title]) > [data-field-key="l"] { grid-column: 2; grid-row: 3; }
+	[data-item-row]:has([data-ext-title]) > [data-field-key="s"] { grid-column: 3; grid-row: 3; }
+	[data-item-row]:has([data-ext-title]) > [data-field-key="d"] { grid-column: 4; grid-row: 3; }
+
+	/* Qty field: inline label + input + suffix */
+	[data-ext-qty]::before { content: 'quantity:'; font-size: 0.65rem; flex-shrink: 0; padding-right: 0.2rem; color: rgba(0,0,0,0.25); }
+	[data-ext-qty]::after  { content: '@'; flex-shrink: 0; padding-left: 0.2rem; font-size: 0.9rem; color: rgba(0,0,0,0.25); }
+	[data-ext-qty] > * { flex: 1; width: auto; min-width: 0; }
+	[data-ext-qty] input { font-size: 1.25rem; font-weight: normal; }
 }
 
 /* ── About page prose blocks ─────────────────────────────────────────────── */

@@ -15,14 +15,14 @@ test.describe('basic calculation', () => {
 	test('entering pence in one field updates the total', async ({ page }) => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'v');
-		await expect(getTotalField(page, 'd')).toHaveText('v');
+		await expect(getTotalField(page, 'd')).toHaveValue('v');
 	});
 
 	test('two lines sum correctly', async ({ page }) => {
 		await goto(page);
 		await enterValue(page, 0, 'd', 'iii');
 		await enterValue(page, 1, 'd', 'v');
-		await expect(getTotalField(page, 'd')).toHaveText('viij');
+		await expect(getTotalField(page, 'd')).toHaveValue('viij');
 	});
 
 	test('shillings carry to pounds correctly', async ({ page }) => {
@@ -30,7 +30,7 @@ test.describe('basic calculation', () => {
 		await enterValue(page, 0, 's', 'x');
 		await enterValue(page, 1, 's', 'x');
 		// 10s + 10s = 20s = £1
-		await expect(getTotalField(page, 'l')).toHaveText('j');
+		await expect(getTotalField(page, 'l')).toHaveValue('j');
 	});
 
 	test('entering shillings shows correct total', async ({ page }) => {
@@ -38,6 +38,6 @@ test.describe('basic calculation', () => {
 		await enterValue(page, 0, 's', 'v');
 		await enterValue(page, 1, 's', 'vij');
 		// 5s + 7s = 12s
-		await expect(getTotalField(page, 's')).toHaveText('xij');
+		await expect(getTotalField(page, 's')).toHaveValue('xij');
 	});
 });
