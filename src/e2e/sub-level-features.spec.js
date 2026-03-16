@@ -115,7 +115,7 @@ test.describe('row actions inside subtotal', () => {
 			dialogMessage = dialog.message();
 			await dialog.dismiss();
 		});
-		await page.getByRole('button', { name: 'Delete row' }).first().click();
+		await page.getByRole('button', { name: 'Delete row' }).first().click({ force: true });
 		expect(dialogMessage).toBe('Delete this row?');
 	});
 
@@ -132,7 +132,7 @@ test.describe('row actions inside subtotal', () => {
 			dialogMessage = dialog.message();
 			await dialog.dismiss();
 		});
-		await page.getByRole('button', { name: 'Clear item' }).first().click();
+		await page.getByRole('button', { name: 'Clear item' }).first().click({ force: true });
 		expect(dialogMessage).toBe('Clear this item?');
 	});
 

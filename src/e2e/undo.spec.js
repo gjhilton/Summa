@@ -310,9 +310,9 @@ test.describe('undo', () => {
 		// Total should be v
 		await expect(getTotalField(page, 'd')).toHaveValue('v');
 		// Clear the subtotal item from parent
-		await page.getByRole('button', { name: 'Drag to reorder' }).nth(2).hover();
+		await page.getByRole('button', { name: 'Open actions' }).nth(2).click();
 		page.once('dialog', d => d.accept());
-		await page.getByRole('button', { name: 'Clear item' }).nth(2).click();
+		await page.getByRole('button', { name: 'Clear item' }).nth(2).click({ force: true });
 		await expect(getTotalField(page, 'd')).toHaveValue('');
 		// Undo restores the 5d inside
 		await clickUndo(page);

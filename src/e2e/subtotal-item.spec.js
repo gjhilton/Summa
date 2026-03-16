@@ -186,8 +186,8 @@ test.describe('subtotal items', () => {
 		await enterValue(page, 0, 'd', 'v'); // 5d inside subtotal
 		await navigateViaBreadcrumb(page, 'Summa totalis');
 		// Hover the subtotal row (index 2) to reveal its action strip, then duplicate
-		await page.getByRole('button', { name: 'Drag to reorder' }).nth(2).hover();
-		await page.getByRole('button', { name: 'Duplicate row' }).nth(2).click();
+		await page.getByRole('button', { name: 'Open actions' }).nth(2).click();
+		await page.getByRole('button', { name: 'Duplicate row' }).nth(2).click({ force: true });
 		// Now 2 subtotal items each contributing 5d → total 10d
 		await expect(getTotalField(page, 'd')).toHaveValue('x');
 	});

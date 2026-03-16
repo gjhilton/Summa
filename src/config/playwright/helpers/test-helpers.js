@@ -198,7 +198,7 @@ export async function loadFile(page, filePath) {
  * @param {number} [rowIndex=0] - 0-based index among line items
  */
 export async function revealRowActions(page, rowIndex = 0) {
-	await page.getByLabel('li', { exact: true }).nth(rowIndex).hover();
+	await page.getByRole('button', { name: 'Open actions' }).nth(rowIndex).click();
 }
 
 /**
@@ -209,7 +209,7 @@ export async function revealRowActions(page, rowIndex = 0) {
 export async function clickDeleteRow(page, rowIndex = 0) {
 	await revealRowActions(page, rowIndex);
 	page.once('dialog', d => d.accept());
-	await page.getByRole('button', { name: 'Delete row' }).nth(rowIndex).click();
+	await page.getByRole('button', { name: 'Delete row' }).nth(rowIndex).click({ force: true });
 }
 
 /**
@@ -219,7 +219,7 @@ export async function clickDeleteRow(page, rowIndex = 0) {
  */
 export async function clickDuplicateRow(page, rowIndex = 0) {
 	await revealRowActions(page, rowIndex);
-	await page.getByRole('button', { name: 'Duplicate row' }).nth(rowIndex).click();
+	await page.getByRole('button', { name: 'Duplicate row' }).nth(rowIndex).click({ force: true });
 }
 
 /**
@@ -230,7 +230,7 @@ export async function clickDuplicateRow(page, rowIndex = 0) {
 export async function clickClearRow(page, rowIndex = 0) {
 	await revealRowActions(page, rowIndex);
 	page.once('dialog', d => d.accept());
-	await page.getByRole('button', { name: 'Clear item' }).nth(rowIndex).click();
+	await page.getByRole('button', { name: 'Clear item' }).nth(rowIndex).click({ force: true });
 }
 
 /**

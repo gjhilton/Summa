@@ -51,7 +51,7 @@ const ActionStripWrapper = styled('div', {
     bottom: 0,
     width: '240px',
     display: 'flex',
-    zIndex: 3,
+    zIndex: 10,
     overflow: 'hidden',
     background: '#e8e8e8',
     boxShadow: 'inset 8px 0 16px -4px rgba(0,0,0,0.25)',
@@ -93,16 +93,15 @@ const ActionButtonIcon = styled('span', {
 
 interface ActionStripProps {
   onClose: () => void
-  desktopVisible: boolean
   isOpen?: boolean
   onRemove?: () => void
   onDuplicate?: () => void
   onClearItem?: () => void
 }
 
-function ActionStrip({ onClose, desktopVisible, isOpen, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
-  // Desktop: visible when hovered or when open via button. Touch: visible only when swiped open.
-  const visible = canHover ? (desktopVisible || (isOpen ?? false)) : (isOpen ?? false)
+function ActionStrip({ onClose, isOpen, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
+  // Desktop: visible only when opened via the reveal button. Touch: visible only when swiped open.
+  const visible = !canHover || (isOpen ?? false)
   return (
     <ActionStripWrapper visible={visible} hasRevealButton={canHover || undefined} data-no-print>
       <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
@@ -146,7 +145,6 @@ const ContentWrapper = styled('div', {
     flex: 1,
     minWidth: 0,
     position: 'relative',
-    zIndex: 2,
     borderTopWidth: '1px',
     borderBottomWidth: '1px',
     borderTopStyle: 'solid',
@@ -166,7 +164,7 @@ const ContentWrapper = styled('div', {
         boxShadow: '6px 0 16px rgba(0,0,0,0.3)',
       },
       false: {
-        transform: 'translateX(0)',
+        transform: 'none',
         boxShadow: 'none',
       },
     },
@@ -268,7 +266,6 @@ interface ItemProps {
   showActions?: boolean
   isOpen?: boolean
   error?: boolean
-  desktopVisible?: boolean
   onClose?: () => void
   onReveal?: () => void
   onRemove?: () => void
@@ -277,8 +274,6 @@ interface ItemProps {
   onTouchStart?: React.TouchEventHandler
   onTouchMove?: React.TouchEventHandler
   onTouchEnd?: React.TouchEventHandler
-  onMouseEnter?: React.MouseEventHandler
-  onMouseLeave?: React.MouseEventHandler
   children: React.ReactNode
 }
 
@@ -288,7 +283,6 @@ export function Item({
   showActions = false,
   isOpen = false,
   error = false,
-  desktopVisible = false,
   onClose,
   onReveal,
   onRemove,
@@ -297,14 +291,11 @@ export function Item({
   onTouchStart,
   onTouchMove,
   onTouchEnd,
-  onMouseEnter,
-  onMouseLeave,
   children,
 }: ItemProps) {
   const bg = error ? 'error' : isOpen ? 'open' : 'default'
   return (
-    <StyledItem data-item sideMargins={sideMargins || undefined} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      {showActions && <ActionStrip onClose={onClose!} desktopVisible={desktopVisible} isOpen={isOpen} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
+    <StyledItem data-item sideMargins={sideMargins || undefined}>
       <DragHandle />
       <ContentWrapper
         data-item-content
@@ -319,6 +310,7 @@ export function Item({
       >
         {children}
       </ContentWrapper>
+      {showActions && <ActionStrip onClose={onClose!} isOpen={isOpen} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
       {showActions && canHover && (
         <RevealButton
           type="button"
@@ -372,7 +364,6 @@ export function SwipeableItem({ children, onRemove, onDuplicate, onClearItem, er
       showActions
       isOpen={isOpen}
       error={error}
-      desktopVisible={false}
       onClose={onClose}
       onReveal={onReveal}
       onRemove={onRemove}
@@ -950,10 +941,10 @@ export const ItemTotal = ({ totalDisplay, explanation, itemCount, subLevel }: It
       </Block>
       <BlockCurrency values={totalDisplay} />
     </BlockRow>
-    {explanation && (
+    {(explanation || itemCount !== undefined) && (
       <TotalAnnotationRow data-no-print>
-        <TotalItemCount>{itemCount !== undefined ? `${itemCount} items` : ''}</TotalItemCount>
-        <ExplanationRow>{explanation}</ExplanationRow>
+        <TotalItemCount>{itemCount !== undefined ? `Items: ${itemCount}` : ''}</TotalItemCount>
+        {explanation && <ExplanationRow>{explanation}</ExplanationRow>}
       </TotalAnnotationRow>
     )}
   </Item>

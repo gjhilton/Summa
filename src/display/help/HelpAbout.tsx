@@ -12,7 +12,7 @@ const HelpLink = styled('a', {
 export function HelpAbout() {
   return (
     <HelpSection>
-      <HelpHeading>Make Summa  better</HelpHeading>
+      <HelpHeading>About Summa</HelpHeading>
 
       <HelpPara>
         If you find a bug or have a feature requestplease open an issue on the{' '}

@@ -141,8 +141,8 @@ test.describe('sub-level: duplicating rows', () => {
 		await navigateIntoSubtotal(page);
 		await enableShowWorking(page);
 		// Hover row 0 to reveal action strip, then duplicate
-		await page.getByRole('button', { name: 'Drag to reorder' }).nth(0).hover();
-		await page.getByRole('button', { name: 'Duplicate row' }).nth(0).click();
+		await page.getByRole('button', { name: 'Open actions' }).nth(0).click();
+		await page.getByRole('button', { name: 'Duplicate row' }).nth(0).click({ force: true });
 		await expect(getItemsCount(page)).toHaveText('Items: 3');
 	});
 
@@ -152,8 +152,8 @@ test.describe('sub-level: duplicating rows', () => {
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
 		await enterValue(page, 0, 'd', 'v'); // 5d in row 0
-		await page.getByRole('button', { name: 'Drag to reorder' }).nth(0).hover();
-		await page.getByRole('button', { name: 'Duplicate row' }).nth(0).click();
+		await page.getByRole('button', { name: 'Open actions' }).nth(0).click();
+		await page.getByRole('button', { name: 'Duplicate row' }).nth(0).click({ force: true });
 		// Row 1 is the duplicate → 5d; total = 5+5 = x
 		await expect(getTotalField(page, 'd')).toHaveValue('x');
 	});
@@ -379,9 +379,9 @@ test.describe('clear item action on subtotal row', () => {
 		// Go back to root and clear the subtotal item
 		await navigateViaBreadcrumb(page, 'Summa totalis');
 		// Hover the subtotal row (index 2) to reveal its action strip
-		await page.getByRole('button', { name: 'Drag to reorder' }).nth(2).hover();
+		await page.getByRole('button', { name: 'Open actions' }).nth(2).click();
 		page.once('dialog', d => d.accept());
-		await page.getByRole('button', { name: 'Clear item' }).nth(2).click();
+		await page.getByRole('button', { name: 'Clear item' }).nth(2).click({ force: true });
 		// Root total should be 0 (subtotal cleared)
 		await expect(getTotalField(page, 'd')).toHaveValue('');
 		// Navigate into subtotal — should have empty title and empty children

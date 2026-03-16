@@ -56,9 +56,9 @@ export function SplashScreen({ onGetStarted, onReadManual }: Props) {
             British accounts. Enter line items in pounds, shillings and pence in Roman numerals, and Summa totals will total them up.
           </Intro>
           <Intro>
-            Summa is free software provided without warranty of correctness. It
-            is beta quality and almost certainly contains defects — you are
-            strongly advised to check any results against the source documents.
+            Summa is beta software provided without warranty of correctness. It
+            almost certainly contains defects — you are strongly advised to
+            check any results against the source documents.
           </Intro>
           <Intro>
             Your work is stored only in your browser&rsquo;s local storage and

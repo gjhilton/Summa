@@ -51,8 +51,7 @@ export function HelpOrganising() {
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <Item
             showActions
-            isOpen={!canHover}
-            desktopVisible
+            isOpen
             onClose={() => {}}
             onRemove={() => {}}
             onDuplicate={() => {}}
