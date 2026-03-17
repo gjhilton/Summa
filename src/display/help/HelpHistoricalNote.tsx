@@ -26,7 +26,7 @@ export function HelpHistoricalNote() {
 		  <HelpPara>
 		Other period exotica, for example iijx and vjx with the values
 		of 13 and 16 respectively (by analogy to tertio decimo and sexto
-decimo) are mot suported, neither are multiplying superscripts, long hundreds etc. 
+decimo) are <em>not</em> suported, neither are multiplying superscripts, long hundreds etc. 
 		
       </HelpPara>
 
