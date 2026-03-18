@@ -14,6 +14,7 @@ import { HelpExtendedItems } from './help/HelpExtendedItems'
 import { HelpSubtotalItems } from './help/HelpSubtotalItems'
 import { HelpSaveLoad } from './help/HelpSaveLoad'
 import { HelpAbout } from './help/HelpAbout'
+import { HelpChangelog } from './help/HelpChangelog'
 
 const HelpLogoWrapper = styled('div', {
   base: { width: '100%', maxWidth: '320px', marginBottom: '1rem' },
@@ -69,6 +70,7 @@ export function HelpScreen({ onBack, showExplanation, onShowExplanationChange, a
         <HelpSubtotalItems />
         <HelpSaveLoad />
         <HelpAbout />
+        <HelpChangelog />
       </PageWidth>
       <ScreenFooter />
     </ScreenContainer>

@@ -27,7 +27,7 @@ export function HelpGettingStarted() {
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <Item>
             <BlockRow>
-              <BlockTitle title="Porter" />
+              <BlockTitle title="Bookes" />
               <BlockCurrency values={{ l: '0', s: 'iij', d: 'vj' }} />
             </BlockRow>
           </Item>
@@ -44,7 +44,7 @@ export function HelpGettingStarted() {
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <Item error>
             <BlockRow>
-              <BlockTitle title="Porter" />
+              <BlockTitle title="Bookes" />
               <BlockCurrency
                 values={{ l: '0', s: '3s', d: 'vj' }}
                 fieldErrors={{ l: false, s: true, d: false }}

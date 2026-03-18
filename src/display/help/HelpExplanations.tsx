@@ -31,7 +31,7 @@ export function HelpExplanations({ showExplanation, onShowExplanationChange }: P
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <Item>
             <BlockRow>
-              <BlockTitle title="Porter" />
+              <BlockTitle title="Bookes" />
               <BlockCurrency values={{ l: '0', s: 'iij', d: 'vj' }} />
             </BlockRow>
             <ExplanationRow>

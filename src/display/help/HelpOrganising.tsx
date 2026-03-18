@@ -28,7 +28,7 @@ export function HelpOrganising() {
           <DragCtx.Provider value={MOCK_DRAG_CTX}>
             <Item>
               <BlockRow>
-                <BlockTitle title="Porter" />
+                <BlockTitle title="Bookes" />
                 <BlockCurrency values={{ l: '0', s: 'iij', d: 'vj' }} />
               </BlockRow>
             </Item>
@@ -58,7 +58,7 @@ export function HelpOrganising() {
             onClearItem={() => {}}
           >
             <BlockRow>
-              <BlockTitle title="Porter" />
+              <BlockTitle title="Bookes" />
               <BlockCurrency values={{ l: '0', s: 'iij', d: 'vj' }} />
             </BlockRow>
           </Item>
