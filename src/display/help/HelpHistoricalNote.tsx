@@ -20,7 +20,13 @@ export function HelpHistoricalNote() {
       </HelpPara>
 
       <HelpPara>
-        Scribes tended to write <Roman>x</Roman>, <Roman>u</Roman>/<Roman>v</Roman> and <Roman>i</Roman>/<Roman>j</Roman> as minuscules (i.e. lower case) and <Roman>L</Roman>, <Roman>C</Roman>, <Roman>M</Roman> as majuscule (uppercase) but Summa lets you use any casing for input.
+        Other period exotica — for example <Roman>iijx</Roman> and <Roman>vjx</Roman> with the values
+        of 13 and 16 respectively (by analogy to <em>tertio decimo</em> and <em>sexto decimo</em>) — are <em>not</em> supported,
+        nor are multiplying superscripts, long hundreds, etc.
+      </HelpPara>
+
+      <HelpPara>
+        Scribes tended to write <Roman>x</Roman>, <Roman>u</Roman>/<Roman>v</Roman> and <Roman>i</Roman>/<Roman>j</Roman> as minuscules (i.e. lower case) and <Roman>L</Roman>, <Roman>C</Roman>, <Roman>M</Roman> as majuscules (upper case), but Summa accepts any casing for input.
       </HelpPara>
 
       <HelpPara>

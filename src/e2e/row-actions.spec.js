@@ -185,6 +185,7 @@ test.describe('action strip reveal button', () => {
 		await expect(page.getByRole('button', { name: 'Open actions' })).toHaveCount(2);
 	});
 
+
 	test('clicking reveal button shows action buttons', async ({ page }) => {
 		await goto(page);
 		await page.getByRole('button', { name: 'Open actions' }).first().click();
