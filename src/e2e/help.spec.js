@@ -104,9 +104,9 @@ test.describe('Getting Started section', () => {
 	});
 
 	// Screen samples
-	test('screen sample: item row with title "Porter" renders', async ({ page }) => {
+	test('screen sample: item row with title "Bookes" renders', async ({ page }) => {
 		// BlockTitle renders the title as a readonly input value, not as text content
-		await expect(page.locator('input[value="Porter"]').first()).toBeVisible();
+		await expect(page.locator('input[value="Bookes"]').first()).toBeVisible();
 	});
 
 	test('screen sample: error item with invalid field renders', async ({ page }) => {
@@ -263,8 +263,8 @@ test.describe('Extended Items section', () => {
 		await expect(page.getByText(/quantity multiplied by a unit price/i)).toBeVisible();
 	});
 
-	test('screen sample: ItemExtended with title "Beer" renders', async ({ page }) => {
-		await expect(page.getByText('Beer')).toBeVisible();
+	test('screen sample: ItemExtended with title "Bookes" renders', async ({ page }) => {
+		await expect(page.locator('input[value="Bookes"]').first()).toBeVisible();
 	});
 
 	test('screen sample: ItemExtended shows quantity "iiij"', async ({ page }) => {
@@ -296,17 +296,14 @@ test.describe('Subtotal Items section', () => {
 		await expect(page.getByText(/undo is local/i)).toBeVisible();
 	});
 
-	test('screen sample: ItemSubTotal "Provisions" renders with edit button', async ({ page }) => {
-		// ItemSubTotal shows "Provisions (3 items)" and the BreadcrumbNav also shows "Provisions"
-		await expect(page.getByText('Provisions (3 items)')).toBeVisible();
-		// The ItemSubTotal sample renders an "edit" button
+	test('screen sample: ItemSubTotal "Bookes" renders with edit button', async ({ page }) => {
+		await expect(page.getByText('Bookes (3 items)')).toBeVisible();
 		await expect(page.getByRole('button', { name: 'edit' })).toBeVisible();
 	});
 
-	test('screen sample: BreadcrumbNav renders with "Summary" and "Provisions" crumbs', async ({
+	test('screen sample: BreadcrumbNav renders with "Summary" and "Bookes" crumbs', async ({
 		page,
 	}) => {
-		// BreadcrumbNav sample uses "Summary" and "Provisions" — no real breadcrumb on help screen
 		await expect(page.getByRole('button', { name: 'Summary' })).toBeVisible();
 	});
 });
