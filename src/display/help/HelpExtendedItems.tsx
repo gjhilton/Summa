@@ -10,7 +10,7 @@ export function HelpExtendedItems() {
 
       <HelpPara>
         An extended item calculates a quantity multiplied by a unit price —
-        useful for entries such as &ldquo;four barrels of beer at ij s
+        useful for entries such as &ldquo;four bookes at ij s
         each&rdquo;. Enter the quantity and unit price; Summa calculates the
         total automatically.
       </HelpPara>
@@ -18,7 +18,7 @@ export function HelpExtendedItems() {
       <ScreenSample>
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <ItemExtended
-            title="Beer"
+            title="Bookes"
             quantity="iiij"
             literals={{ l: '0', s: 'ij', d: '0' }}
             resultDisplay={{ l: '0', s: 'viij', d: '0' }}

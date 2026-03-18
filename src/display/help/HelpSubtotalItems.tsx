@@ -19,7 +19,7 @@ export function HelpSubtotalItems() {
       <ScreenSample>
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <ItemSubTotal
-            title="Provisions"
+            title="Bookes"
             count={3}
             totalDisplay={{ l: '0', s: 'xij', d: '0' }}
             onEdit={() => {}}
@@ -38,7 +38,7 @@ export function HelpSubtotalItems() {
         <BreadcrumbNav
           breadcrumbs={[
             { id: '', title: 'Summary', path: [] },
-            { id: 'id1', title: 'Provisions', path: ['id1'] },
+            { id: 'id1', title: 'Bookes', path: ['id1'] },
           ]}
           onNavigate={() => {}}
         />

@@ -12,7 +12,7 @@ export function HelpAdvanced({ advancedMode, onAdvancedModeChange }: Props) {
       <HelpHeading>Advanced features</HelpHeading>
 
       <HelpPara>
-        In the same way, you can toggle advanced features on and off.{' '}
+        Advanced features can be toggled on and off.{' '}
         <strong>
           Advanced features are currently{' '}
           {advancedMode ? 'enabled' : 'disabled'}.

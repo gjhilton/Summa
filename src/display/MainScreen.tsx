@@ -56,11 +56,14 @@ const ActionStripWrapper = styled('div', {
     background: '#e8e8e8',
     boxShadow: 'inset 8px 0 16px -4px rgba(0,0,0,0.25)',
     transition: 'opacity 0.2s ease, transform 0.2s ease',
+    // default: hidden
+    opacity: 0,
+    transform: 'translateX(12px)',
+    pointerEvents: 'none',
   },
   variants: {
     visible: {
-      true:  { opacity: 1, transform: 'translateX(0)',    pointerEvents: 'auto' },
-      false: { opacity: 0, transform: 'translateX(12px)', pointerEvents: 'none' },
+      true: { opacity: 1, transform: 'translateX(0)', pointerEvents: 'auto' },
     },
     hasRevealButton: {
       true: { right: '2rem' },
@@ -84,6 +87,7 @@ const ActionButton = styled('button', {
     padding: '0 4px',
     lineHeight: 1.2,
     background: 'transparent',
+    _disabled: { opacity: 0.35, cursor: 'not-allowed' },
   },
 })
 
@@ -94,17 +98,18 @@ const ActionButtonIcon = styled('span', {
 interface ActionStripProps {
   onClose: () => void
   isOpen?: boolean
+  canDelete?: boolean
   onRemove?: () => void
   onDuplicate?: () => void
   onClearItem?: () => void
 }
 
-function ActionStrip({ onClose, isOpen, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
-  // Desktop: visible only when opened via the reveal button. Touch: visible only when swiped open.
-  const visible = !canHover || (isOpen ?? false)
+function ActionStrip({ onClose, isOpen, canDelete = true, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
+  // Visible only when opened — via reveal button (desktop) or swipe (touch).
+  const visible = isOpen ?? false
   return (
-    <ActionStripWrapper visible={visible} hasRevealButton={canHover || undefined} data-no-print>
-      <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
+    <ActionStripWrapper visible={visible || undefined} hasRevealButton={canHover || undefined} data-no-print>
+      <ActionButton tabIndex={-1} disabled={!canDelete || undefined} onClick={() => { if (canDelete && window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
         <ActionButtonIcon>🗑</ActionButtonIcon>
         Delete
       </ActionButton>
@@ -266,6 +271,7 @@ interface ItemProps {
   showActions?: boolean
   isOpen?: boolean
   error?: boolean
+  canDelete?: boolean
   onClose?: () => void
   onReveal?: () => void
   onRemove?: () => void
@@ -283,6 +289,7 @@ export function Item({
   showActions = false,
   isOpen = false,
   error = false,
+  canDelete = true,
   onClose,
   onReveal,
   onRemove,
@@ -310,7 +317,7 @@ export function Item({
       >
         {children}
       </ContentWrapper>
-      {showActions && <ActionStrip onClose={onClose!} isOpen={isOpen} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
+      {showActions && <ActionStrip onClose={onClose!} isOpen={isOpen} canDelete={canDelete} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} />}
       {showActions && canHover && (
         <RevealButton
           type="button"
@@ -328,7 +335,7 @@ export function Item({
 
 // ─── SwipeableItem — stateful container ──────────────────────────────────────
 
-export function SwipeableItem({ children, onRemove, onDuplicate, onClearItem, error }: { children: React.ReactNode, onRemove?: () => void, onDuplicate?: () => void, onClearItem?: () => void, error?: boolean }) {
+export function SwipeableItem({ children, canDelete = true, onRemove, onDuplicate, onClearItem, error }: { children: React.ReactNode, canDelete?: boolean, onRemove?: () => void, onDuplicate?: () => void, onClearItem?: () => void, error?: boolean }) {
   const id = React.useId()
   const { openId, setOpenId } = useSwipeContext()
   const isOpen = openId === id
@@ -364,6 +371,7 @@ export function SwipeableItem({ children, onRemove, onDuplicate, onClearItem, er
       showActions
       isOpen={isOpen}
       error={error}
+      canDelete={canDelete}
       onClose={onClose}
       onReveal={onReveal}
       onRemove={onRemove}
@@ -826,6 +834,7 @@ interface ItemUnitProps {
   literals: LsdStrings
   explanation?: React.ReactNode
   explanationIsError?: boolean
+  canDelete?: boolean
   onTitleChange?: (v: string) => void
   onFieldChange?: (field: 'l' | 's' | 'd', value: string) => void
   onRemove?: () => void
@@ -835,8 +844,8 @@ interface ItemUnitProps {
   error?: boolean
 }
 
-export const ItemUnit = ({ title, literals, explanation, explanationIsError, onTitleChange, onFieldChange, onRemove, onDuplicate, onClearItem, fieldErrors, error }: ItemUnitProps) =>
-  <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
+export const ItemUnit = ({ title, literals, explanation, explanationIsError, canDelete, onTitleChange, onFieldChange, onRemove, onDuplicate, onClearItem, fieldErrors, error }: ItemUnitProps) =>
+  <SwipeableItem canDelete={canDelete} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow data-block-row>
       <BlockTitle title={title} editable onChange={onTitleChange} ariaLabel="Line title" />
       <BlockCurrency editable values={literals} onFieldChange={onFieldChange} fieldErrors={fieldErrors} />
@@ -850,6 +859,7 @@ interface ItemExtendedProps {
   quantity: string
   explanation?: React.ReactNode
   explanationIsError?: boolean
+  canDelete?: boolean
   onTitleChange?: (v: string) => void
   onFieldChange?: (field: 'l' | 's' | 'd', value: string) => void
   onQuantityChange?: (v: string) => void
@@ -862,8 +872,8 @@ interface ItemExtendedProps {
   error?: boolean
 }
 
-export const ItemExtended = ({ title, literals, quantity, explanation, explanationIsError, onTitleChange, onFieldChange, onQuantityChange, onRemove, onDuplicate, onClearItem, fieldErrors, quantityError, resultDisplay, error }: ItemExtendedProps) =>
-  <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
+export const ItemExtended = ({ title, literals, quantity, explanation, explanationIsError, canDelete, onTitleChange, onFieldChange, onQuantityChange, onRemove, onDuplicate, onClearItem, fieldErrors, quantityError, resultDisplay, error }: ItemExtendedProps) =>
+  <SwipeableItem canDelete={canDelete} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow data-block-row>
       <BlockTitle title={title} editable onChange={onTitleChange} ariaLabel="Item title">
         <QuantityField editable value={quantity} onChange={onQuantityChange} error={quantityError || undefined} />
@@ -879,6 +889,7 @@ interface ItemSubTotalProps {
   count?: number
   totalDisplay: LsdStrings
   onEdit: () => void
+  canDelete?: boolean
   onRemove?: () => void
   onDuplicate?: () => void
   onClearItem?: () => void
@@ -887,8 +898,8 @@ interface ItemSubTotalProps {
   error?: boolean
 }
 
-export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, onRemove, onDuplicate, onClearItem, explanation, explanationIsError, error }: ItemSubTotalProps) =>
-  <SwipeableItem onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
+export const ItemSubTotal = ({ title, count = 0, totalDisplay, onEdit, canDelete, onRemove, onDuplicate, onClearItem, explanation, explanationIsError, error }: ItemSubTotalProps) =>
+  <SwipeableItem canDelete={canDelete} onRemove={onRemove} onDuplicate={onDuplicate} onClearItem={onClearItem} error={error}>
     <BlockRow data-block-row>
       <Block>
         <SubtotalTitleRow>
@@ -1323,11 +1334,13 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
             const errorExplanation = showExplanation ? renderErrorExplanation(line) : null
             const explanation = errorExplanation ?? (showExplanation ? renderExplanation(line) : null)
             const explanationIsError = !!errorExplanation
+            const canDelete = lines.length > 2
             switch (line.itemType) {
               case ItemType.LINE_ITEM:
                 return <SortableLine key={line.id} id={line.id}>
                   <ItemUnit
                     title={line.title} literals={line.literals} explanation={explanation} explanationIsError={explanationIsError || undefined}
+                    canDelete={canDelete}
                     onTitleChange={v => onTitleChange(line.id, v)}
                     onFieldChange={(f, v) => onFieldChange(line.id, f, v)}
                     onRemove={() => onRemoveLine(line.id)}
@@ -1341,6 +1354,7 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
                 return <SortableLine key={line.id} id={line.id}>
                   <ItemExtended
                     title={line.title} literals={line.literals} quantity={line.quantity} explanation={explanation} explanationIsError={explanationIsError || undefined}
+                    canDelete={canDelete}
                     onTitleChange={v => onTitleChange(line.id, v)}
                     onFieldChange={(f, v) => onFieldChange(line.id, f, v)}
                     onQuantityChange={v => onQuantityChange(line.id, v)}
@@ -1357,6 +1371,7 @@ export function ListOfItems({ lines, totalDisplay, totalPence, advanced, showExp
                 return <SortableLine key={line.id} id={line.id}>
                   <ItemSubTotal
                     title={line.title} count={line.lines.length} totalDisplay={line.totalDisplay} explanation={explanation} explanationIsError={explanationIsError || undefined}
+                    canDelete={canDelete}
                     onEdit={() => onEditSubtotal(line.id)}
                     onRemove={() => onRemoveLine(line.id)}
                     onDuplicate={() => onDuplicateLine(line.id)}

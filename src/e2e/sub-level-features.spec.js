@@ -109,6 +109,8 @@ test.describe('row actions inside subtotal', () => {
 		await toggleAdvancedOptions(page);
 		await addSubtotalItem(page);
 		await navigateIntoSubtotal(page);
+		// Need at least 3 rows so Delete is enabled
+		await page.getByRole('button', { name: '+ item' }).click();
 		await revealRowActions(page, 0);
 		let dialogMessage = '';
 		page.once('dialog', async dialog => {

@@ -27,7 +27,7 @@ export function HelpGettingStarted() {
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <Item>
             <BlockRow>
-              <BlockTitle title="Porter" />
+              <BlockTitle title="Bookes" />
               <BlockCurrency values={{ l: '0', s: 'iij', d: 'vj' }} />
             </BlockRow>
           </Item>
@@ -44,7 +44,7 @@ export function HelpGettingStarted() {
         <DragCtx.Provider value={MOCK_DRAG_CTX}>
           <Item error>
             <BlockRow>
-              <BlockTitle title="Porter" />
+              <BlockTitle title="Bookes" />
               <BlockCurrency
                 values={{ l: '0', s: '3s', d: 'vj' }}
                 fieldErrors={{ l: false, s: true, d: false }}
@@ -80,8 +80,10 @@ export function HelpGettingStarted() {
       <HelpPara>
         Your work is saved automatically in the browser's local storage as you type. If you
         close the tab and come back later, Summa will restore exactly where you
-        left off. Use <strong>export</strong> if you want a portable backup or
-        need to share your calculation. Notice that local storage can be unreliable, so you are strongly advised to use the 'export' fuctionality to save iportnat work bewteen sessions. The docuemnt is saved as a simple JSON file which should be easy to import and parse in any other software you're using. 
+        left off. However, local storage can be unreliable, so you are strongly
+        advised to use <strong>export</strong> to save important work between
+        sessions. Exported files are plain JSON and can be loaded into any other
+        software.
       </HelpPara>
     </HelpSection>
   )

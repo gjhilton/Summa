@@ -28,7 +28,7 @@ export function HelpOrganising() {
           <DragCtx.Provider value={MOCK_DRAG_CTX}>
             <Item>
               <BlockRow>
-                <BlockTitle title="Porter" />
+                <BlockTitle title="Bookes" />
                 <BlockCurrency values={{ l: '0', s: 'iij', d: 'vj' }} />
               </BlockRow>
             </Item>
@@ -38,8 +38,7 @@ export function HelpOrganising() {
 
       {canHover ? (
         <HelpPara>
-          Tap the chevron button at the  extreme righ thad margin of a  row to reveal the Delete, Duplicate and Clear buttons on
-          the right-hand side.
+          Click the chevron button at the right-hand edge of a row to reveal the Delete, Duplicate and Clear buttons.
         </HelpPara>
       ) : (
         <HelpPara>
@@ -58,7 +57,7 @@ export function HelpOrganising() {
             onClearItem={() => {}}
           >
             <BlockRow>
-              <BlockTitle title="Porter" />
+              <BlockTitle title="Bookes" />
               <BlockCurrency values={{ l: '0', s: 'iij', d: 'vj' }} />
             </BlockRow>
           </Item>
