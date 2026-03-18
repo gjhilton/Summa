@@ -31,6 +31,8 @@ test.describe('row actions', () => {
 
 	test('delete: confirm dialog appears', async ({ page }) => {
 		await goto(page);
+		// Need at least 3 rows so Delete is enabled
+		await page.getByRole('button', { name: '+ item' }).click();
 		await revealRowActions(page, 0);
 		let dialogMessage = '';
 		page.once('dialog', async dialog => {
@@ -143,6 +145,35 @@ test.describe('row actions', () => {
 		await expect(dInput).toHaveValue('');
 		await clickUndo(page);
 		await expect(dInput).toHaveValue('v');
+	});
+});
+
+test.describe('delete disabled at minimum row count', () => {
+	test('delete button is disabled when only 2 rows exist', async ({ page }) => {
+		await goto(page);
+		await revealRowActions(page, 0);
+		await expect(
+			page.getByRole('button', { name: 'Delete row' }).first()
+		).toBeDisabled();
+	});
+
+	test('delete button is enabled when more than 2 rows exist', async ({ page }) => {
+		await goto(page);
+		await page.getByRole('button', { name: '+ item' }).click();
+		await revealRowActions(page, 0);
+		await expect(
+			page.getByRole('button', { name: 'Delete row' }).first()
+		).toBeEnabled();
+	});
+
+	test('delete button becomes disabled again after deleting down to 2 rows', async ({ page }) => {
+		await goto(page);
+		await page.getByRole('button', { name: '+ item' }).click();
+		await clickDeleteRow(page, 0);
+		await revealRowActions(page, 0);
+		await expect(
+			page.getByRole('button', { name: 'Delete row' }).first()
+		).toBeDisabled();
 	});
 });
 
