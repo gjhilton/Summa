@@ -56,11 +56,14 @@ const ActionStripWrapper = styled('div', {
     background: '#e8e8e8',
     boxShadow: 'inset 8px 0 16px -4px rgba(0,0,0,0.25)',
     transition: 'opacity 0.2s ease, transform 0.2s ease',
+    // default: hidden
+    opacity: 0,
+    transform: 'translateX(12px)',
+    pointerEvents: 'none',
   },
   variants: {
     visible: {
-      true:  { opacity: 1, transform: 'translateX(0)',    pointerEvents: 'auto' },
-      false: { opacity: 0, transform: 'translateX(12px)', pointerEvents: 'none' },
+      true: { opacity: 1, transform: 'translateX(0)', pointerEvents: 'auto' },
     },
     hasRevealButton: {
       true: { right: '2rem' },
@@ -100,10 +103,10 @@ interface ActionStripProps {
 }
 
 function ActionStrip({ onClose, isOpen, onRemove, onDuplicate, onClearItem }: ActionStripProps) {
-  // Desktop: visible only when opened via the reveal button. Touch: visible only when swiped open.
-  const visible = !canHover || (isOpen ?? false)
+  // Visible only when opened — via reveal button (desktop) or swipe (touch).
+  const visible = isOpen ?? false
   return (
-    <ActionStripWrapper visible={visible} hasRevealButton={canHover || undefined} data-no-print>
+    <ActionStripWrapper visible={visible || undefined} hasRevealButton={canHover || undefined} data-no-print>
       <ActionButton tabIndex={-1} onClick={() => { if (window.confirm('Delete this row?')) { onRemove?.(); onClose() } }} aria-label="Delete row">
         <ActionButtonIcon>🗑</ActionButtonIcon>
         Delete

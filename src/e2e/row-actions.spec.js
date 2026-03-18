@@ -147,6 +147,13 @@ test.describe('row actions', () => {
 });
 
 test.describe('action strip reveal button', () => {
+	test('no action strip is open on page load', async ({ page }) => {
+		await goto(page);
+		// Every row shows "Open actions" (closed); none show "Close actions" (open)
+		await expect(page.getByRole('button', { name: 'Close actions' })).toHaveCount(0);
+		await expect(page.getByRole('button', { name: 'Open actions' })).toHaveCount(2);
+	});
+
 	test('clicking reveal button shows action buttons', async ({ page }) => {
 		await goto(page);
 		await page.getByRole('button', { name: 'Open actions' }).first().click();
