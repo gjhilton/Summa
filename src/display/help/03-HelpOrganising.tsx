@@ -17,7 +17,7 @@ export function HelpOrganising() {
       <HelpHeading>Organising items</HelpHeading>
 
       <HelpPara>
-        Drag any line to a new position using the handle on its left edge.
+        Drag any line to a new position using the drag handle on its left edge.
       </HelpPara>
 
       <AnnotatedSample>

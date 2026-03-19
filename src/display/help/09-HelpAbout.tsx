@@ -25,16 +25,18 @@ export function HelpAbout() {
       <HelpHeading>About Summa</HelpHeading>
 
       <HelpPara>
-        If you find a bug or have a feature request, please open an issue on the{' '}
+        If you find a bug or have a feature request, I'd be so mgrateful if you could open an issue on the{' '}
         <HelpLink href="https://github.com/gjhilton/Summa/issues">
           GitHub issues page
         </HelpLink>
-        . Features currently under consideration include:
+        . Similarly, if theres functionality you'd like to see added,again please open an issue. Your good ideas will help out other users, and are hugely valuable. Features currently under consideration include:
       </HelpPara>
       <HelpList>
-        <li>better printed output</li>
+	  	<li>support marks as inout and output</li>
+        <li>improved printed output</li>
+		<li>export as LaTeX list</li>
         <li>copy calculations to clipboard</li>
-        <li>allow line items to include an obolus</li>
+        <li>allow items to include an obolus</li>
         <li>(your request here!)</li>
       </HelpList>
     </HelpSection>

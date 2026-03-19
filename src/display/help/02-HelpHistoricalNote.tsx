@@ -6,12 +6,12 @@ export function HelpHistoricalNote() {
       <HelpHeading>Historical note</HelpHeading>
 
       <HelpPara>
-        Early modern usage tended not to distinguish between u and v, nor between i
+        Early modern usage had different conventions about the distinction between u and v, and between i
         and j. They are interchangeable in Summa. The letter j is the
-        characteristically period form: it appears as the final character in a
-        run of i's, so 2 is <Roman>ij</Roman>, 3 is <Roman>iij</Roman>, 4 is <Roman>iiij</Roman>, and 6 is <Roman>vj</Roman>. Note that
-        4 is very often <Roman>iiij</Roman> in early modern usage rather than the classical subtractive
-        <Roman> iv</Roman> — Summa accepts both forms.
+        characteristically used for 1, and  appears as the final character after a
+        run of i's, so 2 would be <Roman>ij</Roman>, 3 is <Roman>iij</Roman>, 4 is <Roman>iiij</Roman>, and 6 is <Roman>vj</Roman>. Note that
+        4 is very often <Roman>iiij</Roman> in early modern usage rather than the familiar subtractive
+        <Roman> iv</Roman>. 9 is however <Roman> ix</Roman> Summa accepts both forms.
       </HelpPara>
 
       <HelpPara>
@@ -21,8 +21,8 @@ export function HelpHistoricalNote() {
 
       <HelpPara>
         Other period exotica — for example <Roman>iijx</Roman> and <Roman>vjx</Roman> with the values
-        of 13 and 16 respectively (by analogy to <em>tertio decimo</em> and <em>sexto decimo</em>) — are <em>not</em> supported,
-        nor are multiplying superscripts, long hundreds, etc.
+        of 13 and 16 respectively (by analogy to <em>tertio decimo</em> and <em>sexto decimo</em>) — are <em>not</em> presently supported,
+        nor are multiplying superscripts, long hundreds, scores, etc.
       </HelpPara>
 
       <HelpPara>
