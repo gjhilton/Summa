@@ -22,7 +22,17 @@
 		"test:e2e:errors": "rm -f e2e-output.log && playwright test --config src/config/playwright.config.js 2>&1 | tee /dev/tty | grep -A 30 'Error:' > e2e-output.log || true",
 		"test:e2e:codegen": "playwright codegen http://localhost:8080/Summa/",
 		"storybook": "storybook dev -p 6006 --config-dir src/config/storybook",
-		"storybook:build": "storybook build --config-dir src/config/storybook"
+		"storybook:build": "storybook build --config-dir src/config/storybook",
+		"prepare": "husky src/config/.husky"
+	},
+	"lint-staged": {
+		"*.{ts,tsx}": [
+			"eslint --config src/config/eslint.config.js --fix",
+			"prettier --write --config src/config/.prettierrc --ignore-path src/config/.prettierignore"
+		],
+		"*.{json,md,css}": [
+			"prettier --write --config src/config/.prettierrc --ignore-path src/config/.prettierignore"
+		]
 	},
 	"dependencies": {
 		"@dnd-kit/core": "^6.3.1",
@@ -48,7 +58,9 @@
 		"eslint-plugin-react-hooks": "^5.1.0",
 		"eslint-plugin-react-refresh": "^0.4.18",
 		"globals": "^15.15.0",
+		"husky": "^9.1.7",
 		"jsdom": "^26.0.0",
+		"lint-staged": "^16.4.0",
 		"marked": "^17.0.3",
 		"prettier": "^3.5.1",
 		"storybook": "^8.6.18",
