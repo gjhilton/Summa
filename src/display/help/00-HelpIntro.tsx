@@ -1,6 +1,7 @@
-import { Logo } from '@/display/MainScreen'
 import { styled } from '@/styled-system/jsx'
-import { HelpSection, HelpPara } from './shared'
+import { Logo } from '@/display/MainScreen'
+import { SummaIntro } from '@/display/shared/SummaIntro'
+import { HelpSection } from './shared'
 
 const HelpLogoWrapper = styled('div', {
   base: { width: '100%', maxWidth: '320px' },
@@ -12,11 +13,7 @@ export function HelpIntro() {
       <HelpLogoWrapper>
         <Logo size="l" />
       </HelpLogoWrapper>
-      <HelpPara>
-        <strong>Summa is a simple calculator for historians working with Early Modern English and Scottish accounts.</strong>{' '}
-        Enter amounts as sterling pounds, shillings and pence in Roman
-        numerals and Summa will add them up for you.
-      </HelpPara>
+      <SummaIntro />
     </HelpSection>
   )
 }

@@ -362,3 +362,10 @@ export function initialState(): CalculationState {
 	const { totalPence, totalDisplay, hasError } = computeGrandTotal(lines);
 	return { lines, totalPence, totalDisplay, hasError };
 }
+
+export function firstVisitLines(): AnyLineState[] {
+	let lines: AnyLineState[] = [emptyLine(), emptyLine()];
+	lines = processFieldUpdate(lines, lines[0].id, 'd', 'j');
+	lines = processFieldUpdate(lines, lines[1].id, 'd', 'ij');
+	return lines;
+}

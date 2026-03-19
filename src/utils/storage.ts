@@ -1,6 +1,6 @@
 import type { AnyLineState } from '@/types/calculation';
 import type { SavedAnyLine } from '@/types/savedCalculation';
-import { initialState } from '@/utils/calculationLogic';
+import { initialState, firstVisitLines } from '@/utils/calculationLogic';
 import { serializeLines, deserializeLines } from '@/utils/serialization';
 
 export const STORAGE_KEY = 'summa_calculation'
@@ -17,7 +17,7 @@ export function markWelcomeSeen(): void {
 export function loadFromStorage(): AnyLineState[] {
 	try {
 		const saved = localStorage.getItem(STORAGE_KEY);
-		if (!saved) return initialState().lines;
+		if (!saved) return firstVisitLines();
 		const parsed = JSON.parse(saved) as unknown;
 		const rawLines = Array.isArray(parsed)
 			? parsed

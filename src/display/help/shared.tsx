@@ -24,6 +24,9 @@ export const HelpHeading = styled('h2', {
 export const HelpPara = styled('p', {
   base: {
     margin: 0,
+    fontSize: '1rem',
+    lineHeight: 1.6,
+    color: 'black',
     maxWidth: '48ch',
   },
 })
