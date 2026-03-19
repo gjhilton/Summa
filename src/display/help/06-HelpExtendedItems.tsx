@@ -10,8 +10,8 @@ export function HelpExtendedItems() {
 
       <HelpPara>
         An extended item calculates a quantity multiplied by a unit price —
-        useful for entries such as &ldquo;four bookes at ij s
-        each&rdquo;. Enter the quantity and unit price; Summa calculates the
+        useful for entries such as "four bookes at ij s
+        each". Enter the quantity and unit price; Summa calculates the
         total automatically.
       </HelpPara>
 

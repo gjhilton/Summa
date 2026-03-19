@@ -1,21 +1,11 @@
 import { styled } from '@/styled-system/jsx'
-import { HelpSection, HelpHeading, HelpPara } from './shared'
+import { HelpSection, HelpHeading, HelpPara, HelpList } from './shared'
 
 const HelpLink = styled('a', {
   base: {
     color: 'inherit',
     textDecoration: 'underline',
     textUnderlineOffset: '2px',
-  },
-})
-
-const HelpList = styled('ul', {
-  base: {
-    margin: 0,
-    paddingLeft: '1.25rem',
-    fontSize: '1rem',
-    lineHeight: 1.8,
-    color: '#333',
   },
 })
 
@@ -39,10 +29,10 @@ export function HelpAbout() {
         <li>allow items to include an obolus</li>
         <li>(your request here!)</li>
       </HelpList>
-	  
-	   <HelpPara>
-	  If you've found Summa useful, you might also enjoy <a href="https://gjhilton.github.io/Sharpie/">our palaeography learning game, Sharpie</a>.
-	  </HelpPara>
+      <HelpPara>
+        If you've found Summa useful, you might also enjoy{' '}
+        <HelpLink href="https://gjhilton.github.io/Sharpie/">our palaeography learning game, Sharpie</HelpLink>.
+      </HelpPara>
     </HelpSection>
   )
 }

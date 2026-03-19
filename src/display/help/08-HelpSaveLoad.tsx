@@ -1,6 +1,5 @@
 import { Button } from '@/display/shared/Button'
-import { HelpSection, HelpHeading, HelpPara, ScreenSample } from './shared'
-import { ButtonRow } from './helpLayout'
+import { HelpSection, HelpHeading, HelpPara, ScreenSample, ButtonRow } from './shared'
 
 export function HelpSaveLoad() {
   return (

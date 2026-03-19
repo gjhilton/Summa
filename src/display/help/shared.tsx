@@ -6,6 +6,9 @@ export const HelpSection = styled('section', {
     flexDirection: 'column',
     gap: '1.25rem',
     paddingBottom: '2rem',
+    color: 'black',
+    fontSize: '1rem',
+    lineHeight: 1.6,
   },
 })
 
@@ -21,10 +24,16 @@ export const HelpHeading = styled('h2', {
 export const HelpPara = styled('p', {
   base: {
     margin: 0,
-    fontSize: '1rem',
-    lineHeight: 1.6,
-    color: '#333',
     maxWidth: '48ch',
+  },
+})
+
+export const HelpList = styled('ul', {
+  base: {
+    margin: 0,
+    paddingLeft: '1.25rem',
+    lineHeight: 1.8,
+    listStyleType: 'disc',
   },
 })
 
@@ -50,6 +59,14 @@ export const ToggleRow = styled('div', {
   base: {
     display: 'flex',
     justifyContent: 'flex-start',
+    padding: '1rem 1.5rem',
+  },
+})
+
+export const ButtonRow = styled('div', {
+  base: {
+    display: 'flex',
+    gap: '0.5rem',
     padding: '1rem 1.5rem',
   },
 })

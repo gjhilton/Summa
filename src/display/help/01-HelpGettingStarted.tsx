@@ -1,3 +1,4 @@
+import { styled } from '@/styled-system/jsx'
 import { DragCtx } from '@/display/DragCtx'
 import {
   Item,
@@ -7,9 +8,15 @@ import {
   AddItemBar,
 } from '@/display/MainScreen'
 import { Button } from '@/display/shared/Button'
-import { HelpSection, HelpHeading, HelpPara, ScreenSample } from './shared'
-import { ButtonRow } from './helpLayout'
+import { HelpSection, HelpHeading, HelpPara, ScreenSample, ButtonRow } from './shared'
 import { MOCK_DRAG_CTX } from './mockDragCtx'
+
+const FieldList = styled('ol', {
+  base: {
+    margin: 0,
+    listStyleType: 'none',
+  },
+})
 
 export function HelpGettingStarted() {
   return (
@@ -21,11 +28,11 @@ export function HelpGettingStarted() {
       <HelpPara>
         Each item has three fields:
       </HelpPara>
-      <ol>
+      <FieldList>
         <li><strong>li</strong> — pounds (librae), equivalent to 20s or 240d</li>
         <li><strong>s</strong> — shillings (solidi), equivalent to 12d</li>
         <li><strong>d</strong> — pence (denarii)</li>
-      </ol>
+      </FieldList>
       <HelpPara>
         Items can also have an optional title to help you keep track of what's what.
       </HelpPara>
