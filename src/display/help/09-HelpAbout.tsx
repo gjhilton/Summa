@@ -39,6 +39,10 @@ export function HelpAbout() {
         <li>allow items to include an obolus</li>
         <li>(your request here!)</li>
       </HelpList>
+	  
+	   <HelpPara>
+	  If you've found Summa useful, you might also enjoy <a href="https://gjhilton.github.io/Sharpie/">our palaeography learning game, Sharpie</a>.
+	  </HelpPara>
     </HelpSection>
   )
 }
