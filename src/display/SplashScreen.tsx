@@ -1,10 +1,9 @@
 import { styled } from '@/styled-system/jsx'
-import { Logo } from './MainScreen'
 import { Button } from './shared/Button'
 import { ScreenContainer } from './shared/ScreenContainer'
 import { ScreenFooter } from './shared/Footer'
 import { PageWidth } from './shared/PageWidth'
-import { SummaIntro } from './shared/SummaIntro'
+import { HelpIntro } from './help/00-HelpIntro'
 import { HelpPara } from './help/shared'
 
 const Content = styled('div', {
@@ -16,10 +15,6 @@ const Content = styled('div', {
     paddingTop: '4rem',
     paddingBottom: '4rem',
   },
-})
-
-const LogoWrapper = styled('div', {
-  base: { width: '100%', maxWidth: '320px' },
 })
 
 const ButtonRow = styled('div', {
@@ -40,10 +35,7 @@ export function SplashScreen({ onGetStarted, onReadManual }: Props) {
     <ScreenContainer background="grey">
       <PageWidth>
         <Content>
-          <LogoWrapper>
-            <Logo size="l" />
-          </LogoWrapper>
-          <SummaIntro />
+          <HelpIntro />
           <HelpPara>
             Summa is beta software provided without warranty of correctness. It
             almost certainly contains defects — you are strongly advised to

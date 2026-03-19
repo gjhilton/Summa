@@ -17,7 +17,7 @@ export function markWelcomeSeen(): void {
 export function loadFromStorage(): AnyLineState[] {
 	try {
 		const saved = localStorage.getItem(STORAGE_KEY);
-		if (!saved) return firstVisitLines();
+		if (!saved) return localStorage.getItem(WELCOME_KEY) ? initialState().lines : firstVisitLines();
 		const parsed = JSON.parse(saved) as unknown;
 		const rawLines = Array.isArray(parsed)
 			? parsed
