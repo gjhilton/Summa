@@ -7,11 +7,10 @@ export function HelpHistoricalNote() {
 
       <HelpPara>
         Early modern usage had different conventions about the distinction between u and v, and between i
-        and j. They are interchangeable in Summa. The letter j is the
-        characteristically used for 1, and  appears as the final character after a
-        run of i's, so 2 would be <Roman>ij</Roman>, 3 is <Roman>iij</Roman>, 4 is <Roman>iiij</Roman>, and 6 is <Roman>vj</Roman>. Note that
+        and j. They are interchangeable in Summa. The letter j is characteristically
+        used as the final character in a run of i's, so 2 is <Roman>ij</Roman>, 3 is <Roman>iij</Roman>, 4 is <Roman>iiij</Roman>, and 6 is <Roman>vj</Roman>. Note that
         4 is very often <Roman>iiij</Roman> in early modern usage rather than the familiar subtractive
-        <Roman> iv</Roman>. 9 is however <Roman> ix</Roman> Summa accepts both forms.
+        <Roman>iv</Roman>. 9 is, however, <Roman>ix</Roman>. Summa accepts both forms.
       </HelpPara>
 
       <HelpPara>
