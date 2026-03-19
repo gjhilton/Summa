@@ -23,10 +23,9 @@ export function HelpIntro() {
         <Logo size="l" />
       </HelpLogoWrapper>
       <HelpIntroPara>
-        <strong>Summa is a calculator for historians working with Early Modern British accounts.</strong>{' '}
-        Enter pounds, shillings and pence in Roman
-        numerals — exactly as they appear in period documents — and Summa
-        totals the column for you.
+        <strong>Summa is a simple calculator for historians working with Early Modern English and Scottish accounts.</strong>{' '}
+        Enter amounts as sterling pounds, shillings and pence in Roman
+        numerals and Summa will add them up for you.
       </HelpIntroPara>
     </>
   )
