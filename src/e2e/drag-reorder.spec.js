@@ -80,6 +80,7 @@ test.describe('drag to reorder', () => {
 
 		await dragRow(page, 0, 1);
 		await expect(getField(page, 'd', 0)).toHaveValue('iij');
+		await expect(page.getByRole('button', { name: 'undo', exact: true })).toBeVisible();
 
 		await clickUndo(page);
 		// After undo, should restore original order

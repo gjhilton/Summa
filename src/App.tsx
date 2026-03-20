@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -55,17 +55,6 @@ function appendToStack(
 	return { ...stacks, [pathKey]: [...trimmed, snapshot] };
 }
 
-function popFromStack(
-	stacks: UndoStacks,
-	pathKey: string,
-	setLines: (lines: AnyLineState[]) => void
-): UndoStacks {
-	const stack = stacks[pathKey] ?? [];
-	if (stack.length === 0) return stacks;
-	setLines(stack[stack.length - 1]);
-	return { ...stacks, [pathKey]: stack.slice(0, -1) };
-}
-
 function useUndoStack(pathKey: string): UndoStack {
 	const [undoStacks, setUndoStacks] = useState<UndoStacks>({});
 	const lastCoalesceKeyRef = useRef<string | null>(null);
@@ -76,13 +65,17 @@ function useUndoStack(pathKey: string): UndoStack {
 		setUndoStacks(stacks => appendToStack(stacks, pathKey, snapshot));
 	}
 
-	const pop = useCallback(
-		(setLines: (lines: AnyLineState[]) => void) => {
-			lastCoalesceKeyRef.current = null;
-			setUndoStacks(stacks => popFromStack(stacks, pathKey, setLines));
-		},
-		[pathKey]
-	);
+	function pop(setLines: (lines: AnyLineState[]) => void) {
+		const stack = undoStacks[pathKey] ?? [];
+		if (stack.length === 0) return;
+		lastCoalesceKeyRef.current = null;
+		const snapshot = stack[stack.length - 1];
+		setLines(snapshot);
+		setUndoStacks(prev => ({
+			...prev,
+			[pathKey]: (prev[pathKey] ?? []).slice(0, -1),
+		}));
+	}
 
 	function reset() {
 		lastCoalesceKeyRef.current = null;

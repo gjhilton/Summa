@@ -92,8 +92,10 @@ test.describe('drag with 3 rows', () => {
 		await page.getByRole('button', { name: '+ item' }).click();
 		await enterValue(page, 2, 'd', 'vij');  // 7d
 
-		// Record original order
+		// Wait for drag to complete and undo button to appear before undoing
 		await dragRow(page, 0, 2);
+		await expect(getField(page, 'd', 0)).toHaveValue('v');
+		await expect(page.getByRole('button', { name: 'undo', exact: true })).toBeVisible();
 		await clickUndo(page);
 
 		// Restored: row 0 = 3d

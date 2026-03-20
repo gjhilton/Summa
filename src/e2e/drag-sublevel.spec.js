@@ -88,6 +88,8 @@ test.describe('drag reorder inside subtotal', () => {
 		await enterValue(page, 2, 'd', 'vij');
 
 		await dragRow(page, 0, 2);
+		// Wait for drag to complete before navigating back
+		await expect(getField(page, 'd', 0)).toHaveValue('v');
 
 		// Navigate back to root; root row 0 should still be 10d
 		await navigateViaBreadcrumb(page, 'Summa totalis');
@@ -124,6 +126,10 @@ test.describe('drag reorder inside subtotal', () => {
 		await enterValue(page, 2, 'd', 'vij');  // 7d
 
 		await dragRow(page, 0, 2);
+		// Wait for drag to complete and undo button to appear before undoing
+		await expect(getField(page, 'd', 0)).toHaveValue('v');
+		await expect(page.getByRole('button', { name: 'undo', exact: true })).toBeVisible();
+		await page.waitForTimeout(200);
 		await clickUndo(page);
 
 		// Restored: row 0 = 3d, row 1 = 5d, row 2 = 7d
