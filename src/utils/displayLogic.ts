@@ -9,46 +9,46 @@ import { formatLsdDisplay } from '@/utils/calculationLogic';
 import { normalizeEarlyModernInput } from '@/utils/earlyModern';
 import { romanToInteger } from '@/utils/roman';
 
-export function toLineView(line: AnyLineState): AnyLineView {
-	if (line.itemType === ItemType.SUBTOTAL_ITEM) {
-		const view: SubtotalItemView = {
-			id: line.id,
-			itemType: ItemType.SUBTOTAL_ITEM,
-			title: line.title,
-			totalDisplay: line.totalDisplay,
-			totalPence: line.totalPence,
-			error: line.error,
-		};
-		return view;
-	}
+function toSubtotalItemView(
+	line: AnyLineState & { itemType: ItemType.SUBTOTAL_ITEM }
+): SubtotalItemView {
+	return {
+		id: line.id,
+		itemType: ItemType.SUBTOTAL_ITEM,
+		title: line.title,
+		totalDisplay: line.totalDisplay,
+		totalPence: line.totalPence,
+		error: line.error,
+	};
+}
 
-	if (line.itemType === ItemType.LINE_ITEM) {
-		const view: LineItemView = {
-			id: line.id,
-			itemType: ItemType.LINE_ITEM,
-			title: line.title,
-			error: line.error,
-			fieldErrors: line.fieldErrors,
-			literals: line.literals,
-			totalPence: line.totalPence,
-		};
-		return view;
-	}
+function toLineItemView(
+	line: AnyLineState & { itemType: ItemType.LINE_ITEM }
+): LineItemView {
+	return {
+		id: line.id,
+		itemType: ItemType.LINE_ITEM,
+		title: line.title,
+		error: line.error,
+		fieldErrors: line.fieldErrors,
+		literals: line.literals,
+		totalPence: line.totalPence,
+	};
+}
 
-	// EXTENDED_ITEM
+function blankZero(s: string): string {
+	return s === '0' ? '' : s;
+}
+
+function toExtendedItemView(
+	line: AnyLineState & { itemType: ItemType.EXTENDED_ITEM }
+): ExtendedItemView {
 	// quantityError is defined as !isValidRoman(qNorm) || empty, so when it's
 	// false we know the quantity is valid and romanToInteger is safe to call.
 	const qNorm = normalizeEarlyModernInput(line.quantity);
 	const quantityInt = line.quantityError ? null : romanToInteger(qNorm);
-
 	const rawSubtotal = formatLsdDisplay(line.totalPence);
-	const subtotalDisplay = {
-		l: rawSubtotal.l === '0' ? '' : rawSubtotal.l,
-		s: rawSubtotal.s === '0' ? '' : rawSubtotal.s,
-		d: rawSubtotal.d === '0' ? '' : rawSubtotal.d,
-	};
-
-	const view: ExtendedItemView = {
+	return {
 		id: line.id,
 		itemType: ItemType.EXTENDED_ITEM,
 		title: line.title,
@@ -60,7 +60,17 @@ export function toLineView(line: AnyLineState): AnyLineView {
 		quantityError: line.quantityError,
 		quantityInt,
 		basePence: line.basePence,
-		subtotalDisplay,
+		subtotalDisplay: {
+			l: blankZero(rawSubtotal.l),
+			s: blankZero(rawSubtotal.s),
+			d: blankZero(rawSubtotal.d),
+		},
 	};
-	return view;
+}
+
+export function toLineView(line: AnyLineState): AnyLineView {
+	if (line.itemType === ItemType.SUBTOTAL_ITEM)
+		return toSubtotalItemView(line);
+	if (line.itemType === ItemType.LINE_ITEM) return toLineItemView(line);
+	return toExtendedItemView(line);
 }

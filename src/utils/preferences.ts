@@ -24,20 +24,24 @@ function load(): Preferences {
 	return DEFAULTS;
 }
 
+function savePreferences(prefs: Preferences): void {
+	try {
+		localStorage.setItem(PREFERENCES_KEY, JSON.stringify(prefs));
+	} catch {
+		/* ignore */
+	}
+}
+
 export function usePreferences(): [
 	Preferences,
-	(update: Partial<Preferences>) => void,
+	(patch: Partial<Preferences>) => void,
 ] {
 	const [prefs, setPrefs] = useState<Preferences>(load);
 
 	function update(patch: Partial<Preferences>): void {
 		setPrefs(prev => {
 			const next = { ...prev, ...patch };
-			try {
-				localStorage.setItem(PREFERENCES_KEY, JSON.stringify(next));
-			} catch {
-				/* ignore */
-			}
+			savePreferences(next);
 			return next;
 		});
 	}

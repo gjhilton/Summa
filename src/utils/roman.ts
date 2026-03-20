@@ -37,22 +37,29 @@ function charValue(c: string): number {
  * Accepts additive forms (iiii) and valid subtractive forms (iv, ix, xl, xc, cd, cm).
  * Rejects vv, ll, dd, and illegal subtractive pairs (il, ic, etc.).
  */
+function hasIllegalSubtractivePair(s: string): boolean {
+	for (let i = 0; i < s.length - 1; i++) {
+		if (
+			charValue(s[i]) < charValue(s[i + 1]) &&
+			!VALID_SUBTRACTIVE.has(s[i] + s[i + 1])
+		) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/** Returns true if the string contains vv, ll, or dd (non-repeatable Roman chars doubled). */
+function hasDoubledSingleton(s: string): boolean {
+	return /vv/.test(s) || /ll/.test(s) || /dd/.test(s);
+}
+
 export function isValidRoman(input: string): boolean {
 	if (!input) return false;
 	const s = input.toLowerCase();
 	if (!/^[ivxlcdm]+$/.test(s)) return false;
-	if (/vv/.test(s) || /ll/.test(s) || /dd/.test(s)) return false;
-
-	for (let i = 0; i < s.length - 1; i++) {
-		const curr = charValue(s[i]);
-		const next = charValue(s[i + 1]);
-		if (curr < next) {
-			if (!VALID_SUBTRACTIVE.has(s[i] + s[i + 1])) {
-				return false;
-			}
-		}
-	}
-	return true;
+	if (hasDoubledSingleton(s)) return false;
+	return !hasIllegalSubtractivePair(s);
 }
 
 /**

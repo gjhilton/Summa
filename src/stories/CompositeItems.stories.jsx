@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { DndContext } from "@dnd-kit/core"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
 import { ItemUnit, ItemExtended, ItemSubTotal, ItemTotal, SwipeProvider } from "@/display/MainScreen"
@@ -15,14 +15,23 @@ function WithDrag({ id, children }) {
   )
 }
 
+function SwipeWrapper({ children }) {
+  const [openId, setOpenId] = useState(null)
+  return (
+    <SwipeProvider openId={openId} setOpenId={setOpenId}>
+      {children}
+    </SwipeProvider>
+  )
+}
+
 const withSwipe = (Story) => (
   <DndContext>
     <SortableContext items={["a", "b", "c"]}>
-      <SwipeProvider>
+      <SwipeWrapper>
         <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
           <Story />
         </div>
-      </SwipeProvider>
+      </SwipeWrapper>
     </SortableContext>
   </DndContext>
 )
@@ -148,5 +157,61 @@ export const AllItems = {
       <WithDrag id="c"><ItemSubTotal title={subTotalItem.title} count={subTotalItem.lines.length} totalDisplay={subTotalItem.totalDisplay} onEdit={() => {}} /></WithDrag>
       <ItemTotal totalDisplay={DUMMY_DATA.totalDisplay} />
     </>
+  ),
+}
+
+export const ItemTotalWithItemCount = {
+  name: "ItemTotal — with item count",
+  render: () => <ItemTotal totalDisplay={DUMMY_DATA.totalDisplay} itemCount={3} />,
+}
+
+export const ItemTotalWithExplanation = {
+  name: "ItemTotal — with explanation",
+  render: () => (
+    <ItemTotal
+      totalDisplay={DUMMY_DATA.totalDisplay}
+      itemCount={3}
+      explanation={<>iij li xiiij s vj d = 1086d</>}
+    />
+  ),
+}
+
+export const ItemTotalSubLevel = {
+  name: "ItemTotal — sub-level (paginæ label)",
+  render: () => <ItemTotal totalDisplay={{ l: "0", s: "xij", d: "0" }} subLevel />,
+}
+
+export const ItemUnitWithExplanation = {
+  name: "ItemUnit — with explanation",
+  render: () => (
+    <WithDrag id="a"><ItemUnit
+      title="Bookes"
+      literals={{ l: '0', s: 'iij', d: 'vj' }}
+      explanation={<>(3 × 12<sup>d</sup> = 36<sup>d</sup>) + 6<sup>d</sup> = 42<sup>d</sup></>}
+    /></WithDrag>
+  ),
+}
+
+export const ItemSubTotalZeroLines = {
+  name: "ItemSubTotal — empty sub-calculation",
+  render: () => (
+    <WithDrag id="c"><ItemSubTotal
+      title="Untitled"
+      count={0}
+      totalDisplay={{ l: '0', s: '0', d: '0' }}
+      onEdit={() => {}}
+    /></WithDrag>
+  ),
+}
+
+export const ItemUnitNoDelete = {
+  name: "ItemUnit — cannot delete (last item)",
+  render: () => (
+    <WithDrag id="a"><ItemUnit
+      title="Last item"
+      literals={{ l: '0', s: 'vj', d: '0' }}
+      canDelete={false}
+      onTitleChange={() => {}} onFieldChange={() => {}} onRemove={() => {}}
+    /></WithDrag>
   ),
 }

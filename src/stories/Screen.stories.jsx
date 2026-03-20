@@ -1,7 +1,6 @@
-import React from "react"
-import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar, SubHeaderEdit } from "@/display/MainScreen"
+import React, { useRef, useState } from "react"
+import { HeaderEdit, FooterEdit, ListOfItems, AddItemBar, SubHeaderEdit, MainScreen } from "@/display/MainScreen"
 import { DUMMY_DATA } from "@/utils/dummyData"
-import { Renderer } from "@/display/Renderer"
 import { DndContext } from "@dnd-kit/core"
 
 export default {
@@ -10,7 +9,7 @@ export default {
 }
 
 export const Header = {
-  name: "HeaderEdit",
+  name: "HeaderEdit — default",
   decorators: [
     (Story) => (
       <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
@@ -19,6 +18,30 @@ export const Header = {
     ),
   ],
   render: () => <HeaderEdit />,
+}
+
+export const HeaderWithUndo = {
+  name: "HeaderEdit — with undo",
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => <HeaderEdit canUndo={true} onUndo={() => {}} />,
+}
+
+export const HeaderSaveDisabled = {
+  name: "HeaderEdit — export disabled (has error)",
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => <HeaderEdit hasError={true} />,
 }
 
 export const List = {
@@ -92,6 +115,90 @@ export const FooterWithHelp = {
   ),
 }
 
+export const FooterBothEnabled = {
+  name: "FooterEdit — both toggles on",
+  decorators: [
+    (Story) => (
+      <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: () => (
+    <FooterEdit
+      onHelp={() => {}}
+      showExplanation={true}
+      onShowExplanationChange={() => {}}
+      advancedMode={true}
+      onAdvancedModeChange={() => {}}
+    />
+  ),
+}
+
+export const ListAdvanced = {
+  name: "ListOfItems — advanced mode",
+  decorators: [
+    (Story) => (
+      <DndContext>
+        <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+          <Story />
+        </div>
+      </DndContext>
+    ),
+  ],
+  render: () => (
+    <ListOfItems
+      lines={DUMMY_DATA.lines}
+      totalDisplay={DUMMY_DATA.totalDisplay}
+      totalPence={DUMMY_DATA.totalPence}
+      advanced={true}
+      showExplanation={false}
+      onFieldChange={() => {}}
+      onQuantityChange={() => {}}
+      onTitleChange={() => {}}
+      onRemoveLine={() => {}}
+      onAddLine={() => {}}
+      onAddExtended={() => {}}
+      onAddSubtotal={() => {}}
+      onDuplicateLine={() => {}}
+      onClearItem={() => {}}
+      onEditSubtotal={() => {}}
+    />
+  ),
+}
+
+export const ListWithExplanations = {
+  name: "ListOfItems — with explanations",
+  decorators: [
+    (Story) => (
+      <DndContext>
+        <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
+          <Story />
+        </div>
+      </DndContext>
+    ),
+  ],
+  render: () => (
+    <ListOfItems
+      lines={DUMMY_DATA.lines}
+      totalDisplay={DUMMY_DATA.totalDisplay}
+      totalPence={DUMMY_DATA.totalPence}
+      advanced={false}
+      showExplanation={true}
+      onFieldChange={() => {}}
+      onQuantityChange={() => {}}
+      onTitleChange={() => {}}
+      onRemoveLine={() => {}}
+      onAddLine={() => {}}
+      onAddExtended={() => {}}
+      onAddSubtotal={() => {}}
+      onDuplicateLine={() => {}}
+      onClearItem={() => {}}
+      onEditSubtotal={() => {}}
+    />
+  ),
+}
+
 export const AddBarDefault = {
   name: "AddItemBar — default",
   decorators: [
@@ -116,39 +223,65 @@ export const AddBarAdvanced = {
   render: () => <AddItemBar advanced onAddUnit={() => {}} onAddExtended={() => {}} onAddSubtotal={() => {}} />,
 }
 
+function FullScreenWrapper() {
+  const saveDialogRef = useRef(null)
+  const loadDialogRef = useRef(null)
+  const loadInputRef = useRef(null)
+  const [swipeOpenId, setSwipeOpenId] = useState(null)
+  return (
+    <MainScreen
+      lines={DUMMY_DATA.lines}
+      totalDisplay={DUMMY_DATA.totalDisplay}
+      totalPence={DUMMY_DATA.totalPence}
+      showExplanation={false}
+      onShowExplanationChange={() => {}}
+      advancedMode={false}
+      onAdvancedModeChange={() => {}}
+      onHelp={() => {}}
+      onFieldChange={() => {}}
+      onQuantityChange={() => {}}
+      onTitleChange={() => {}}
+      onRemoveLine={() => {}}
+      onAddLine={() => {}}
+      onAddExtended={() => {}}
+      onAddSubtotal={() => {}}
+      onClear={() => {}}
+      onDuplicateLine={() => {}}
+      onClearItem={() => {}}
+      breadcrumbs={[{ id: '', title: 'Summa totalis', path: [] }]}
+      navigationPath={[]}
+      onSubTitleChange={() => {}}
+      onNavigate={() => {}}
+      onEditSubtotal={() => {}}
+      onUndo={() => {}}
+      canUndo={false}
+      swipeOpenId={swipeOpenId}
+      onSwipeOpenIdChange={setSwipeOpenId}
+      onSaveOpen={() => {}}
+      onSaveClose={() => {}}
+      saveFilename=""
+      onSaveFilenameChange={() => {}}
+      onSave={() => {}}
+      saveDialogRef={saveDialogRef}
+      onLoadOpen={() => {}}
+      onLoadClose={() => {}}
+      loadError=""
+      loadLoading={false}
+      loadHasFile={false}
+      loadInputRef={loadInputRef}
+      onLoadFile={() => {}}
+      onLoadFileChange={() => {}}
+      loadDialogRef={loadDialogRef}
+    />
+  )
+}
+
 export const Full = {
-  name: "Renderer (full screen)",
+  name: "MainScreen (full screen)",
   render: () => (
-    <div style={{ maxWidth: 480, margin: "0 auto", fontFamily: "serif" }}>
-      <Renderer
-        lines={DUMMY_DATA.lines}
-        totalDisplay={DUMMY_DATA.totalDisplay}
-        totalPence={DUMMY_DATA.totalPence}
-        showExplanation={false}
-        onShowExplanationChange={() => {}}
-        advancedMode={false}
-        onAdvancedModeChange={() => {}}
-        onDragEnd={() => {}}
-        onHelp={() => {}}
-        onFieldChange={() => {}}
-        onQuantityChange={() => {}}
-        onTitleChange={() => {}}
-        onRemoveLine={() => {}}
-        onAddLine={() => {}}
-        onAddExtended={() => {}}
-        onAddSubtotal={() => {}}
-        onClear={() => {}}
-        onDuplicateLine={() => {}}
-        onClearItem={() => {}}
-        onSave={() => {}}
-        onLoad={() => Promise.resolve()}
-        breadcrumbs={[{ id: '', title: 'Summa totalis', path: [] }]}
-        navigationPath={[]}
-        onSubTitleChange={() => {}}
-        onNavigate={() => {}}
-        onEditSubtotal={() => {}}
-      />
-    </div>
+    <DndContext>
+      <FullScreenWrapper />
+    </DndContext>
   ),
 }
 
@@ -165,8 +298,6 @@ export const SubLevelView = {
             { id: subtotalItem.id, title: subtotalItem.title, path: [subtotalItem.id] },
           ]}
           onNavigate={() => {}}
-          subTitle={subtotalItem.title}
-          onSubTitleChange={() => {}}
           onDone={() => {}}
         />
         <ListOfItems

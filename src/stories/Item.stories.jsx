@@ -139,3 +139,39 @@ export const ExtendedDesktopHover = {
     </Item>
   ),
 }
+
+// ── Error state ───────────────────────────────────────────────────────────────
+
+export const ErrorState = {
+  name: "Error state",
+  render: () => (
+    <Item showActions error>
+      <BlockTitle title="Bad entry" editable={true} />
+      <BlockCurrency editable={true} values={{ l: "abc", s: "vj", d: "iij" }} fieldErrors={{ l: true, s: false, d: false }} />
+    </Item>
+  ),
+}
+
+// ── Cannot delete ─────────────────────────────────────────────────────────────
+
+export const CannotDelete = {
+  name: "Cannot delete · swiped open",
+  render: () => (
+    <Item showActions isOpen canDelete={false} onClose={() => {}} onDuplicate={() => {}} onClearItem={() => {}}>
+      <BlockTitle title="Last item" editable={true} />
+      <BlockCurrency editable={true} />
+    </Item>
+  ),
+}
+
+// ── Long title ────────────────────────────────────────────────────────────────
+
+export const LongTitle = {
+  name: "Very long title",
+  render: () => (
+    <Item showActions>
+      <BlockTitle title="Sundry household provisions for the quarter including tallow candles, beeswax and salt" editable={true} />
+      <BlockCurrency editable={true} values={{ l: "iij", s: "xiiij", d: "vj" }} />
+    </Item>
+  ),
+}

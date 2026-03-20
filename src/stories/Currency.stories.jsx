@@ -37,3 +37,26 @@ export const LargeValues = {
   name: "Read-only · large values",
   render: () => <Currency editable={false} values={{ l: "mcccxlij", s: "xix", d: "xj" }} />,
 }
+
+export const WithFieldErrors = {
+  name: "With field errors",
+  render: () => (
+    <Currency
+      editable={true}
+      values={{ l: "abc", s: "vj", d: "xyz" }}
+      fieldErrors={{ l: true, s: false, d: true }}
+      onFieldChange={() => {}}
+    />
+  ),
+}
+
+export const OnlyPounds = {
+  name: "Editable · pounds only filled",
+  render: () => (
+    <Currency
+      editable={true}
+      values={{ l: "iij", s: "", d: "" }}
+      onFieldChange={() => {}}
+    />
+  ),
+}

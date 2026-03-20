@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
-	serializeLine,
-	serializeLines,
-	deserializeLine,
-	deserializeLines,
+	serialiseLine,
+	serialiseLines,
+	deserialiseLine,
+	deserialiseLines,
 	createSummaFile,
 	parseSummaFile,
-} from '@/utils/serialization';
+} from '@/utils/serialisation';
 import {
 	emptyLine,
 	emptyExtendedItem,
@@ -27,11 +27,12 @@ import {
 	SavedLine,
 	SavedExtendedItem,
 	SavedSubtotalItem,
+	SavedAnyLine,
 } from '@/types/savedCalculation';
 
-// ─── serializeLine ────────────────────────────────────────────────────────────
+// ─── serialiseLine ────────────────────────────────────────────────────────────
 
-describe('serializeLine — LINE_ITEM', () => {
+describe('serialiseLine — LINE_ITEM', () => {
 	it('strips computed fields', () => {
 		let line = emptyLine();
 		line = processFieldUpdate(
@@ -40,7 +41,7 @@ describe('serializeLine — LINE_ITEM', () => {
 			'd',
 			'v'
 		)[0] as typeof line;
-		const saved = serializeLine(line);
+		const saved = serialiseLine(line);
 		expect('error' in saved).toBe(false);
 		expect('fieldErrors' in saved).toBe(false);
 		expect('totalPence' in saved).toBe(false);
@@ -55,7 +56,7 @@ describe('serializeLine — LINE_ITEM', () => {
 			'v'
 		);
 		line = lines[0] as typeof line;
-		const saved = serializeLine(line);
+		const saved = serialiseLine(line);
 		expect(saved.id).toBe(line.id);
 		expect(saved.itemType).toBe(ItemType.LINE_ITEM);
 		expect(saved.title).toBe(line.title);
@@ -65,14 +66,14 @@ describe('serializeLine — LINE_ITEM', () => {
 	});
 });
 
-describe('serializeLine — EXTENDED_ITEM', () => {
+describe('serialiseLine — EXTENDED_ITEM', () => {
 	it('strips computed fields', () => {
 		let item = emptyExtendedItem();
 		let lines: AnyLineState[] = [item, emptyLine()];
 		lines = processFieldUpdate(lines, item.id, 'd', 'v');
 		lines = processQuantityUpdate(lines, item.id, 'iii');
 		item = lines[0] as typeof item;
-		const saved = serializeLine(item);
+		const saved = serialiseLine(item);
 		expect('error' in saved).toBe(false);
 		expect('fieldErrors' in saved).toBe(false);
 		expect('basePence' in saved).toBe(false);
@@ -85,7 +86,7 @@ describe('serializeLine — EXTENDED_ITEM', () => {
 		let lines: AnyLineState[] = [item, emptyLine()];
 		lines = processQuantityUpdate(lines, item.id, 'iii');
 		item = lines[0] as typeof item;
-		const saved = serializeLine(item);
+		const saved = serialiseLine(item);
 		expect(saved.itemType).toBe(ItemType.EXTENDED_ITEM);
 		if (saved.itemType === ItemType.EXTENDED_ITEM) {
 			expect(saved.quantity).toBe('iii');
@@ -94,18 +95,18 @@ describe('serializeLine — EXTENDED_ITEM', () => {
 	});
 });
 
-describe('serializeLine — SUBTOTAL_ITEM', () => {
+describe('serialiseLine — SUBTOTAL_ITEM', () => {
 	it('strips computed fields from subtotal', () => {
 		const item = emptySubtotalItem();
-		const saved = serializeLine(item);
+		const saved = serialiseLine(item);
 		expect('totalPence' in saved).toBe(false);
 		expect('totalDisplay' in saved).toBe(false);
 		expect('error' in saved).toBe(false);
 	});
 
-	it('recursively serializes child lines', () => {
+	it('recursively serialises child lines', () => {
 		const item = emptySubtotalItem();
-		const saved = serializeLine(item);
+		const saved = serialiseLine(item);
 		expect(saved.itemType).toBe(ItemType.SUBTOTAL_ITEM);
 		if (saved.itemType === ItemType.SUBTOTAL_ITEM) {
 			expect(Array.isArray(saved.lines)).toBe(true);
@@ -115,9 +116,9 @@ describe('serializeLine — SUBTOTAL_ITEM', () => {
 	});
 });
 
-// ─── deserializeLine ──────────────────────────────────────────────────────────
+// ─── deserialiseLine ──────────────────────────────────────────────────────────
 
-describe('deserializeLine — LINE_ITEM', () => {
+describe('deserialiseLine — LINE_ITEM', () => {
 	it('recomputes error/fieldErrors/totalPence', () => {
 		const saved: SavedLine = {
 			id: 'test-id',
@@ -125,7 +126,7 @@ describe('deserializeLine — LINE_ITEM', () => {
 			title: 'Test',
 			literals: { l: '', s: '', d: 'v' },
 		};
-		const line = deserializeLine(saved);
+		const line = deserialiseLine(saved);
 		expect(line.itemType).toBe(ItemType.LINE_ITEM);
 		if (line.itemType === ItemType.LINE_ITEM) {
 			expect(line.totalPence).toBe(5);
@@ -141,7 +142,7 @@ describe('deserializeLine — LINE_ITEM', () => {
 			title: '',
 			literals: { l: '', s: '', d: 'zz' },
 		};
-		const line = deserializeLine(saved);
+		const line = deserialiseLine(saved);
 		expect(line.itemType).toBe(ItemType.LINE_ITEM);
 		if (line.itemType === ItemType.LINE_ITEM) {
 			expect(line.error).toBe(true);
@@ -151,7 +152,7 @@ describe('deserializeLine — LINE_ITEM', () => {
 	});
 });
 
-describe('deserializeLine — EXTENDED_ITEM', () => {
+describe('deserialiseLine — EXTENDED_ITEM', () => {
 	it('recomputes extended item fields', () => {
 		const saved: SavedExtendedItem = {
 			id: 'test-id',
@@ -160,7 +161,7 @@ describe('deserializeLine — EXTENDED_ITEM', () => {
 			literals: { l: '', s: '', d: 'v' },
 			quantity: 'iii',
 		};
-		const line = deserializeLine(saved);
+		const line = deserialiseLine(saved);
 		expect(isExtendedItem(line)).toBe(true);
 		if (isExtendedItem(line)) {
 			expect(line.basePence).toBe(5);
@@ -171,7 +172,7 @@ describe('deserializeLine — EXTENDED_ITEM', () => {
 	});
 });
 
-describe('deserializeLine — SUBTOTAL_ITEM', () => {
+describe('deserialiseLine — SUBTOTAL_ITEM', () => {
 	it('recurses and recomputes subtotal', () => {
 		const saved: SavedSubtotalItem = {
 			id: 'sub-id',
@@ -192,7 +193,7 @@ describe('deserializeLine — SUBTOTAL_ITEM', () => {
 				},
 			],
 		};
-		const line = deserializeLine(saved);
+		const line = deserialiseLine(saved);
 		expect(isSubtotalItem(line)).toBe(true);
 		if (isSubtotalItem(line)) {
 			expect(line.totalPence).toBe(8);
@@ -204,7 +205,7 @@ describe('deserializeLine — SUBTOTAL_ITEM', () => {
 // ─── round-trips ─────────────────────────────────────────────────────────────
 
 describe('round-trip: LINE_ITEM', () => {
-	it('deserialize(serialize(line)) equals original runtime state', () => {
+	it('deserialise(serialise(line)) equals original runtime state', () => {
 		let line = emptyLine();
 		line = processFieldUpdate(
 			[line, emptyLine()],
@@ -212,8 +213,8 @@ describe('round-trip: LINE_ITEM', () => {
 			's',
 			'x'
 		)[0] as typeof line;
-		const saved = serializeLine(line);
-		const restored = deserializeLine(saved);
+		const saved = serialiseLine(line);
+		const restored = deserialiseLine(saved);
 		expect(restored).toEqual(line);
 	});
 });
@@ -225,8 +226,8 @@ describe('round-trip: EXTENDED_ITEM', () => {
 		lines = processFieldUpdate(lines, item.id, 'd', 'vi');
 		lines = processQuantityUpdate(lines, item.id, 'ii');
 		item = lines[0] as typeof item;
-		const saved = serializeLine(item);
-		const restored = deserializeLine(saved);
+		const saved = serialiseLine(item);
+		const restored = deserialiseLine(saved);
 		expect(restored).toEqual(item);
 	});
 });
@@ -242,20 +243,20 @@ describe('round-trip: SUBTOTAL_ITEM with nested extended', () => {
 		const subtotal = emptySubtotalItem();
 		const finalSubtotal = recomputeSubtotal({ ...subtotal, lines });
 
-		const saved = serializeLine(finalSubtotal);
-		const restored = deserializeLine(saved);
+		const saved = serialiseLine(finalSubtotal);
+		const restored = deserialiseLine(saved);
 		expect(restored).toEqual(finalSubtotal);
 	});
 });
 
-// ─── serializeLines preserves order ──────────────────────────────────────────
+// ─── serialiseLines preserves order ──────────────────────────────────────────
 
-describe('serializeLines preserves order', () => {
+describe('serialiseLines preserves order', () => {
 	it('first in, first out', () => {
 		const line1 = emptyLine();
 		const line2 = emptyLine();
 		const line3 = emptyLine();
-		const saved = serializeLines([line1, line2, line3]);
+		const saved = serialiseLines([line1, line2, line3]);
 		expect(saved[0].id).toBe(line1.id);
 		expect(saved[1].id).toBe(line2.id);
 		expect(saved[2].id).toBe(line3.id);
@@ -271,8 +272,8 @@ describe('serializeLines preserves order', () => {
 			lines: [child1, child2, child3],
 		});
 
-		const saved = serializeLine(subWithLines);
-		const restored = deserializeLine(saved);
+		const saved = serialiseLine(subWithLines);
+		const restored = deserialiseLine(saved);
 		expect(isSubtotalItem(restored)).toBe(true);
 		if (isSubtotalItem(restored)) {
 			expect(restored.lines[0].id).toBe(child1.id);
@@ -298,7 +299,7 @@ describe('createSummaFile', () => {
 		);
 	});
 
-	it('contains serialized lines', () => {
+	it('contains serialised lines', () => {
 		const state = initialState();
 		const file = createSummaFile(state);
 		expect(Array.isArray(file.lines)).toBe(true);
@@ -456,14 +457,161 @@ describe('parseSummaFile', () => {
 	});
 });
 
-// ─── deserializeLines ─────────────────────────────────────────────────────────
+// ─── deserialiseLines ─────────────────────────────────────────────────────────
 
-describe('deserializeLines', () => {
+describe('deserialiseLines', () => {
 	it('maps over all lines', () => {
 		const lines = [emptyLine(), emptyLine(), emptyExtendedItem()];
-		const saved = serializeLines(lines);
-		const restored = deserializeLines(saved);
+		const saved = serialiseLines(lines);
+		const restored = deserialiseLines(saved);
 		expect(restored).toHaveLength(3);
 		expect(restored[2].itemType).toBe(ItemType.EXTENDED_ITEM);
+	});
+});
+
+// ─── deserialiseLine — null/non-object guard ──────────────────────────────────
+
+describe('deserialiseLine — null/non-object guard', () => {
+	it('throws on null input', () => {
+		expect(() => deserialiseLine(null as unknown as SavedAnyLine)).toThrow(
+			'Invalid file format: line item must be an object'
+		);
+	});
+
+	it('throws on primitive string input', () => {
+		expect(() =>
+			deserialiseLine('not-an-object' as unknown as SavedAnyLine)
+		).toThrow('Invalid file format: line item must be an object');
+	});
+
+	it('throws on number input', () => {
+		expect(() => deserialiseLine(42 as unknown as SavedAnyLine)).toThrow(
+			'Invalid file format: line item must be an object'
+		);
+	});
+});
+
+// ─── deserialise validation error branches ────────────────────────────────────
+
+describe('deserialiseLine — LINE_ITEM validation errors', () => {
+	it('throws when id is missing', () => {
+		const bad = {
+			itemType: ItemType.LINE_ITEM,
+			title: '',
+			literals: { l: '', s: '', d: '' },
+		};
+		expect(() => deserialiseLine(bad as SavedAnyLine)).toThrow(
+			'Invalid line item: missing id'
+		);
+	});
+
+	it('throws when literals is missing', () => {
+		const bad = { id: 'x', itemType: ItemType.LINE_ITEM, title: '' };
+		expect(() => deserialiseLine(bad as SavedAnyLine)).toThrow(
+			'Invalid line item: missing literals'
+		);
+	});
+});
+
+describe('deserialiseLine — EXTENDED_ITEM validation errors', () => {
+	it('throws when id is missing', () => {
+		const bad = {
+			itemType: ItemType.EXTENDED_ITEM,
+			title: '',
+			literals: { l: '', s: '', d: '' },
+			quantity: 'j',
+		};
+		expect(() => deserialiseLine(bad as SavedAnyLine)).toThrow(
+			'Invalid extended item: missing id'
+		);
+	});
+
+	it('throws when literals is missing', () => {
+		const bad = {
+			id: 'x',
+			itemType: ItemType.EXTENDED_ITEM,
+			title: '',
+			quantity: 'j',
+		};
+		expect(() => deserialiseLine(bad as SavedAnyLine)).toThrow(
+			'Invalid extended item: missing literals'
+		);
+	});
+
+	it('throws when quantity is not a string', () => {
+		const bad = {
+			id: 'x',
+			itemType: ItemType.EXTENDED_ITEM,
+			title: '',
+			literals: { l: '', s: '', d: '' },
+			quantity: 42,
+		};
+		expect(() => deserialiseLine(bad as unknown as SavedAnyLine)).toThrow(
+			'Invalid extended item: missing quantity'
+		);
+	});
+});
+
+describe('deserialiseLine — SUBTOTAL_ITEM validation errors', () => {
+	it('throws when id is missing', () => {
+		const bad = { itemType: ItemType.SUBTOTAL_ITEM, title: '', lines: [] };
+		expect(() => deserialiseLine(bad as unknown as SavedAnyLine)).toThrow(
+			'Invalid subtotal item: missing id'
+		);
+	});
+
+	it('throws when lines is missing', () => {
+		const bad = { id: 'x', itemType: ItemType.SUBTOTAL_ITEM, title: '' };
+		expect(() => deserialiseLine(bad as unknown as SavedAnyLine)).toThrow(
+			'Invalid subtotal item: missing lines'
+		);
+	});
+
+	it('throws when lines is not an array', () => {
+		const bad = {
+			id: 'x',
+			itemType: ItemType.SUBTOTAL_ITEM,
+			title: '',
+			lines: 'not-array',
+		};
+		expect(() => deserialiseLine(bad as unknown as SavedAnyLine)).toThrow(
+			'Invalid subtotal item: missing lines'
+		);
+	});
+});
+
+// ─── title ?? '' fallback branch ─────────────────────────────────────────────
+
+describe("deserialiseLine — missing title (title ?? '' fallback)", () => {
+	it('LINE_ITEM: uses empty string when title is absent', () => {
+		const saved = {
+			id: 'x',
+			itemType: ItemType.LINE_ITEM,
+			literals: { l: '', s: '', d: 'v' },
+		} as unknown as SavedAnyLine;
+		const line = deserialiseLine(saved);
+		expect(line.title).toBe('');
+	});
+
+	it('EXTENDED_ITEM: uses empty string when title is absent', () => {
+		const saved: SavedExtendedItem = {
+			id: 'x',
+			itemType: ItemType.EXTENDED_ITEM,
+			literals: { l: '', s: '', d: 'v' },
+			quantity: 'j',
+		} as SavedExtendedItem;
+		const line = deserialiseLine(saved);
+		expect(line.title).toBe('');
+	});
+
+	it('SUBTOTAL_ITEM: uses empty string when title is absent', () => {
+		// Omit title intentionally to test the `?? ''` fallback
+		const saved = {
+			id: 'x',
+			itemType: ItemType.SUBTOTAL_ITEM,
+			lines: [],
+		} as unknown as SavedSubtotalItem;
+		const line = deserialiseLine(saved);
+		expect(line.title).toBe('');
 	});
 });
