@@ -42,6 +42,76 @@ export default defineConfig({
 				'src/generated/**',
 				'**/main.tsx',
 			],
+			thresholds: {
+				// 100% coverage required for all src/utils/ business-logic files.
+				// dummyData.ts is excluded — it is a static fixture constant with no logic.
+				'src/utils/calculationLogic.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/currency.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/displayLogic.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/earlyModern.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/errorText.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/explanation.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/features.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/preferences.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/roman.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/serialisation.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+				'src/utils/storage.ts': {
+					statements: 100,
+					branches: 100,
+					functions: 100,
+					lines: 100,
+				},
+			},
 		},
 	},
 });

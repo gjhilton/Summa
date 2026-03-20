@@ -87,32 +87,27 @@ export function emptySubtotalItem(): SubtotalItemState {
 	};
 }
 
-export function clearItem(line: AnyLineState): AnyLineState {
-	if (line.itemType === ItemType.SUBTOTAL_ITEM) {
-		const lines: AnyLineState[] = [emptyLine(), emptyLine()];
-		const { totalPence, totalDisplay } = computeGrandTotal(lines);
-		return {
-			...line,
-			title: '',
-			lines,
-			totalPence,
-			totalDisplay,
-			error: false,
-		};
-	}
-	if (line.itemType === ItemType.EXTENDED_ITEM) {
-		return {
-			...line,
-			title: '',
-			literals: EMPTY_LITERALS,
-			quantity: 'j',
-			error: false,
-			fieldErrors: EMPTY_FIELD_ERRORS,
-			quantityError: false,
-			basePence: 0,
-			totalPence: 0,
-		};
-	}
+function clearSubtotalItem(line: SubtotalItemState): SubtotalItemState {
+	const lines: AnyLineState[] = [emptyLine(), emptyLine()];
+	const { totalPence, totalDisplay } = computeGrandTotal(lines);
+	return { ...line, title: '', lines, totalPence, totalDisplay, error: false };
+}
+
+function clearExtendedItem(line: ExtendedItemState): ExtendedItemState {
+	return {
+		...line,
+		title: '',
+		literals: EMPTY_LITERALS,
+		quantity: 'j',
+		error: false,
+		fieldErrors: EMPTY_FIELD_ERRORS,
+		quantityError: false,
+		basePence: 0,
+		totalPence: 0,
+	};
+}
+
+function clearLineItem(line: LineState): LineState {
 	return {
 		...line,
 		title: '',
@@ -121,6 +116,12 @@ export function clearItem(line: AnyLineState): AnyLineState {
 		fieldErrors: EMPTY_FIELD_ERRORS,
 		totalPence: 0,
 	};
+}
+
+export function clearItem(line: AnyLineState): AnyLineState {
+	if (line.itemType === ItemType.SUBTOTAL_ITEM) return clearSubtotalItem(line);
+	if (line.itemType === ItemType.EXTENDED_ITEM) return clearExtendedItem(line);
+	return clearLineItem(line);
 }
 
 export function duplicateLine(line: AnyLineState): AnyLineState {
@@ -269,6 +270,10 @@ function evaluateField(value: string, field: 'l' | 's' | 'd'): FieldResult {
 	};
 }
 
+function resultsToFieldErrors(results: FieldResult[]): LsdBooleans {
+	return { l: results[0].error, s: results[1].error, d: results[2].error };
+}
+
 export function computeLinePence(literals: LsdStrings): {
 	totalPence: number;
 	error: boolean;
@@ -276,11 +281,7 @@ export function computeLinePence(literals: LsdStrings): {
 } {
 	const fields = ['l', 's', 'd'] as const;
 	const results = fields.map(f => evaluateField(literals[f], f));
-	const fieldErrors = {
-		l: results[0].error,
-		s: results[1].error,
-		d: results[2].error,
-	};
+	const fieldErrors = resultsToFieldErrors(results);
 	const error = results.some(r => r.error);
 	const totalPence = error ? 0 : results.reduce((sum, r) => sum + r.pence, 0);
 	return { totalPence, error, fieldErrors };

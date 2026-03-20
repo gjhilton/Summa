@@ -1,6 +1,9 @@
 import {
 	ItemType,
 	AnyLineState,
+	LineState,
+	ExtendedItemState,
+	SubtotalItemState,
 	CalculationState,
 	isExtendedItem,
 	isSubtotalItem,
@@ -19,30 +22,38 @@ import {
 	recomputeSubtotal,
 } from '@/utils/calculationLogic';
 
-export function serialiseLine(line: AnyLineState): SavedAnyLine {
-	if (isSubtotalItem(line)) {
-		return {
-			id: line.id,
-			itemType: ItemType.SUBTOTAL_ITEM,
-			title: line.title,
-			lines: serialiseLines(line.lines),
-		};
-	}
-	if (isExtendedItem(line)) {
-		return {
-			id: line.id,
-			itemType: ItemType.EXTENDED_ITEM,
-			title: line.title,
-			literals: line.literals,
-			quantity: line.quantity,
-		};
-	}
+function serialiseSubtotalItem(line: SubtotalItemState): SavedSubtotalItem {
+	return {
+		id: line.id,
+		itemType: ItemType.SUBTOTAL_ITEM,
+		title: line.title,
+		lines: serialiseLines(line.lines),
+	};
+}
+
+function serialiseExtendedItem(line: ExtendedItemState): SavedExtendedItem {
+	return {
+		id: line.id,
+		itemType: ItemType.EXTENDED_ITEM,
+		title: line.title,
+		literals: line.literals,
+		quantity: line.quantity,
+	};
+}
+
+function serialiseLineItem(line: LineState): SavedLine {
 	return {
 		id: line.id,
 		itemType: ItemType.LINE_ITEM,
 		title: line.title,
 		literals: line.literals,
 	};
+}
+
+export function serialiseLine(line: AnyLineState): SavedAnyLine {
+	if (isSubtotalItem(line)) return serialiseSubtotalItem(line);
+	if (isExtendedItem(line)) return serialiseExtendedItem(line);
+	return serialiseLineItem(line);
 }
 
 export function serialiseLines(lines: AnyLineState[]): SavedAnyLine[] {
@@ -75,11 +86,15 @@ function deserialiseSubtotalItem(s: SavedSubtotalItem): AnyLineState {
 	});
 }
 
-function deserialiseExtendedItem(s: SavedExtendedItem): AnyLineState {
+function assertValidExtendedItem(s: SavedExtendedItem): void {
 	if (!s.id) throw new Error('Invalid extended item: missing id');
 	if (!s.literals) throw new Error('Invalid extended item: missing literals');
 	if (typeof s.quantity !== 'string')
 		throw new Error('Invalid extended item: missing quantity');
+}
+
+function deserialiseExtendedItem(s: SavedExtendedItem): AnyLineState {
+	assertValidExtendedItem(s);
 	const { basePence, totalPence, error, fieldErrors, quantityError } =
 		computeExtendedItemPence(s.literals, s.quantity);
 	return {

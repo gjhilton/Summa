@@ -43,32 +43,43 @@ interface UndoStack {
 	clearCoalesceKey: () => void;
 }
 
+type UndoStacks = Record<string, AnyLineState[][]>;
+
+function appendToStack(
+	stacks: UndoStacks,
+	pathKey: string,
+	snapshot: AnyLineState[]
+): UndoStacks {
+	const existing = stacks[pathKey] ?? [];
+	const trimmed = existing.length >= MAX_UNDO ? existing.slice(1) : existing;
+	return { ...stacks, [pathKey]: [...trimmed, snapshot] };
+}
+
+function popFromStack(
+	stacks: UndoStacks,
+	pathKey: string,
+	setLines: (lines: AnyLineState[]) => void
+): UndoStacks {
+	const stack = stacks[pathKey] ?? [];
+	if (stack.length === 0) return stacks;
+	setLines(stack[stack.length - 1]);
+	return { ...stacks, [pathKey]: stack.slice(0, -1) };
+}
+
 function useUndoStack(pathKey: string): UndoStack {
-	const [undoStacks, setUndoStacks] = useState<
-		Record<string, AnyLineState[][]>
-	>({});
+	const [undoStacks, setUndoStacks] = useState<UndoStacks>({});
 	const lastCoalesceKeyRef = useRef<string | null>(null);
 
 	function push(snapshot: AnyLineState[], coalesceKey?: string) {
 		if (coalesceKey && coalesceKey === lastCoalesceKeyRef.current) return;
 		lastCoalesceKeyRef.current = coalesceKey ?? null;
-		setUndoStacks(stacks => {
-			const existing = stacks[pathKey] ?? [];
-			const trimmed =
-				existing.length >= MAX_UNDO ? existing.slice(1) : existing;
-			return { ...stacks, [pathKey]: [...trimmed, snapshot] };
-		});
+		setUndoStacks(stacks => appendToStack(stacks, pathKey, snapshot));
 	}
 
 	const pop = useCallback(
 		(setLines: (lines: AnyLineState[]) => void) => {
 			lastCoalesceKeyRef.current = null;
-			setUndoStacks(stacks => {
-				const stack = stacks[pathKey] ?? [];
-				if (stack.length === 0) return stacks;
-				setLines(stack[stack.length - 1]);
-				return { ...stacks, [pathKey]: stack.slice(0, -1) };
-			});
+			setUndoStacks(stacks => popFromStack(stacks, pathKey, setLines));
 		},
 		[pathKey]
 	);
@@ -100,6 +111,14 @@ function deriveSubTitle(
 		l => l.id === id
 	);
 	return item && isSubtotalItem(item) ? item.title : '';
+}
+
+function syncDialogOpen(el: HTMLDialogElement, open: boolean): void {
+	if (open) {
+		if (!el.open) el.showModal();
+	} else {
+		if (el.open) el.close();
+	}
 }
 
 function triggerJsonDownload(filename: string, data: unknown): void {
@@ -146,22 +165,12 @@ export default function App() {
 	// Sync native dialog open/close with state
 	useEffect(() => {
 		const el = saveDialogRef.current;
-		if (!el) return;
-		if (saveOpen) {
-			if (!el.open) el.showModal();
-		} else {
-			if (el.open) el.close();
-		}
+		if (el) syncDialogOpen(el, saveOpen);
 	}, [saveOpen]);
 
 	useEffect(() => {
 		const el = loadDialogRef.current;
-		if (!el) return;
-		if (loadOpen) {
-			if (!el.open) el.showModal();
-		} else {
-			if (el.open) el.close();
-		}
+		if (el) syncDialogOpen(el, loadOpen);
 	}, [loadOpen]);
 
 	// Reset load modal state when it opens
@@ -262,19 +271,10 @@ export default function App() {
 	}
 
 	function handleSave(filename: string) {
-		const {
-			totalPence: tp,
-			totalDisplay: td,
-			hasError: he,
-		} = computeGrandTotal(lines);
+		const totals = computeGrandTotal(lines);
 		triggerJsonDownload(
 			`${filename}.summa.json`,
-			createSummaFile({
-				lines,
-				totalPence: tp,
-				totalDisplay: td,
-				hasError: he,
-			})
+			createSummaFile({ lines, ...totals })
 		);
 	}
 

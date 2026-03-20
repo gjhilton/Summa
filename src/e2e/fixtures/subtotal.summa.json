@@ -1,0 +1,34 @@
+{
+	"metadata": {
+		"appName": "summa",
+		"version": "0.5.0",
+		"savedAt": "2024-01-01T00:00:00.000Z"
+	},
+	"lines": [
+		{
+			"id": "fixture-sub-1",
+			"itemType": "SUBTOTAL_ITEM",
+			"title": "Quarter 1",
+			"lines": [
+				{
+					"id": "fixture-sub-1-line-1",
+					"itemType": "LINE_ITEM",
+					"title": "January",
+					"literals": { "l": "", "s": "v", "d": "" }
+				},
+				{
+					"id": "fixture-sub-1-line-2",
+					"itemType": "LINE_ITEM",
+					"title": "February",
+					"literals": { "l": "", "s": "iij", "d": "" }
+				}
+			]
+		},
+		{
+			"id": "fixture-line-1",
+			"itemType": "LINE_ITEM",
+			"title": "Standalone item",
+			"literals": { "l": "", "s": "ij", "d": "" }
+		}
+	]
+}
