@@ -22,8 +22,6 @@ export const SingleLevel = {
         { id: '1', title: 'sundries', path: ['1'] },
       ]}
       onNavigate={() => {}}
-      subTitle="sundries"
-      onSubTitleChange={() => {}}
       onDone={() => {}}
     />
   ),
@@ -39,25 +37,38 @@ export const TwoLevelsDeep = {
         { id: '2', title: 'kitchen', path: ['1', '2'] },
       ]}
       onNavigate={() => {}}
-      subTitle="kitchen"
-      onSubTitleChange={() => {}}
       onDone={() => {}}
     />
   ),
 }
 
-export const UntitledSubCalc = {
-  name: "Untitled sub-calculation",
+export const WithUndo = {
+  name: "With undo button",
   render: () => (
     <SubHeaderEdit
       breadcrumbs={[
         { id: '', title: 'Summa totalis', path: [] },
-        { id: '1', title: 'Untitled', path: ['1'] },
+        { id: '1', title: 'sundries', path: ['1'] },
       ]}
       onNavigate={() => {}}
-      subTitle=""
-      onSubTitleChange={() => {}}
       onDone={() => {}}
+      onUndo={() => {}}
+      canUndo={true}
+    />
+  ),
+}
+
+export const WithClear = {
+  name: "With clear button",
+  render: () => (
+    <SubHeaderEdit
+      breadcrumbs={[
+        { id: '', title: 'Summa totalis', path: [] },
+        { id: '1', title: 'sundries', path: ['1'] },
+      ]}
+      onNavigate={() => {}}
+      onDone={() => {}}
+      onClear={() => {}}
     />
   ),
 }

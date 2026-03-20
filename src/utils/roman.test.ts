@@ -104,3 +104,13 @@ describe('isValidRoman', () => {
 	it('accepts uppercase mcmxcix', () =>
 		expect(isValidRoman('MCMXCIX')).toBe(true));
 });
+
+// ─── romanToInteger with unknown chars (charValue fallback) ───────────────────
+
+describe('romanToInteger — unknown character fallback', () => {
+	// charValue returns 0 for unknown chars; this exercises the ?? 0 branch
+	it('treats unknown chars as zero', () => {
+		// 'z' is not a Roman char — charValue returns 0, so romanToInteger('z') = 0
+		expect(romanToInteger('z')).toBe(0);
+	});
+});

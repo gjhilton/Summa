@@ -1,0 +1,22 @@
+{
+	"metadata": {
+		"appName": "summa",
+		"version": "0.5.0",
+		"savedAt": "2024-01-01T00:00:00.000Z"
+	},
+	"lines": [
+		{
+			"id": "fixture-ext-1",
+			"itemType": "EXTENDED_ITEM",
+			"title": "Bookes",
+			"literals": { "l": "", "s": "", "d": "v" },
+			"quantity": "iij"
+		},
+		{
+			"id": "fixture-line-1",
+			"itemType": "LINE_ITEM",
+			"title": "Other item",
+			"literals": { "l": "", "s": "j", "d": "" }
+		}
+	]
+}

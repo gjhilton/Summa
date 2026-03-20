@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
 	emptyLine,
 	emptyExtendedItem,
@@ -13,13 +13,40 @@ import {
 	formatComponent,
 	formatLsdDisplay,
 	computeFieldWorking,
+	clearItem,
+	duplicateLine,
 } from '@/utils/calculationLogic';
 import {
 	AnyLineState,
 	ItemType,
 	SubtotalItemState,
 	isSubtotalItem,
+	isExtendedItem,
 } from '@/types/calculation';
+
+// ─── randomUUIDFallback (via generateId) ──────────────────────────────────────
+
+describe('generateId — fallback path when crypto.randomUUID is unavailable', () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
+
+	it('generates a UUID-shaped string using the fallback', () => {
+		// Temporarily hide crypto.randomUUID to force the fallback
+		const original = crypto.randomUUID;
+		// @ts-expect-error — deliberately removing the method to test the fallback
+		crypto.randomUUID = undefined;
+		try {
+			const line = emptyLine();
+			// UUID pattern: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+			expect(line.id).toMatch(
+				/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+			);
+		} finally {
+			crypto.randomUUID = original;
+		}
+	});
+});
 
 describe('emptySubtotalItem', () => {
 	it('has correct shape', () => {
@@ -358,6 +385,130 @@ describe('computeFieldWorking', () => {
 		const result = computeFieldWorking('ij', 'd');
 		expect(result).not.toBeNull();
 		expect(result!.pence).toBe(2);
+	});
+});
+
+// ─── clearItem ────────────────────────────────────────────────────────────────
+
+describe('clearItem — LINE_ITEM', () => {
+	it('resets title, literals, error, fieldErrors and totalPence', () => {
+		let line = emptyLine();
+		line = processFieldUpdate(
+			[line, emptyLine()],
+			line.id,
+			'd',
+			'v'
+		)[0] as typeof line;
+		// Confirm it has a value first
+		expect(line.totalPence).toBe(5);
+		const cleared = clearItem(line);
+		expect(cleared.itemType).toBe(ItemType.LINE_ITEM);
+		if (cleared.itemType === ItemType.LINE_ITEM) {
+			expect(cleared.title).toBe('');
+			expect(cleared.literals).toEqual({ l: '', s: '', d: '' });
+			expect(cleared.error).toBe(false);
+			expect(cleared.fieldErrors).toEqual({
+				l: false,
+				s: false,
+				d: false,
+			});
+			expect(cleared.totalPence).toBe(0);
+			expect(cleared.id).toBe(line.id); // id preserved
+		}
+	});
+});
+
+describe('clearItem — EXTENDED_ITEM', () => {
+	it('resets all extended fields but preserves id', () => {
+		let item = emptyExtendedItem();
+		let lines: AnyLineState[] = [item, emptyLine()];
+		lines = processFieldUpdate(lines, item.id, 'd', 'v');
+		item = lines[0] as typeof item;
+		expect(item.totalPence).toBe(5);
+		const cleared = clearItem(item);
+		expect(isExtendedItem(cleared)).toBe(true);
+		if (isExtendedItem(cleared)) {
+			expect(cleared.title).toBe('');
+			expect(cleared.literals).toEqual({ l: '', s: '', d: '' });
+			expect(cleared.quantity).toBe('j');
+			expect(cleared.error).toBe(false);
+			expect(cleared.fieldErrors).toEqual({
+				l: false,
+				s: false,
+				d: false,
+			});
+			expect(cleared.quantityError).toBe(false);
+			expect(cleared.basePence).toBe(0);
+			expect(cleared.totalPence).toBe(0);
+			expect(cleared.id).toBe(item.id);
+		}
+	});
+});
+
+describe('clearItem — SUBTOTAL_ITEM', () => {
+	it('resets title, replaces children with two empty lines, resets error/pence', () => {
+		let sub = emptySubtotalItem();
+		// Give it a child with a value and a title
+		sub = recomputeSubtotal({
+			...sub,
+			title: 'Old title',
+			lines: processFieldUpdate(sub.lines, sub.lines[0].id, 'd', 'v'),
+		});
+		expect(sub.totalPence).toBe(5);
+		const cleared = clearItem(sub);
+		expect(isSubtotalItem(cleared)).toBe(true);
+		if (isSubtotalItem(cleared)) {
+			expect(cleared.title).toBe('');
+			expect(cleared.lines).toHaveLength(2);
+			expect(cleared.totalPence).toBe(0);
+			expect(cleared.error).toBe(false);
+			expect(cleared.id).toBe(sub.id); // id preserved
+		}
+	});
+});
+
+// ─── duplicateLine ────────────────────────────────────────────────────────────
+
+describe('duplicateLine — LINE_ITEM', () => {
+	it('produces a new id but same content', () => {
+		let line = emptyLine();
+		line = processFieldUpdate(
+			[line, emptyLine()],
+			line.id,
+			'd',
+			'v'
+		)[0] as typeof line;
+		const dupe = duplicateLine(line);
+		expect(dupe.id).not.toBe(line.id);
+		expect(dupe.itemType).toBe(ItemType.LINE_ITEM);
+		if (dupe.itemType === ItemType.LINE_ITEM) {
+			expect(dupe.literals).toEqual(line.literals);
+			expect(dupe.totalPence).toBe(line.totalPence);
+		}
+	});
+});
+
+describe('duplicateLine — EXTENDED_ITEM', () => {
+	it('produces a new id but same content', () => {
+		const item = emptyExtendedItem();
+		const dupe = duplicateLine(item);
+		expect(dupe.id).not.toBe(item.id);
+		expect(dupe.itemType).toBe(ItemType.EXTENDED_ITEM);
+	});
+});
+
+describe('duplicateLine — SUBTOTAL_ITEM', () => {
+	it('produces a new id and recursively duplicates children', () => {
+		const sub = emptySubtotalItem();
+		const originalChildId = sub.lines[0].id;
+		const dupe = duplicateLine(sub);
+		expect(dupe.id).not.toBe(sub.id);
+		expect(isSubtotalItem(dupe)).toBe(true);
+		if (isSubtotalItem(dupe)) {
+			expect(dupe.lines).toHaveLength(2);
+			// Children also get new ids
+			expect(dupe.lines[0].id).not.toBe(originalChildId);
+		}
 	});
 });
 
